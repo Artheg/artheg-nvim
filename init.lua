@@ -154,10 +154,10 @@ vim.g.gitblame_message_template = "<author> (<committer-date>) • <summary>"
 plug {'neoclide/coc.nvim', branch='release'}
 
 plug {'ms-jpq/coq.artifacts', branch='artifacts' }
-plug {'nvim-treesitter/nvim-treesitter', run=':TSUpdate'}
-plug 'tree-sitter/tree-sitter-typescript'
-local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
-parser_config.typescript.used_by = { "typescript" }
+-- plug {'nvim-treesitter/nvim-treesitter', run=':TSUpdate'}
+-- plug 'tree-sitter/tree-sitter-typescript'
+-- local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
+-- parser_config.typescript.used_by = { "typescript" }
 plug {'ms-jpq/chadtree', branch='chad', run='python3 -m chadtree deps'}
 -- require('lsp');
 
@@ -197,8 +197,11 @@ vim.cmd[[colorscheme ayu]]
 -- coloscheme switcher
 plug 'xolox/vim-misc'
 plug 'xolox/vim-colorscheme-switcher'
+plug 'honza/vim-snippets'
 
 -- Keybindings
+
+vim.api.nvim_set_keymap('i', '<C-l>', '<Plug>(coc-snippets-vim)', {})
 
 ----- Floaterm
 
@@ -210,13 +213,13 @@ vim.api.nvim_set_keymap('n', '<Leader>gg', ':!git gui<cr><cr>', {silent=true})
 vim.api.nvim_set_keymap('n', '<Leader>gt', ':!alacritty -t tig -e tig <cr><cr>', {silent=true}) 
 
 ----- LSP
-vim.api.nvim_set_keymap('n', '<Leader>k', ':lua vim.lsp.buf.code_action()<CR>', {silent=true}) 
-vim.api.nvim_set_keymap('n', '<Leader>s', ':LspSignatureHelp<CR>', {silent=true}) 
-vim.api.nvim_set_keymap('n', 'gf', ':LspDef<CR>', {silent=true}) 
+-- vim.api.nvim_set_keymap('n', '<Leader>k', ':lua vim.lsp.buf.code_action()<CR>', {silent=true}) 
+-- vim.api.nvim_set_keymap('n', '<Leader>s', ':LspSignatureHelp<CR>', {silent=true}) 
+-- vim.api.nvim_set_keymap('n', 'gf', ':LspDef<CR>', {silent=true}) 
 
 -- Angular
 vim.api.nvim_set_keymap('n', '<Leader>ac', '/constructor<Esc>:nohl<cr>f(a<cr>', {silent=true}) 
-vim.api.nvim_set_keymap('n', '<Leader>at', '/.component.html<cr>gf', {silent=true}) 
+vim.api.nvim_set_keymap('n', '<Leader>at', '/.component.html<cr>gd', {silent=true}) 
 
 -----
 
@@ -255,7 +258,11 @@ vim.api.nvim_set_keymap('i', '<F10>', '<ESC>:Neoormat<CR>a', {})
 -----
 
 ----- Clipboard
-vim.api.nvim_set_keymap('i', '<C-v>', '<ESC>+p<S-v>==ea', {noremap=true})
-vim.api.nvim_set_keymap('v', '<C-c>', '<ESC>"+p<S-v>==ea', {noremap=true})
-vim.api.nvim_set_keymap('n', '<C-S-v>', '"+p', {noremap=true})
-vim.api.nvim_set_keymap('v', '<C-d>', '"+d', {noremap=true})
+vim.api.nvim_set_keymap('i', '<C-v>', '<ESC>"+p<S-v>==ea', {noremap=true})
+vim.api.nvim_set_keymap('v', '<C-c>', '"+y', {noremap=true})
+vim.api.nvim_set_keymap('n', '<C-v>', '"+p', {noremap=true})
+vim.api.nvim_set_keymap('v', '<C-S-v>', '"+p<S-v>==ea', {noremap=true})
+
+----- coc.nvim
+vim.api.nvim_set_keymap('n', 'K', ':call CocAction("doHover")<CR>', {silent=true} )
+vim.api.nvim_set_keymap('n', 'gd', ':call CocAction("jumpDefinition")<CR>', {silent=true} )

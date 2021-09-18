@@ -1,6 +1,7 @@
 {
 	"signature.enable": true,
 	"suggest.autoTrigger": "always",
+  "suggest.enablePreview": true,
 	"prettier.tslintIntegration": false,
   "prettier.proseWrap": "never",
   "prettier.singleQuote": true,
