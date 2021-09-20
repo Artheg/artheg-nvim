@@ -153,7 +153,7 @@ vim.g.gitblame_message_template = "<author> (<committer-date>) • <summary>"
 
 plug {'neoclide/coc.nvim', branch='release'}
 
-plug {'ms-jpq/coq.artifacts', branch='artifacts' }
+-- plug {'ms-jpq/coq.artifacts', branch='artifacts' }
 -- plug {'nvim-treesitter/nvim-treesitter', run=':TSUpdate'}
 -- plug 'tree-sitter/tree-sitter-typescript'
 -- local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
