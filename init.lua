@@ -76,7 +76,7 @@ plug 'ptzz/lf.vim'
 vim.g['lf_replace_netrw'] = 1
 vim.g['lf_map_keys'] = 0
 
-vim.api.nvim_set_keymap( 'n', '<leader>e', ':lua require("telescope.builtin").file_browser({cwd = vim.fn.expand("%:p:h")})<CR>', {} )
+vim.api.nvim_set_keymap( 'n', '<leader>e', ':CHADopen<CR>', {silent=true} )
 --
 
 -- opening screen
@@ -216,6 +216,10 @@ vim.api.nvim_set_keymap('n', '<Leader>gt', ':!alacritty -t tig -e tig <cr><cr>',
 -- vim.api.nvim_set_keymap('n', '<Leader>k', ':lua vim.lsp.buf.code_action()<CR>', {silent=true}) 
 -- vim.api.nvim_set_keymap('n', '<Leader>s', ':LspSignatureHelp<CR>', {silent=true}) 
 -- vim.api.nvim_set_keymap('n', 'gf', ':LspDef<CR>', {silent=true}) 
+
+----- Coc
+vim.api.nvim_set_keymap('n', '<Leader>gf', ':CocFix<CR>', {silent=true}) 
+vim.api.nvim_set_keymap('n', '<Leader>gto', ':CocCommand tsserver.organizeImports<CR>', {silent=true}) 
 
 -- Angular
 vim.api.nvim_set_keymap('n', '<Leader>ac', '/constructor<Esc>:nohl<cr>f(a<cr>', {silent=true}) 
