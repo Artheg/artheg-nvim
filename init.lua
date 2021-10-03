@@ -240,8 +240,21 @@ vim.api.nvim_set_keymap('n', '<Leader>tp', ':Telescope projects<CR>', {silent=tr
 -----
 
 ----- Windows
+vim.cmd[[
+let windowMaximized = 1
+function! ToggleWindowMaximize()
+ if g:windowMaximized
+   :exe "normal \<C-w>_ \<C-w>|"
+   let g:windowMaximized = 0
+ else
+   :exe "normal \<C-w>="
+   let g:windowMaximized = 1
+ endif
+endfunction
+]]
 vim.api.nvim_set_keymap('n', 'L', '<c-w><c-w>', {silent=true}) 
 vim.api.nvim_set_keymap('n', 'H', '<c-w>W', {silent=true}) 
+vim.api.nvim_set_keymap('n', '<C-x>', ':call ToggleWindowMaximize()<cr>', {silent=true})
 -----
 
 ----- CHADTree
