@@ -18,11 +18,16 @@ vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
 
 vim.opt.scrolloff = 25
+-- cursor line
+vim.cmd[[set cursorline]]
 
 -- confirm save on q
 vim.opt.confirm = true
 -- hide buffers instead of closing them
 vim.opt.hidden = true
+
+-- disable highlight search
+vim.cmd[[set nohlsearch]]
 
 -- change active directory based on current active file
 -- vim.opt.autochdir = true
@@ -54,7 +59,12 @@ local plug = require('paq-nvim').paq
 plug {'savq/paq-nvim', opt=true}
 
 -- lexima (autocomplete {} () etc.)
-plug 'cohama/lexima.vim'
+-- plug 'cohama/lexima.vim'
+plug 'windwp/nvim-autopairs'
+
+-- git signs and hunk actions
+plug 'lewis6991/gitsigns.nvim'
+require('gitsigns').setup()
 
 -- Rooter
 plug 'ahmedkhalf/project.nvim'
@@ -84,43 +94,35 @@ vim.api.nvim_set_keymap( 'n', '<leader>e', ':CHADopen<CR>', {silent=true} )
 plug 'glepnir/dashboard-nvim'
 vim.g['dashboard_default_executive'] = 'telescope'
 vim.g['dashboard_custom_header'] = {
-
-  [[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀          ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ]],
-  [[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀          ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ]],
-  [[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀          ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ]],
-  [[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀          ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ]],
-  [[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀          ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ]],
-  [[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀          ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ]],
-  [[⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣠⣤⣤⣴⣦⣤⣤⣄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ]],
-  [[⠀⠀⠀⠀⠀⠀⢀⣤⣾⣿⣿⣿⣿⠿⠿⠿⠿⣿⣿⣿⣿⣶⣤⡀⠀⠀⠀⠀⠀⠀ ]],
-  [[⠀⠀⠀⠀⣠⣾⣿⣿⡿⠛⠉⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⢿⣿⣿⣶⡀⠀⠀⠀⠀ ]],
-  [[⠀⠀⠀⣴⣿⣿⠟⠁⠀⠀⠀⣶⣶⣶⣶⡆⠀⠀⠀⠀⠀⠀⠈⠻⣿⣿⣦⠀⠀⠀ ]],
-  [[⠀⠀⣼⣿⣿⠋⠀⠀⠀⠀⠀⠛⠛⢻⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠙⣿⣿⣧⠀⠀ ]],
-  [[⠀⢸⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⢀⣿⣿⣷⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⣿⡇⠀ ]],
-  [[⠀⣿⣿⡿⠀⠀⠀⠀⠀⠀⠀⠀⢀⣾⣿⣿⣿⣇⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⠀ ]],
-  [[⠀⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀⢠⣿⣿⡟⢹⣿⣿⡆⠀⠀⠀⠀⠀⠀⠀⣹⣿⣿⠀ ]],
-  [[⠀⣿⣿⣷⠀⠀⠀⠀⠀⠀⣰⣿⣿⠏⠀⠀⢻⣿⣿⡄⠀⠀⠀⠀⠀⠀⣿⣿⡿⠀ ]],
-  [[⠀⢸⣿⣿⡆⠀⠀⠀⠀⣴⣿⡿⠃⠀⠀⠀⠈⢿⣿⣷⣤⣤⡆⠀⠀⣰⣿⣿⠇⠀ ]],
-  [[⠀⠀⢻⣿⣿⣄⠀⠀⠾⠿⠿⠁⠀⠀⠀⠀⠀⠘⣿⣿⡿⠿⠛⠀⣰⣿⣿⡟⠀⠀ ]],
-  [[⠀⠀⠀⠻⣿⣿⣧⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣾⣿⣿⠏⠀⠀⠀ ]],
-  [[⠀⠀⠀⠀⠈⠻⣿⣿⣷⣤⣄⡀⠀⠀⠀⠀⠀⠀⢀⣠⣴⣾⣿⣿⠟⠁⠀⠀⠀⠀ ]],
-  [[⠀⠀⠀⠀⠀⠀⠈⠛⠿⣿⣿⣿⣿⣿⣶⣶⣿⣿⣿⣿⣿⠿⠋⠁⠀⠀⠀⠀⠀⠀ ]],
-  [[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠛⠛⠛⠛⠛⠛⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ]],
-  [[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀          ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ]],
-  [[  Right man in the wrong place ]],
-  [[  can make all the difference  ]],
-  [[         in the world          ]],
-  [[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠛⠛⠛⠛⠛⠛⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ]],
-  [[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀          ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ]],
-  [[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀          ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ]],
-  [[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀          ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ]],
-  [[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀          ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ]],
-  [[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀          ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ]],
-  [[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀          ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ]],
-  [[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀          ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ]],
-  [[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀          ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ]],
-  [[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀          ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ]],
-}
+[[                                     ]],
+[[                                     ]],
+[[            &&&&&&&&&&&&&%           ]],
+[[        %&&&#            &&&%        ]],
+[[      &&%&                  &&&      ]],
+[[     %&&                      &&     ]],
+[[    %&%                       *&&    ]],
+[[    &&%        &&&&%&&&&&%     &&    ]],
+[[    &&&        &&&&&&&&&&&&&   &&    ]],
+[[     &&#       &&&&&&&&&&&&&&&&&%    ]],
+[[      &&%,,,,,,&&&&&&&&&&&&&&&&%     ]],
+[[       (&&&&&&&&&&&&&&&&&&&&&%       ]],
+[[          %&&&&&&&&&&&&&&&&          ]],
+[[                #%%&&#               ]],
+[[                                     ]],
+[[      Right man in the wrong place   ]],
+[[      can make all the difference    ]],
+[[             in the world            ]],
+[[              ⠉⠉⠛⠛⠛⠛⠛⠛⠉⠉             ]],
+[[                                     ]],
+[[                                     ]],
+[[                                     ]],
+[[                                     ]],
+[[                                     ]],
+[[                                     ]],
+[[                                     ]],
+[[                                     ]],
+[[                                     ]]
+}     
 vim.g['dashboard_custom_footer'] = {}
 
 -- bottom line
@@ -189,11 +191,10 @@ plug 'kdheepak/monochrome.nvim'
 plug 'flazz/vim-colorschemes'
 
 -- transparent bg
-vim.cmd[[au ColorScheme * hi Normal ctermbg=none guibg=none]]
-vim.cmd[[au ColorScheme * hi Normal ctermbg=none guibg=none]]
-vim.cmd[[colorscheme ayu]]
--- vim.api.nvim_command('COQnow')
-
+-- vim.cmd[[au ColorScheme * hi Normal ctermbg=none guibg=none]]
+-- vim.cmd[[au ColorScheme * hi NonText  ctermbg=none guibg=none]]
+vim.cmd[[colorscheme alduin]]
+vim.cmd[[hi CocUnusedHighlight guibg=yellow guifg=black]]
 -- coloscheme switcher
 plug 'xolox/vim-misc'
 plug 'xolox/vim-colorscheme-switcher'
@@ -264,8 +265,8 @@ vim.api.nvim_set_keymap('i', '<F10>', '<ESC>:Neoormat<CR>a', {})
 ----- Clipboard
 vim.api.nvim_set_keymap('i', '<C-v>', '<ESC>"+p<S-v>==ea', {noremap=true})
 vim.api.nvim_set_keymap('v', '<C-c>', '"+y', {noremap=true})
-vim.api.nvim_set_keymap('n', '<C-v>', '"+p', {noremap=true})
-vim.api.nvim_set_keymap('v', '<C-S-v>', '"+p<S-v>==ea', {noremap=true})
+vim.api.nvim_set_keymap('n', '<C-S-v>', '"+p', {noremap=true})
+vim.api.nvim_set_keymap('v', '<C-v>', '"+p<S-v>==ea', {noremap=true})
 
 ----- coc.nvim
 vim.api.nvim_set_keymap('n', 'K', ':call CocAction("doHover")<CR>', {silent=true} )
