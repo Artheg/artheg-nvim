@@ -193,8 +193,11 @@ plug 'flazz/vim-colorschemes'
 -- transparent bg
 -- vim.cmd[[au ColorScheme * hi Normal ctermbg=none guibg=none]]
 -- vim.cmd[[au ColorScheme * hi NonText  ctermbg=none guibg=none]]
+
 vim.cmd[[colorscheme alduin]]
-vim.cmd[[hi CocUnusedHighlight guibg=yellow guifg=black]]
+vim.cmd[[hi CocUnusedHighlight gui=bold,underline guibg=darkyellow guifg=black]]
+vim.cmd[[hi CocErrorHighlight gui=bold,underline guibg=darkred guifg=white]]
+vim.cmd[[hi CursorLine gui=bold,underline guibg=#001520]]
 -- coloscheme switcher
 plug 'xolox/vim-misc'
 plug 'xolox/vim-colorscheme-switcher'
