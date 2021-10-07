@@ -214,7 +214,7 @@ vim.api.nvim_set_keymap('t', '<F9>', '<C-\\><C-n>:FloatermToggle<CR>', {silent=t
 
 ----- Git
 vim.api.nvim_set_keymap('n', '<Leader>gg', ':!git gui<cr><cr>', {silent=true}) 
-vim.api.nvim_set_keymap('n', '<Leader>gt', ':!alacritty -t tig -e tig <cr><cr>', {silent=true}) 
+vim.api.nvim_set_keymap('n', '<Leader>gt', ':!$TERM -t tig -e tig <cr><cr>', {silent=true}) 
 
 ----- LSP
 -- vim.api.nvim_set_keymap('n', '<Leader>k', ':lua vim.lsp.buf.code_action()<CR>', {silent=true}) 
