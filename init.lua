@@ -153,15 +153,21 @@ vim.g.gitblame_message_template = "<author> (<committer-date>) • <summary>"
 
 ------- LSP
 
-plug {'neoclide/coc.nvim', branch='release'}
+-- plug {'neoclide/coc.nvim', branch='release'}
 
--- plug {'ms-jpq/coq.artifacts', branch='artifacts' }
--- plug {'nvim-treesitter/nvim-treesitter', run=':TSUpdate'}
+plug {'ms-jpq/coq.artifacts', branch='artifacts' }
+plug {'nvim-treesitter/nvim-treesitter', run=':TSUpdate'}
+require'nvim-treesitter.configs'.setup{
+  highlight = {
+    enable = true
+  },
+}
 -- plug 'tree-sitter/tree-sitter-typescript'
--- local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
--- parser_config.typescript.used_by = { "typescript" }
+local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
+parser_config.typescript.used_by = { "typescript" }
+parser_config.c.used_by = { "c" }
 plug {'ms-jpq/chadtree', branch='chad', run='python3 -m chadtree deps'}
--- require('lsp');
+require('lsp');
 
 ---- HTML
 --local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -185,16 +191,22 @@ plug {'ms-jpq/chadtree', branch='chad', run='python3 -m chadtree deps'}
 --  end,
 --}
 ----- colorschemes
+plug 'kyazdani42/blue-moon'
 plug 'bluz71/vim-nightfly-guicolors'
 plug 'Pocco81/Catppuccino.nvim'
 plug 'kdheepak/monochrome.nvim'
 plug 'flazz/vim-colorschemes'
+plug 'savq/melange'
+plug 'fenetikm/falcon'
+
+vim.g.falcon_background = 1
+vim.g.falcon_inactive = 1
 
 -- transparent bg
--- vim.cmd[[au ColorScheme * hi Normal ctermbg=none guibg=none]]
--- vim.cmd[[au ColorScheme * hi NonText  ctermbg=none guibg=none]]
 
-vim.cmd[[colorscheme alduin]]
+vim.cmd[[colorscheme boa]]
+vim.cmd[[au ColorScheme * hi Normal ctermbg=none guibg=none]]
+vim.cmd[[au ColorScheme * hi NonText  ctermbg=none guibg=none]]
 vim.cmd[[hi CocUnusedHighlight gui=bold,underline guibg=darkyellow guifg=black]]
 vim.cmd[[hi CocErrorHighlight gui=bold,underline guibg=darkred guifg=white]]
 vim.cmd[[hi CursorLine gui=bold,underline guibg=#001520]]
@@ -222,8 +234,8 @@ vim.api.nvim_set_keymap('n', '<Leader>gt', ':!$TERM -t tig -e tig <cr><cr>', {si
 -- vim.api.nvim_set_keymap('n', 'gf', ':LspDef<CR>', {silent=true}) 
 
 ----- Coc
-vim.api.nvim_set_keymap('n', '<Leader>gf', ':CocFix<CR>', {silent=true}) 
-vim.api.nvim_set_keymap('n', '<Leader>gto', ':CocCommand tsserver.organizeImports<CR>', {silent=true}) 
+-- vim.api.nvim_set_keymap('n', '<Leader>gf', ':CocFix<CR>', {silent=true}) 
+-- vim.api.nvim_set_keymap('n', '<Leader>gto', ':CocCommand tsserver.organizeImports<CR>', {silent=true}) 
 
 -- Angular
 vim.api.nvim_set_keymap('n', '<Leader>ac', '/constructor<Esc>:nohl<cr>f(a<cr>', {silent=true}) 
@@ -285,5 +297,5 @@ vim.api.nvim_set_keymap('n', '<C-S-v>', '"+p', {noremap=true})
 vim.api.nvim_set_keymap('v', '<C-v>', '"+p<S-v>==ea', {noremap=true})
 
 ----- coc.nvim
-vim.api.nvim_set_keymap('n', 'K', ':call CocAction("doHover")<CR>', {silent=true} )
-vim.api.nvim_set_keymap('n', 'gd', ':call CocAction("jumpDefinition")<CR>', {silent=true} )
+-- vim.api.nvim_set_keymap('n', 'K', ':call CocAction("doHover")<CR>', {silent=true} )
+-- vim.api.nvim_set_keymap('n', 'gd', ':call CocAction("jumpDefinition")<CR>', {silent=true} )

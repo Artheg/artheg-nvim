@@ -190,3 +190,7 @@ require'lspconfig'.angularls.setup{
     new_config.cmd = cmd
   end,
 }
+
+require'lspconfig'.clangd.setup{
+  on_attach = on_attach
+}
