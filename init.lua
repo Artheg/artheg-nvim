@@ -8,14 +8,15 @@ vim.opt.mouse = 'a'
 -- smartcase search
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
--- syntax highlight
-vim.opt.syntax = 'on'
 --  important for some themes I use
 vim.opt.termguicolors = true
 -- spaces instead tabs
 vim.opt.expandtab = true
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
+
+-- syntax highlight
+vim.opt.syntax = 'on'
 
 vim.opt.scrolloff = 25
 -- cursor line
@@ -43,6 +44,9 @@ vim.opt.updatetime=500
 -- Resize vim's windows automatically on the terminal window resize
 vim.cmd[[autocmd VimResized * wincmd =]]
 
+-- Close quickfix and location list after selecting item
+-- vim.cmd[[:autocmd FileType qf nnoremap <buffer> <CR> <CR>:cclose<CR>]]
+
 ----------------- PAQ plugin manager
 local fn = vim.fn
 
@@ -55,8 +59,14 @@ end
 -- Set the short hand
 local plug = require('paq-nvim').paq
 
+-- extends match (matches special words)
+plug 'andymass/vim-matchup'
+
 -- Make paq manage it self
 plug {'savq/paq-nvim', opt=true}
+
+-- create themes with live preview
+plug {'rktjmp/lush.nvim'}
 
 -- lexima (autocomplete {} () etc.)
 -- plug 'cohama/lexima.vim'
@@ -80,6 +90,9 @@ vim.g['ale_linters'] = { javascript = {'eslintd'}, typescript = {'eslintd'} }
 -- floating terminal
 plug 'voldikss/vim-floaterm'
 --
+
+-- better word motion (e.g. CamelCase)
+plug 'chaoren/vim-wordmotion'
 
 -- lf file manager
 plug 'ptzz/lf.vim'
@@ -127,6 +140,7 @@ vim.g['dashboard_custom_footer'] = {}
 
 -- bottom line
 plug 'itchyny/lightline.vim'
+vim.g.lightline = { colorscheme='wombat' }
 --
 
 -- formatter
@@ -139,6 +153,9 @@ plug 'tpope/vim-commentary'
 plug 'nvim-lua/plenary.nvim'
 plug 'nvim-telescope/telescope.nvim'
 require('telescope').load_extension('projects')
+
+-- highlight hex colors
+plug 'chrisbra/Colorizer'
 
 ----- git
 
@@ -161,12 +178,17 @@ require'nvim-treesitter.configs'.setup{
   highlight = {
     enable = true
   },
+  matchup = {
+    enable = true
+  }
 }
 -- plug 'tree-sitter/tree-sitter-typescript'
 local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
 parser_config.typescript.used_by = { "typescript" }
 parser_config.c.used_by = { "c" }
 plug {'ms-jpq/chadtree', branch='chad', run='python3 -m chadtree deps'}
+local chadtree_settings = { theme = { text_colour_set = 'nord' } }
+vim.api.nvim_set_var('chadtree_settings', chadtree_settings)
 require('lsp');
 
 ---- HTML
@@ -190,34 +212,26 @@ require('lsp');
 --    new_config.cmd = cmd
 --  end,
 --}
------ colorschemes
-plug 'kyazdani42/blue-moon'
-plug 'bluz71/vim-nightfly-guicolors'
-plug 'Pocco81/Catppuccino.nvim'
-plug 'kdheepak/monochrome.nvim'
-plug 'flazz/vim-colorschemes'
-plug 'savq/melange'
-plug 'fenetikm/falcon'
-
-vim.g.falcon_background = 1
-vim.g.falcon_inactive = 1
-
--- transparent bg
-
-vim.cmd[[colorscheme boa]]
-vim.cmd[[au ColorScheme * hi Normal ctermbg=none guibg=none]]
-vim.cmd[[au ColorScheme * hi NonText  ctermbg=none guibg=none]]
-vim.cmd[[hi CocUnusedHighlight gui=bold,underline guibg=darkyellow guifg=black]]
-vim.cmd[[hi CocErrorHighlight gui=bold,underline guibg=darkred guifg=white]]
-vim.cmd[[hi CursorLine gui=bold,underline guibg=#001520]]
--- coloscheme switcher
-plug 'xolox/vim-misc'
-plug 'xolox/vim-colorscheme-switcher'
-plug 'honza/vim-snippets'
 
 -- Keybindings
 
-vim.api.nvim_set_keymap('i', '<C-l>', '<Plug>(coc-snippets-vim)', {})
+-- vim.api.nvim_set_keymap('i', '<C-l>', '<Plug>(coc-snippets-vim)', {})
+
+----- quickfix
+vim.api.nvim_set_keymap('n', '<C-j>', ':cnext<CR>', {})
+vim.api.nvim_set_keymap('n', '<C-k>', ':cprevious<CR>', {})
+vim.api.nvim_set_keymap('n', '<Leader>cc', ':cclose<CR>', {})
+vim.api.nvim_set_keymap('n', '<Leader>co', ':copen<CR>', {})
+
+----- Dashboard
+vim.api.nvim_set_keymap('n','<Leader>fb',':DashboardJumpMark<CR>', { noremap = true , silent = false })
+vim.api.nvim_set_keymap('n','<Leader>tc',':DashboardChangeColorscheme<CR>', { noremap = true , silent = false })
+vim.api.nvim_set_keymap('n','<Leader>ff',':DashboardFindFile<CR>', { noremap = true , silent = false })
+vim.api.nvim_set_keymap('n','<Leader>fh',':DashboardFindHistory<CR>', { noremap = true , silent = false })
+vim.api.nvim_set_keymap('n','<Leader>fa',':DashboardFindHistory<CR>', { noremap = true , silent = false })
+vim.api.nvim_set_keymap('n','<Leader>sl',':<C-u>SessionLoad<CR>', { noremap = true , silent = false })
+vim.api.nvim_set_keymap('n','<Leader>fa',':DashboardFindWord<CR>', { noremap = true , silent = false })
+vim.api.nvim_set_keymap('n','<Leader>cn',':DashboardNewFile<CR>i', { noremap = true , silent = false })
 
 ----- Floaterm
 
@@ -277,6 +291,16 @@ vim.api.nvim_set_keymap('n', '<c-b>', ':CHADopen<cr>', {silent=true})
 -----
 
 ----- Edit
+-- Emacs-like movement for instert mode
+vim.api.nvim_set_keymap('i', '<C-b>', '<C-o>b', {})
+
+vim.api.nvim_set_keymap('i', '<C-f>', '<C-o>w', {})
+vim.api.nvim_set_keymap('i', '<C-a>', '<C-o>I', {})
+vim.api.nvim_set_keymap('i', '<C-e>', '<C-o>A', {})
+-- go to normal mode
+vim.api.nvim_set_keymap('i', '<C-l>', '<ESC>', {})
+
+
 -- save all
 vim.api.nvim_set_keymap('n', '<C-A-s>', ':wall<CR>', {}) 
 vim.api.nvim_set_keymap('i', '<C-A-s>', ':wall<CR>', {}) 
@@ -299,3 +323,29 @@ vim.api.nvim_set_keymap('v', '<C-v>', '"+p<S-v>==ea', {noremap=true})
 ----- coc.nvim
 -- vim.api.nvim_set_keymap('n', 'K', ':call CocAction("doHover")<CR>', {silent=true} )
 -- vim.api.nvim_set_keymap('n', 'gd', ':call CocAction("jumpDefinition")<CR>', {silent=true} )
+
+
+----- colorschemes
+plug 'kyazdani42/blue-moon'
+plug 'bluz71/vim-nightfly-guicolors'
+plug 'Pocco81/Catppuccino.nvim'
+plug 'kdheepak/monochrome.nvim'
+plug 'flazz/vim-colorschemes'
+plug 'savq/melange'
+plug 'fenetikm/falcon'
+plug 'ayu-theme/ayu-vim'
+
+vim.g.falcon_background = 0
+vim.g.falcon_inactive = 1
+
+vim.cmd[[colorscheme melange]]
+-- transparent bg
+vim.cmd[[autocmd vimenter * hi Normal guibg=none guifg=none ctermbg=none ctermfg=none]]
+vim.cmd[[autocmd vimenter * hi NormalNC guibg=none guifg=none ctermbg=none ctermfg=none]]
+vim.cmd[[autocmd vimenter * hi NonText guibg=none guifg=none ctermbg=none ctermfg=none]]
+vim.cmd[[autocmd vimenter * hi Visual guibg=#333344 guifg=none ctermbg=none ctermfg=none]]
+-- -- coloscheme switcher
+plug 'xolox/vim-misc'
+plug 'xolox/vim-colorscheme-switcher'
+-- plug 'honza/vim-snippets'
+

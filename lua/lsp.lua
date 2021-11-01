@@ -3,6 +3,15 @@ local plug = require('paq-nvim').paq
 -- Neovim LSP Integration
 plug 'neovim/nvim-lspconfig'
 
+-- colors for lsp diagnostics events (warning, error, etc.)
+plug 'folke/lsp-colors.nvim'
+require("lsp-colors").setup({
+  Error = "#db4b4b",
+  Warning = "#e0af68",
+  Information = "#0db9d7",
+  Hint = "#10B981"
+})
+
 -- treesitter (syntax parser)
 plug {'nvim-treesitter/nvim-treesitter', run=':TSUpdate'}
 plug 'tree-sitter/tree-sitter-typescript'
@@ -72,7 +81,7 @@ local format_async = function(err, _, result, _, bufnr)
         end
     end
 end
-vim.lsp.handlers["textDocument/formatting"] = format_async
+-- vim.lsp.handlers["textDocument/formatting"] = format_async
 _G.lsp_organize_imports = function()
     local params = {
         command = "_typescript.organizeImports",
@@ -82,7 +91,7 @@ _G.lsp_organize_imports = function()
     vim.lsp.buf.execute_command(params)
 end
 local on_attach = function(client, bufnr)
-    require "lsp_signature".on_attach()
+    require "lsp_signature".on_attach(client)
     local buf_map = vim.api.nvim_buf_set_keymap
     vim.cmd("command! LspDef lua vim.lsp.buf.definition()")
     vim.cmd("command! LspFormatting lua vim.lsp.buf.formatting()")
@@ -180,17 +189,38 @@ require'lspconfig'.html.setup {
 nvim_lsp.html.setup{}
 
 -- Angular
-local project_library_path = "/usr/lib/node_modules"
-local cmd = {"ngserver", "--stdio", "--tsProbeLocations", project_library_path , "--ngProbeLocations", project_library_path}
+-- local project_library_path = "/usr/lib/node_modules"
+-- local cmd = {"ngserver", "--stdio", "--tsProbeLocations", project_library_path , "--ngProbeLocations", project_library_path}
 
-require'lspconfig'.angularls.setup{
-  cmd = cmd,
-  on_attach = on_attach,
-  on_new_config = function(new_config,new_root_dir)
-    new_config.cmd = cmd
-  end,
-}
+-- require'lspconfig'.angularls.setup{
+--   cmd = cmd,
+--   on_attach = on_attach,
+--   on_new_config = function(new_config,new_root_dir)
+--     new_config.cmd = cmd
+--   end,
+-- }
 
-require'lspconfig'.clangd.setup{
+require'lspconfig'.cmake.setup{
   on_attach = on_attach
 }
+
+require'lspconfig'.ccls.setup {
+  on_attach = on_attach,
+  init_options = {
+    compilationDatabaseDirectory = "build";
+    index = {
+      threads = 0;
+    };
+    clang = {
+      excludeArgs = { "-frounding-math"} ;
+    };
+  }
+}
+
+-- icons for lsp
+-- https://github.com/folke/trouble.nvim/issues/52#issuecomment-863885779
+local signs = { Error = " ", Warning = " ", Hint = " ", Information = " " }
+for type, icon in pairs(signs) do
+  local hl = "LspDiagnosticsSign" .. type
+  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
+end
