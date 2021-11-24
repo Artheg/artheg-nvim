@@ -17,7 +17,7 @@ return {
 
     -- coq_nvim autocompletion
     use {'ms-jpq/coq_nvim', branch='coq', run=':COQdeps' }
-    vim.g.coq_settings = { auto_start=true, keymap = { recommended = false } }
+    vim.g.coq_settings = { auto_start=true, keymap = { recommended = true } }
 
     -- these mappings are coq recommended mappings unrelated to nvim-autopairs
     if remap then

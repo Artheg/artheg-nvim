@@ -205,7 +205,13 @@ return require('packer').startup(function(use)
 
   -- Keybindings
 
-  vim.api.nvim_set_keymap('i', '<C-l>', '<Plug>(coc-snippets-vim)', {})
+  ----- Navigation
+  vim.api.nvim_set_keymap('n', '<C-[>', ':tabprev<CR>', { silent = true })
+  vim.api.nvim_set_keymap('n', '<C-]>', ':tabnext<CR>', { silent = true })
+  vim.api.nvim_set_keymap('n', '<Leader>ct', ':tabclose<CR>', { silent = true })
+  vim.api.nvim_set_keymap('n', '<Leader>nt', ':tabnew<CR>', { silent = true })
+
+  -- vim.api.nvim_set_keymap('i', '<C-l>', '<Plug>(coc-snippets-vim)', {})
 
   ----- quickfix
   vim.api.nvim_set_keymap('n', '<C-j>', ':cnext<CR>', {})
@@ -224,9 +230,9 @@ return require('packer').startup(function(use)
   vim.api.nvim_set_keymap('n','<Leader>cn',':DashboardNewFile<CR>i', { noremap = true , silent = false })
 
   ------- Floaterm
-
   vim.api.nvim_set_keymap('n', '<F9>', ':FloatermToggle<cr>', {silent=true})
   vim.api.nvim_set_keymap('t', '<F9>', '<C-\\><C-n>:FloatermToggle<CR>', {silent=true, noremap=true})
+  vim.g.floaterm_opener = 'drop'
 
   ------- Git
   vim.api.nvim_set_keymap('n', '<Leader>gg', ':!git gui<cr><cr>', {silent=true})
@@ -291,7 +297,7 @@ return require('packer').startup(function(use)
     vim.api.nvim_set_keymap('i', '<C-A-s>', ':wall<CR>', {})
     -- save current
     vim.api.nvim_set_keymap('n', '<C-s>', '<ESC>:w<CR>', {})
-    vim.api.nvim_set_keymap('i', '<C-s>', '<ESC>:w<CR>a', {})
+    vim.api.nvim_set_keymap('i', '<C-s>', '<ESC>:w<CR>', {})
     -----
 
     ----- Format
