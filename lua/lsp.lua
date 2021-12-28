@@ -17,44 +17,50 @@ return {
 
     -- coq_nvim autocompletion
     use {'ms-jpq/coq_nvim', branch='coq', run=':COQdeps' }
-    vim.g.coq_settings = { auto_start=true, keymap = { recommended = true } }
+    vim.g.coq_settings = { auto_start=true, keymap = { recommended = true}, clients = { lsp = { resolve_timeout = 3000 }} }
 
-    -- these mappings are coq recommended mappings unrelated to nvim-autopairs
-    if remap then
-      remap('i', '<esc>', [[pumvisible() ? "<c-e><esc>" : "<esc>"]], { expr = true, noremap = true })
-      remap('i', '<c-c>', [[pumvisible() ? "<c-e><c-c>" : "<c-c>"]], { expr = true, noremap = true })
-      remap('i', '<tab>', [[pumvisible() ? "<c-n>" : "<tab>"]], { expr = true, noremap = true })
-      remap('i', '<s-tab>', [[pumvisible() ? "<c-p>" : "<bs>"]], { expr = true, noremap = true })
-    end
-    -- skip it, if you use another global object
-    _G.MUtils= {}
+  use 'windwp/nvim-autopairs'
+  local has_npairs,npairs = pcall(require, 'nvim-autopairs')
+  if has_npairs then
+    npairs.setup({ map_bs = false, map_cr = false })
+  end
 
-    MUtils.CR = function()
-      if vim.fn.pumvisible() ~= 0 then
-        if vim.fn.complete_info({ 'selected' }).selected ~= -1 then
-          return npairs.esc('<c-y>')
-        else
-          return npairs.esc('<c-e>') .. npairs.autopairs_cr()
-        end
-      else
-        return npairs.autopairs_cr()
-      end
-    end
-    if remap then
-      remap('i', '<cr>', 'v:lua.MUtils.CR()', { expr = true, noremap = true })
-    end
+local remap = vim.api.nvim_set_keymap
 
-    MUtils.BS = function()
-      if vim.fn.pumvisible() ~= 0 and vim.fn.complete_info({ 'mode' }).mode == 'eval' then
-        return npairs.esc('<c-e>') .. npairs.autopairs_bs()
-      else
-        return npairs.autopairs_bs()
-      end
-    end
-    if remap then
-      remap('i', '<bs>', 'v:lua.MUtils.BS()', { expr = true, noremap = true })
-    end
+npairs.setup({ map_bs = false, map_cr = false })
 
+vim.g.coq_settings = { keymap = { recommended = false } }
+
+-- these mappings are coq recommended mappings unrelated to nvim-autopairs
+remap('i', '<esc>', [[pumvisible() ? "<c-e><esc>" : "<esc>"]], { expr = true, noremap = true })
+remap('i', '<c-c>', [[pumvisible() ? "<c-e><c-c>" : "<c-c>"]], { expr = true, noremap = true })
+remap('i', '<tab>', [[pumvisible() ? "<c-n>" : "<tab>"]], { expr = true, noremap = true })
+remap('i', '<s-tab>', [[pumvisible() ? "<c-p>" : "<bs>"]], { expr = true, noremap = true })
+
+-- skip it, if you use another global object
+_G.MUtils= {}
+
+MUtils.CR = function()
+  if vim.fn.pumvisible() ~= 0 then
+    if vim.fn.complete_info({ 'selected' }).selected ~= -1 then
+      return npairs.esc('<c-y>')
+    else
+      return npairs.esc('<c-e>') .. npairs.autopairs_cr()
+    end
+  else
+    return npairs.autopairs_cr()
+  end
+end
+remap('i', '<cr>', 'v:lua.MUtils.CR()', { expr = true, noremap = true })
+
+MUtils.BS = function()
+  if vim.fn.pumvisible() ~= 0 and vim.fn.complete_info({ 'mode' }).mode == 'eval' then
+    return npairs.esc('<c-e>') .. npairs.autopairs_bs()
+  else
+    return npairs.autopairs_bs()
+  end
+end
+remap('i', '<bs>', 'v:lua.MUtils.BS()', { expr = true, noremap = true })
     -- lots of snippets from ms-jpg
     -- use {'ms-jpq/coq.artifacts', branch='artifacts' }
 
