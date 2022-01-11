@@ -314,7 +314,7 @@ return require('packer').startup(function(use)
     vim.api.nvim_set_keymap('v', '<C-v>', '"+p<S-v>==ea', {noremap=true})
 
     ----- Terminal
-    vim.api.nvim_set_keymap('n', '<A-t>', ':terminal<cr>', {noremap=true, silent=true})
+    vim.api.nvim_set_keymap('n', '<A-t>', ':terminal tig<cr>i', {noremap=true, silent=true})
 
     ----- coc.nvim
     -- vim.api.nvim_set_keymap('n', 'K', ':call CocAction("doHover")<CR>', {silent=true} )
