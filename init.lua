@@ -43,6 +43,9 @@ vim.opt.updatetime=500
 ---- Resize vim's windows automatically on the terminal window resize
 vim.cmd[[autocmd VimResized * wincmd =]]
 
+---- Toggle tmux panel when entering/exiting vim
+vim.cmd[[autocmd VimEnter,VimLeave * silent !tmux set status]]
+
 -- Close quickfix and location list after selecting item
 vim.cmd[[:autocmd FileType qf nnoremap <buffer> <CR> <CR>:cclose<CR>]]
 
@@ -90,8 +93,15 @@ return require('packer').startup(function(use)
   ---- ALE
   use 'dense-analysis/ale'
   vim.g['ale_fixers'] = {'eslint'}
-  vim.g['ale_linters'] = { javascript = {'eslintd'}, typescript = {'eslintd'} }
+  vim.g['ale_linters'] = { javascript = {'eslint'}, typescript = {'eslintd'} }
+  vim.g['ale_javascript_eslint_executable'] = 'eslint_d'
+  vim.g['ale_javascript_eslint_use_global'] = 1
+  vim.g['ale_typescript_eslint_executable'] = 'eslint_d'
+  vim.g['ale_typescript_eslint_use_global'] = 1
   ----
+
+  ---- Move blocks
+  use 'booperlv/nvim-gomove'
 
   ---- better word motion (e.g. CamelCase)
   use 'chaoren/vim-wordmotion'
@@ -142,10 +152,11 @@ return require('packer').startup(function(use)
   }
   vim.g['dashboard_custom_footer'] = {}
 
-  ---- bottom line
-  use 'vimpostor/vim-tpipeline'
-  -- use 'itchyny/lightline.vim'
-  -- vim.g.lightline = { colorscheme='melange' }
+  ---- status line
+  -- use 'adelarsq/neoline.vim'
+  -- use 'vimpostor/vim-tpipeline'
+  use 'itchyny/lightline.vim'
+  vim.g.lightline = { colorscheme='melange' }
   ----
 
   ---- formatter
@@ -179,7 +190,6 @@ return require('packer').startup(function(use)
 
   use {'ms-jpq/coq.artifacts', branch='artifacts' }
   use {'nvim-treesitter/nvim-treesitter', run=':TSUpdate'}
-  use 'tree-sitter/tree-sitter-typescript'
   local has_nvim_treesitter,nvim_treesitter = pcall(require, 'nvim-treesitter.configs')
   if has_nvim_treesitter then
     nvim_treesitter.setup{
@@ -238,7 +248,7 @@ return require('packer').startup(function(use)
 
   ------- Git
   vim.api.nvim_set_keymap('n', '<Leader>gg', ':!git gui<cr><cr>', {silent=true})
-  vim.api.nvim_set_keymap('n', '<Leader>gt', ':!$TERM -t tig -e tig <cr><cr>', {silent=true})
+  vim.api.nvim_set_keymap('n', '<Leader>gt', ':tabnew<CR> | :!$TERM -t tig -e tig <cr><cr>i', {silent=true})
 
   ------- Coc
   ---- vim.api.nvim_set_keymap('n', '<Leader>gf', ':CocFix<CR>', {silent=true})
@@ -303,8 +313,9 @@ return require('packer').startup(function(use)
     -----
 
     ----- Format
-    vim.api.nvim_set_keymap('n', '<F10>', ':Neoformat<CR>', {})
-    vim.api.nvim_set_keymap('i', '<F10>', '<ESC>:Neoormat<CR>a', {})
+    vim.api.nvim_set_keymap('n', '<F10>', '<ESC>:ALEFix<CR>', {})
+    vim.api.nvim_set_keymap('n', '<C-S-i>', '<ESC>:Neoformat<CR>a', { noremap=true })
+    vim.api.nvim_set_keymap('i', '<C-S-i>', '<ESC>:Neoformat<CR>a', { noremap=true })
     -----
 
     ----- Clipboard
