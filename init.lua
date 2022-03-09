@@ -77,6 +77,7 @@ return require('packer').startup(function(use)
 
   ---- git signs and hunk actions
   use {'lewis6991/gitsigns.nvim', requires = 'nvim-lua/plenary.nvim'}
+  use {'airblade/vim-gitgutter'}
   local has_gitsigns,gitsigns = pcall(require, 'gitsigns')
   if has_gitsigns then gitsigns.setup() end
 
@@ -156,7 +157,7 @@ return require('packer').startup(function(use)
   -- use 'adelarsq/neoline.vim'
   -- use 'vimpostor/vim-tpipeline'
   use 'itchyny/lightline.vim'
-  vim.g.lightline = { colorscheme='melange' }
+  -- vim.g.lightline = { colorscheme='melange' }
   ----
 
   ---- formatter
@@ -204,8 +205,8 @@ return require('packer').startup(function(use)
   -- use 'tree-sitter/tree-sitter-typescript'
   if has_nvim_treesitter then
     local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
-    parser_config.typescript.used_by = { "typescript" }
-    parser_config.c.used_by = { "c" }
+    -- parser_config.typescript.used_by = { "typescript" }
+    -- parser_config.c.used_by = { "c" }
   end
 
   use {'ms-jpq/chadtree', branch='chad', run=':CHADdeps'}
@@ -248,7 +249,7 @@ return require('packer').startup(function(use)
 
   ------- Git
   vim.api.nvim_set_keymap('n', '<Leader>gg', ':!git gui<cr><cr>', {silent=true})
-  vim.api.nvim_set_keymap('n', '<Leader>gt', ':tabnew<CR> | :!$TERM -t tig -e tig <cr><cr>i', {silent=true})
+  vim.api.nvim_set_keymap('n', '<Leader>gt', ':tabnew | :edit term://tig<CR>i', {silent=true})
 
   ------- Coc
   ---- vim.api.nvim_set_keymap('n', '<Leader>gf', ':CocFix<CR>', {silent=true})
@@ -313,6 +314,12 @@ return require('packer').startup(function(use)
     -----
 
     ----- Format
+    -- auto indent on paste
+    vim.api.nvim_set_keymap('n', 'p', ']p', { noremap=true })
+    vim.api.nvim_set_keymap('n', 'P', ']P', { noremap=true })
+    -- vim.api.nvim_set_keymap('n', '<C-p>', ']p', { noremap=true })
+    -- vim.api.nvim_set_keymap('n', '<C-P>', 'P', { noremap=true })
+
     vim.api.nvim_set_keymap('n', '<F10>', '<ESC>:ALEFix<CR>', {})
     vim.api.nvim_set_keymap('n', '<C-S-i>', '<ESC>:Neoformat<CR>a', { noremap=true })
     vim.api.nvim_set_keymap('i', '<C-S-i>', '<ESC>:Neoformat<CR>a', { noremap=true })
@@ -325,7 +332,7 @@ return require('packer').startup(function(use)
     vim.api.nvim_set_keymap('v', '<C-v>', '"+p<S-v>==ea', {noremap=true})
 
     ----- Terminal
-    vim.api.nvim_set_keymap('n', '<A-t>', ':terminal tig<cr>i', {noremap=true, silent=true})
+    -- vim.api.nvim_set_keymap('n', '<A-t>', ':terminal tig<cr>i', {noremap=true, silent=true})
 
     ----- coc.nvim
     -- vim.api.nvim_set_keymap('n', 'K', ':call CocAction("doHover")<CR>', {silent=true} )
@@ -345,7 +352,7 @@ return require('packer').startup(function(use)
     vim.g.falcon_background = 0
     vim.g.falcon_inactive = 1
 
-    vim.cmd[[colorscheme melange]]
+    vim.cmd[[colorscheme OceanicNext]]
     -- transparent bg
     vim.cmd[[autocmd vimenter * hi Normal guibg=none guifg=none ctermbg=none ctermfg=none]]
     vim.cmd[[autocmd vimenter * hi NormalNC guibg=none guifg=none ctermbg=none ctermfg=none]]
@@ -355,6 +362,25 @@ return require('packer').startup(function(use)
     -- use 'xolox/vim-misc'
     -- use 'xolox/vim-colorscheme-switcher'
     -- -- use 'honza/vim-snippets'
+    vim.cmd[[
+    " Open multiple lines (insert empty lines) before or after current line,
+    " and position cursor in the new space, with at least one blank line
+    " before and after the cursor.
+
+    function! OpenLines(nrlines, dir)
+    let nrlines = a:nrlines < 3 ? 3 : a:nrlines
+    let start = line('.') + a:dir
+    call append(start, repeat([''], nrlines))
+    if a:dir < 0
+      normal! 2k
+    else
+      normal! 2j
+      endif
+      endfunction
+      " Mappings to open multiple lines and enter insert mode.
+      nnoremap <Leader>o :<C-u>call OpenLines(v:count, 0)<CR>S
+      nnoremap <Leader>O :<C-u>call OpenLines(v:count, -1)<CR>S
+    ]]
 
     if packer_bootstrap then
       require('packer').sync()
