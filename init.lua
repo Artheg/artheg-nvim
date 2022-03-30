@@ -38,7 +38,7 @@ vim.cmd[[set nohlsearch]]
 ---- start scrolling before reaching n*th line
 vim.opt.scrolloff=25
 ----
-vim.opt.updatetime=500
+-- vim.opt.updatetime=500
 
 ---- Resize vim's windows automatically on the terminal window resize
 vim.cmd[[autocmd VimResized * wincmd =]]
@@ -60,6 +60,10 @@ return require('packer').startup(function(use)
 
   -- Packer can manage itself
   use 'wbthomason/packer.nvim'
+
+  use {'junegunn/fzf'}
+  use {'junegunn/fzf.vim'}
+
 
   ---- extends match (matches special words)
   use 'andymass/vim-matchup'
@@ -156,7 +160,7 @@ return require('packer').startup(function(use)
   ---- status line
   -- use 'adelarsq/neoline.vim'
   -- use 'vimpostor/vim-tpipeline'
-  use 'itchyny/lightline.vim'
+  -- use 'itchyny/lightline.vim'
   -- vim.g.lightline = { colorscheme='melange' }
   ----
 
@@ -170,9 +174,22 @@ return require('packer').startup(function(use)
   use {'nvim-telescope/telescope.nvim', requires = 'nvim-lua/plenary.nvim'}
   local has_telescope,telescope = pcall(require, 'telescope')
   if has_telescope then telescope.load_extension('projects') end
+  use {'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }  
+  use {'nvim-telescope/telescope-fzy-native.nvim' }  
+  require('telescope').load_extension('fzf')
+  require('telescope').load_extension('fzy_native')
+  -- require('telescope.builtin').live_grep{ only_sort_text = true }
+  require('telescope').setup{
+    defaults = { 
+      only_sort_text = true
+    }
 
+  }
   ---- highlight hex colors
   use 'chrisbra/Colorizer'
+
+  ---- better surrounding chars edit
+  use 'tpope/vim-surround'
 
   ------- git
   ----
@@ -218,10 +235,14 @@ return require('packer').startup(function(use)
   -- Keybindings
 
   ----- Navigation
-  vim.api.nvim_set_keymap('n', '<A-n>', ':tabprev<CR>', { silent = true, noremap = true })
-  vim.api.nvim_set_keymap('n', '<A-p>', ':tabnext<CR>', { silent = true, noremap = true })
+  vim.api.nvim_set_keymap('n', '<A-h>', ':tabprev<CR>', { silent = true, noremap = true })
+  vim.api.nvim_set_keymap('n', '<A-l>', ':tabnext<CR>', { silent = true, noremap = true })
   vim.api.nvim_set_keymap('n', '<Leader>ct', ':tabclose<CR>', { silent = true })
   vim.api.nvim_set_keymap('n', '<Leader>nt', ':tabnew<CR>', { silent = true })
+
+  -- buffer
+  vim.api.nvim_set_keymap('n', '<A-j>', ':bnext<CR>', { silent = true })
+  vim.api.nvim_set_keymap('n', '<A-k>', ':bprevious<CR>', { silent = true })
 
   -- vim.api.nvim_set_keymap('i', '<C-l>', '<Plug>(coc-snippets-vim)', {})
 
@@ -261,15 +282,21 @@ return require('packer').startup(function(use)
 
   -------
 
+  ---- LSP
+  vim.api.nvim_set_keymap('n', '<Leader>ld', ':LspDiagLine<CR>', { silent = true })
+
   ------- Telescope
   vim.api.nvim_set_keymap('n', '<Leader>tt', ':Telescope<CR>', {silent=true})
-  vim.api.nvim_set_keymap('n', '<Leader>tgb', ':Telescope git_branches<CR>', {silent=true})
-  vim.api.nvim_set_keymap('n', '<Leader>tgc', ':Telescope git_commits<CR>', {silent=true})
-  vim.api.nvim_set_keymap('n', '<Leader>tgs', ':Telescope git_status<CR>', {silent=true})
-  vim.api.nvim_set_keymap('n', '<Leader>tb', ':Telescope buffers<CR>', {silent=true})
-  vim.api.nvim_set_keymap('n', '<Leader>tr', ':Telescope live_grep<CR>', {silent=true})
-  vim.api.nvim_set_keymap('n', '<Leader>tf', ':Telescope find_files<CR>', {silent=true})
-  vim.api.nvim_set_keymap('n', '<Leader>tp', ':Telescope projects<CR>', {silent=true})
+
+  vim.api.nvim_set_keymap('n', '<Leader>tb', ':Buffers<CR>', {silent=true})
+  vim.api.nvim_set_keymap('n', '<Leader>tr', ':Rg:<CR>', {silent=true})
+  vim.api.nvim_set_keymap('n', '<Leader>tf', ':Files<CR>', {silent=true})
+  -- vim.api.nvim_set_keymap('n', '<Leader>tr', ':Telescope live_grep<CR>', {silent=true})
+  -- vim.api.nvim_set_keymap('n', '<Leader>tf', ':Telescope find_files<CR>', {silent=true})
+  -- vim.api.nvim_set_keymap('n', '<Leader>tp', ':Telescope projects<CR>', {silent=true})
+  -- vim.api.nvim_set_keymap('n', '<Leader>tgb', ':Telescope git_branches<CR>', {silent=true})
+  -- vim.api.nvim_set_keymap('n', '<Leader>tgc', ':Telescope git_commits<CR>', {silent=true})
+  -- vim.api.nvim_set_keymap('n', '<Leader>tgs', ':Telescope git_status<CR>', {silent=true})
   -----
 
   ----- Windows
@@ -354,10 +381,10 @@ return require('packer').startup(function(use)
 
     vim.cmd[[colorscheme OceanicNext]]
     -- transparent bg
-    vim.cmd[[autocmd vimenter * hi Normal guibg=none guifg=none ctermbg=none ctermfg=none]]
-    vim.cmd[[autocmd vimenter * hi NormalNC guibg=none guifg=none ctermbg=none ctermfg=none]]
-    vim.cmd[[autocmd vimenter * hi NonText guibg=none guifg=none ctermbg=none ctermfg=none]]
-    vim.cmd[[autocmd vimenter * hi Visual guibg=#333344 guifg=none ctermbg=none ctermfg=none]]
+    -- vim.cmd[[autocmd vimenter * hi Normal guibg=none guifg=none ctermbg=none ctermfg=none]]
+    -- vim.cmd[[autocmd vimenter * hi NormalNC guibg=none guifg=none ctermbg=none ctermfg=none]]
+    -- vim.cmd[[autocmd vimenter * hi NonText guibg=none guifg=none ctermbg=none ctermfg=none]]
+    -- vim.cmd[[autocmd vimenter * hi Visual guibg=#333344 guifg=none ctermbg=none ctermfg=none]]
     -- -- -- coloscheme switcher
     -- use 'xolox/vim-misc'
     -- use 'xolox/vim-colorscheme-switcher'
