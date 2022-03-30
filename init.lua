@@ -38,7 +38,7 @@ vim.cmd[[set nohlsearch]]
 ---- start scrolling before reaching n*th line
 vim.opt.scrolloff=25
 ----
-vim.opt.updatetime=500
+-- vim.opt.updatetime=500
 
 ---- Resize vim's windows automatically on the terminal window resize
 vim.cmd[[autocmd VimResized * wincmd =]]
@@ -61,8 +61,8 @@ return require('packer').startup(function(use)
   -- Packer can manage itself
   use 'wbthomason/packer.nvim'
 
-  -- vifm integration
-  use 'vifm/vifm.vim'
+  use {'junegunn/fzf'}
+  use {'junegunn/fzf.vim'}
 
   ---- extends match (matches special words)
   use 'andymass/vim-matchup'
@@ -80,6 +80,7 @@ return require('packer').startup(function(use)
 
   ---- git signs and hunk actions
   use {'lewis6991/gitsigns.nvim', requires = 'nvim-lua/plenary.nvim'}
+  use {'airblade/vim-gitgutter'}
   local has_gitsigns,gitsigns = pcall(require, 'gitsigns')
   if has_gitsigns then gitsigns.setup() end
 
@@ -158,8 +159,8 @@ return require('packer').startup(function(use)
   ---- status line
   -- use 'adelarsq/neoline.vim'
   -- use 'vimpostor/vim-tpipeline'
-  use 'itchyny/lightline.vim'
-  vim.g.lightline = { colorscheme='melange' }
+  -- use 'itchyny/lightline.vim'
+  -- vim.g.lightline = { colorscheme='melange' }
   ----
 
   ---- formatter
@@ -172,9 +173,22 @@ return require('packer').startup(function(use)
   use {'nvim-telescope/telescope.nvim', requires = 'nvim-lua/plenary.nvim'}
   local has_telescope,telescope = pcall(require, 'telescope')
   if has_telescope then telescope.load_extension('projects') end
+  use {'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }  
+  use {'nvim-telescope/telescope-fzy-native.nvim' }  
+  require('telescope').load_extension('fzf')
+  require('telescope').load_extension('fzy_native')
+  -- require('telescope.builtin').live_grep{ only_sort_text = true }
+  require('telescope').setup{
+    defaults = { 
+      only_sort_text = true
+    }
 
+  }
   ---- highlight hex colors
   use 'chrisbra/Colorizer'
+
+  ---- better surrounding chars edit
+  use 'tpope/vim-surround'
 
   ------- git
   ----
@@ -207,8 +221,8 @@ return require('packer').startup(function(use)
   -- use 'tree-sitter/tree-sitter-typescript'
   if has_nvim_treesitter then
     local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
-    parser_config.typescript.used_by = { "typescript" }
-    parser_config.c.used_by = { "c" }
+    -- parser_config.typescript.used_by = { "typescript" }
+    -- parser_config.c.used_by = { "c" }
   end
 
   use {'ms-jpq/chadtree', branch='chad', run=':CHADdeps'}
@@ -220,10 +234,14 @@ return require('packer').startup(function(use)
   -- Keybindings
 
   ----- Navigation
-  vim.api.nvim_set_keymap('n', '<A-n>', ':tabprev<CR>', { silent = true, noremap = true })
-  vim.api.nvim_set_keymap('n', '<A-p>', ':tabnext<CR>', { silent = true, noremap = true })
+  vim.api.nvim_set_keymap('n', '<A-h>', ':tabprev<CR>', { silent = true, noremap = true })
+  vim.api.nvim_set_keymap('n', '<A-l>', ':tabnext<CR>', { silent = true, noremap = true })
   vim.api.nvim_set_keymap('n', '<Leader>ct', ':tabclose<CR>', { silent = true })
   vim.api.nvim_set_keymap('n', '<Leader>nt', ':tabnew<CR>', { silent = true })
+
+  -- buffer
+  vim.api.nvim_set_keymap('n', '<A-j>', ':bnext<CR>', { silent = true })
+  vim.api.nvim_set_keymap('n', '<A-k>', ':bprevious<CR>', { silent = true })
 
   -- vim.api.nvim_set_keymap('i', '<C-l>', '<Plug>(coc-snippets-vim)', {})
 
@@ -251,7 +269,7 @@ return require('packer').startup(function(use)
 
   ------- Git
   vim.api.nvim_set_keymap('n', '<Leader>gg', ':!git gui<cr><cr>', {silent=true})
-  vim.api.nvim_set_keymap('n', '<Leader>gt', ':tabnew<CR> | :!$TERM -t tig -e tig <cr><cr>i', {silent=true})
+  vim.api.nvim_set_keymap('n', '<Leader>gt', ':tabnew | :edit term://tig<CR>i', {silent=true})
 
   ------- Coc
   ---- vim.api.nvim_set_keymap('n', '<Leader>gf', ':CocFix<CR>', {silent=true})
@@ -263,15 +281,21 @@ return require('packer').startup(function(use)
 
   -------
 
+  ---- LSP
+  vim.api.nvim_set_keymap('n', '<Leader>ld', ':LspDiagLine<CR>', { silent = true })
+
   ------- Telescope
   vim.api.nvim_set_keymap('n', '<Leader>tt', ':Telescope<CR>', {silent=true})
-  vim.api.nvim_set_keymap('n', '<Leader>tgb', ':Telescope git_branches<CR>', {silent=true})
-  vim.api.nvim_set_keymap('n', '<Leader>tgc', ':Telescope git_commits<CR>', {silent=true})
-  vim.api.nvim_set_keymap('n', '<Leader>tgs', ':Telescope git_status<CR>', {silent=true})
-  vim.api.nvim_set_keymap('n', '<Leader>tb', ':Telescope buffers<CR>', {silent=true})
-  vim.api.nvim_set_keymap('n', '<Leader>tr', ':Telescope live_grep<CR>', {silent=true})
-  vim.api.nvim_set_keymap('n', '<Leader>tf', ':Telescope find_files<CR>', {silent=true})
-  vim.api.nvim_set_keymap('n', '<Leader>tp', ':Telescope projects<CR>', {silent=true})
+
+  vim.api.nvim_set_keymap('n', '<Leader>tb', ':Buffers<CR>', {silent=true})
+  vim.api.nvim_set_keymap('n', '<Leader>tr', ':Rg:<CR>', {silent=true})
+  vim.api.nvim_set_keymap('n', '<Leader>tf', ':Files<CR>', {silent=true})
+  -- vim.api.nvim_set_keymap('n', '<Leader>tr', ':Telescope live_grep<CR>', {silent=true})
+  -- vim.api.nvim_set_keymap('n', '<Leader>tf', ':Telescope find_files<CR>', {silent=true})
+  -- vim.api.nvim_set_keymap('n', '<Leader>tp', ':Telescope projects<CR>', {silent=true})
+  -- vim.api.nvim_set_keymap('n', '<Leader>tgb', ':Telescope git_branches<CR>', {silent=true})
+  -- vim.api.nvim_set_keymap('n', '<Leader>tgc', ':Telescope git_commits<CR>', {silent=true})
+  -- vim.api.nvim_set_keymap('n', '<Leader>tgs', ':Telescope git_status<CR>', {silent=true})
   -----
 
   ----- Windows
@@ -316,6 +340,12 @@ return require('packer').startup(function(use)
     -----
 
     ----- Format
+    -- auto indent on paste
+    vim.api.nvim_set_keymap('n', 'p', ']p', { noremap=true })
+    vim.api.nvim_set_keymap('n', 'P', ']P', { noremap=true })
+    -- vim.api.nvim_set_keymap('n', '<C-p>', ']p', { noremap=true })
+    -- vim.api.nvim_set_keymap('n', '<C-P>', 'P', { noremap=true })
+
     vim.api.nvim_set_keymap('n', '<F10>', '<ESC>:ALEFix<CR>', {})
     vim.api.nvim_set_keymap('n', '<C-S-i>', '<ESC>:Neoformat<CR>a', { noremap=true })
     vim.api.nvim_set_keymap('i', '<C-S-i>', '<ESC>:Neoformat<CR>a', { noremap=true })
@@ -328,7 +358,7 @@ return require('packer').startup(function(use)
     vim.api.nvim_set_keymap('v', '<C-v>', '"+p<S-v>==ea', {noremap=true})
 
     ----- Terminal
-    vim.api.nvim_set_keymap('n', '<A-t>', ':terminal tig<cr>i', {noremap=true, silent=true})
+    -- vim.api.nvim_set_keymap('n', '<A-t>', ':terminal tig<cr>i', {noremap=true, silent=true})
 
     ----- coc.nvim
     -- vim.api.nvim_set_keymap('n', 'K', ':call CocAction("doHover")<CR>', {silent=true} )
@@ -348,16 +378,35 @@ return require('packer').startup(function(use)
     vim.g.falcon_background = 0
     vim.g.falcon_inactive = 1
 
-    vim.cmd[[colorscheme melange]]
+    vim.cmd[[colorscheme OceanicNext]]
     -- transparent bg
-    vim.cmd[[autocmd vimenter * hi Normal guibg=none guifg=none ctermbg=none ctermfg=none]]
-    vim.cmd[[autocmd vimenter * hi NormalNC guibg=none guifg=none ctermbg=none ctermfg=none]]
-    vim.cmd[[autocmd vimenter * hi NonText guibg=none guifg=none ctermbg=none ctermfg=none]]
-    vim.cmd[[autocmd vimenter * hi Visual guibg=#333344 guifg=none ctermbg=none ctermfg=none]]
+    -- vim.cmd[[autocmd vimenter * hi Normal guibg=none guifg=none ctermbg=none ctermfg=none]]
+    -- vim.cmd[[autocmd vimenter * hi NormalNC guibg=none guifg=none ctermbg=none ctermfg=none]]
+    -- vim.cmd[[autocmd vimenter * hi NonText guibg=none guifg=none ctermbg=none ctermfg=none]]
+    -- vim.cmd[[autocmd vimenter * hi Visual guibg=#333344 guifg=none ctermbg=none ctermfg=none]]
     -- -- -- coloscheme switcher
     -- use 'xolox/vim-misc'
     -- use 'xolox/vim-colorscheme-switcher'
     -- -- use 'honza/vim-snippets'
+    vim.cmd[[
+    " Open multiple lines (insert empty lines) before or after current line,
+    " and position cursor in the new space, with at least one blank line
+    " before and after the cursor.
+
+    function! OpenLines(nrlines, dir)
+    let nrlines = a:nrlines < 3 ? 3 : a:nrlines
+    let start = line('.') + a:dir
+    call append(start, repeat([''], nrlines))
+    if a:dir < 0
+      normal! 2k
+    else
+      normal! 2j
+      endif
+      endfunction
+      " Mappings to open multiple lines and enter insert mode.
+      nnoremap <Leader>o :<C-u>call OpenLines(v:count, 0)<CR>S
+      nnoremap <Leader>O :<C-u>call OpenLines(v:count, -1)<CR>S
+    ]]
 
     if packer_bootstrap then
       require('packer').sync()
