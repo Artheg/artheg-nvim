@@ -64,6 +64,43 @@ return require('packer').startup(function(use)
   use {'junegunn/fzf'}
   use {'junegunn/fzf.vim'}
 
+  ---- automatically replaces words
+  use 'AndrewRadev/switch.vim'
+  vim.g['switch_custom_definitions'] = { 
+    { "width", "height"}, 
+    { "x", "y", "z" },
+    { "top", "bottom", "Top", "Bottom" }
+  }
+  vim.cmd[[
+    nnoremap <silent> <Plug>(SwitchInLine) :<C-u>call SwitchLine(v:count1)<cr>
+    nmap <F3> <Plug>(SwitchInLine)w
+
+    fun! SwitchLine(cnt)
+        let tick = b:changedtick
+        let start = getcurpos()
+        for n in range(a:cnt)
+            Switch
+        endfor
+        if b:changedtick != tick
+            return
+        endif
+        while v:true
+            let pos = getcurpos()
+            normal! w
+            if pos[1] != getcurpos()[1] || pos == getcurpos()
+                break
+            endif
+            for n in range(a:cnt)
+                Switch
+            endfor
+            if b:changedtick != tick
+                return
+            endif
+        endwhile
+        call setpos('.', start)
+    endfun
+  ]]
+
   ---- extends match (matches special words)
   use 'andymass/vim-matchup'
 
@@ -177,13 +214,7 @@ return require('packer').startup(function(use)
   use {'nvim-telescope/telescope-fzy-native.nvim' }  
   require('telescope').load_extension('fzf')
   require('telescope').load_extension('fzy_native')
-  -- require('telescope.builtin').live_grep{ only_sort_text = true }
-  require('telescope').setup{
-    defaults = { 
-      only_sort_text = true
-    }
 
-  }
   ---- highlight hex colors
   use 'chrisbra/Colorizer'
 
@@ -341,12 +372,12 @@ return require('packer').startup(function(use)
 
     ----- Format
     -- auto indent on paste
-    vim.api.nvim_set_keymap('n', 'p', ']p', { noremap=true })
-    vim.api.nvim_set_keymap('n', 'P', ']P', { noremap=true })
+    vim.api.nvim_set_keymap('n', 'p', 'p`[v`]=', { noremap=true })
+    vim.api.nvim_set_keymap('n', 'P', 'P`[v`]=', { noremap=true })
     -- vim.api.nvim_set_keymap('n', '<C-p>', ']p', { noremap=true })
     -- vim.api.nvim_set_keymap('n', '<C-P>', 'P', { noremap=true })
 
-    vim.api.nvim_set_keymap('n', '<F10>', '<ESC>:ALEFix<CR>', {})
+    vim.api.nvim_set_keymap('n', '<F10>', '<ESC>:Neoformat | ALEFix<CR>', {})
     vim.api.nvim_set_keymap('n', '<C-S-i>', '<ESC>:Neoformat<CR>a', { noremap=true })
     vim.api.nvim_set_keymap('i', '<C-S-i>', '<ESC>:Neoformat<CR>a', { noremap=true })
     -----
@@ -380,10 +411,10 @@ return require('packer').startup(function(use)
 
     vim.cmd[[colorscheme OceanicNext]]
     -- transparent bg
-    -- vim.cmd[[autocmd vimenter * hi Normal guibg=none guifg=none ctermbg=none ctermfg=none]]
-    -- vim.cmd[[autocmd vimenter * hi NormalNC guibg=none guifg=none ctermbg=none ctermfg=none]]
-    -- vim.cmd[[autocmd vimenter * hi NonText guibg=none guifg=none ctermbg=none ctermfg=none]]
-    -- vim.cmd[[autocmd vimenter * hi Visual guibg=#333344 guifg=none ctermbg=none ctermfg=none]]
+    vim.cmd[[autocmd vimenter * hi Normal guibg=none guifg=none ctermbg=none ctermfg=none]]
+    vim.cmd[[autocmd vimenter * hi NormalNC guibg=none guifg=none ctermbg=none ctermfg=none]]
+    vim.cmd[[autocmd vimenter * hi NonText guibg=none guifg=none ctermbg=none ctermfg=none]]
+    vim.cmd[[autocmd vimenter * hi Visual guibg=#333344 guifg=none ctermbg=none ctermfg=none]]
     -- -- -- coloscheme switcher
     -- use 'xolox/vim-misc'
     -- use 'xolox/vim-colorscheme-switcher'
