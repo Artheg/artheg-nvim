@@ -143,8 +143,9 @@ return require('packer').startup(function(use)
   vim.g['dashboard_custom_footer'] = {}
 
   ---- bottom line
-  use 'itchyny/lightline.vim'
-  vim.g.lightline = { colorscheme='wombat' }
+  use 'vimpostor/vim-tpipeline'
+  -- use 'itchyny/lightline.vim'
+  -- vim.g.lightline = { colorscheme='melange' }
   ----
 
   ---- formatter
@@ -206,8 +207,8 @@ return require('packer').startup(function(use)
   -- Keybindings
 
   ----- Navigation
-  vim.api.nvim_set_keymap('n', '<C-[>', ':tabprev<CR>', { silent = true })
-  vim.api.nvim_set_keymap('n', '<C-]>', ':tabnext<CR>', { silent = true })
+  vim.api.nvim_set_keymap('n', '<A-n>', ':tabprev<CR>', { silent = true, noremap = true })
+  vim.api.nvim_set_keymap('n', '<A-p>', ':tabnext<CR>', { silent = true, noremap = true })
   vim.api.nvim_set_keymap('n', '<Leader>ct', ':tabclose<CR>', { silent = true })
   vim.api.nvim_set_keymap('n', '<Leader>nt', ':tabnew<CR>', { silent = true })
 
@@ -310,6 +311,9 @@ return require('packer').startup(function(use)
     vim.api.nvim_set_keymap('v', '<C-c>', '"+y', {noremap=true})
     vim.api.nvim_set_keymap('n', '<C-S-v>', '"+p', {noremap=true})
     vim.api.nvim_set_keymap('v', '<C-v>', '"+p<S-v>==ea', {noremap=true})
+
+    ----- Terminal
+    vim.api.nvim_set_keymap('n', '<A-t>', ':terminal<cr>', {noremap=true, silent=true})
 
     ----- coc.nvim
     -- vim.api.nvim_set_keymap('n', 'K', ':call CocAction("doHover")<CR>', {silent=true} )
