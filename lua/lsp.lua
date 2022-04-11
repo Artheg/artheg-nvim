@@ -17,7 +17,7 @@ return {
 
     -- coq_nvim autocompletion
     use {'ms-jpq/coq_nvim', branch='coq', run=':COQdeps' }
-    vim.g.coq_settings = { auto_start=true, keymap = { recommended = true}, clients = { lsp = { resolve_timeout = 3000 }} }
+    vim.g.coq_settings = { auto_start=true, keymap = { recommended = false}, clients = { lsp = { resolve_timeout = 3000 }} }
 
   use 'windwp/nvim-autopairs'
   local has_npairs,npairs = pcall(require, 'nvim-autopairs')
@@ -28,8 +28,33 @@ return {
 local remap = vim.api.nvim_set_keymap
 
 npairs.setup({ map_bs = false, map_cr = false })
+local Rule   = require'nvim-autopairs.rule'
 
-vim.g.coq_settings = { keymap = { recommended = false } }
+npairs.add_rules {
+  Rule(' ', ' ')
+    :with_pair(function (opts)
+      local pair = opts.line:sub(opts.col - 1, opts.col)
+      return vim.tbl_contains({ '()', '[]', '{}' }, pair)
+    end),
+  Rule('( ', ' )')
+      :with_pair(function() return false end)
+      :with_move(function(opts)
+          return opts.prev_char:match('.%)') ~= nil
+      end)
+      :use_key(')'),
+  Rule('{ ', ' }')
+      :with_pair(function() return false end)
+      :with_move(function(opts)
+          return opts.prev_char:match('.%}') ~= nil
+      end)
+      :use_key('}'),
+  Rule('[ ', ' ]')
+      :with_pair(function() return false end)
+      :with_move(function(opts)
+          return opts.prev_char:match('.%]') ~= nil
+      end)
+      :use_key(']')
+}
 
 -- these mappings are coq recommended mappings unrelated to nvim-autopairs
 remap('i', '<esc>', [[pumvisible() ? "<c-e><esc>" : "<esc>"]], { expr = true, noremap = true })
@@ -123,14 +148,14 @@ remap('i', '<bs>', 'v:lua.MUtils.BS()', { expr = true, noremap = true })
       buf_map(bufnr, "n", "<Leader>a", ":LspDiagLine<CR>", {silent = true})
       buf_map(bufnr, "i", "<C-x><C-x>", "<cmd> LspSignatureHelp<CR>",
       {silent = true})
-      if client.resolved_capabilities.document_formatting then
-        vim.api.nvim_exec([[
-        augroup LspAutocommands
-        autocmd! * <buffer>
-        autocmd BufWritePost <buffer> LspFormatting
-        augroup END
-        ]], true)
-      end
+      -- if client.resolved_capabilities.document_formatting then
+      --   vim.api.nvim_exec([[
+      --   augroup LspAutocommands
+      --   autocmd! * <buffer>
+      --   autocmd BufWritePost <buffer> LspFormatting
+      --   augroup END
+      --   ]], true)
+      -- end
     end
     if has_nvim_lsp then
       nvim_lsp.tsserver.setup {
@@ -223,7 +248,8 @@ remap('i', '<bs>', 'v:lua.MUtils.BS()', { expr = true, noremap = true })
           clang = {
             excludeArgs = { "-frounding-math"} ;
           };
-        }
+          single_file_support = true;
+        };
       }
     end
 

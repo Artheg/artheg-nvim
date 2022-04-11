@@ -66,11 +66,11 @@ return require('packer').startup(function(use)
 
   ---- lexima (autocomplete {} () etc.)
   ---- use 'cohama/lexima.vim'
-  use 'windwp/nvim-autopairs'
-  local has_npairs,npairs = pcall(require, 'nvim-autopairs')
-  if has_npairs then
-    npairs.setup({ map_bs = false, map_cr = false })
-  end
+  -- use 'windwp/nvim-autopairs'
+  -- local has_npairs,npairs = pcall(require, 'nvim-autopairs')
+  -- if has_npairs then
+  --   npairs.setup({ map_bs = false, map_cr = false })
+  -- end
 
   ---- git signs and hunk actions
   use {'lewis6991/gitsigns.nvim', requires = 'nvim-lua/plenary.nvim'}
