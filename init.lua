@@ -144,9 +144,6 @@ return require('packer').startup(function(use)
   vim.g['ale_typescript_eslint_use_global'] = 1
   ----
 
-  ---- Move blocks
-  use 'booperlv/nvim-gomove'
-
   ---- better word motion (e.g. CamelCase)
   use 'chaoren/vim-wordmotion'
 
