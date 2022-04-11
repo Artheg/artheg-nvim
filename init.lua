@@ -69,7 +69,7 @@ return require('packer').startup(function(use)
   use 'windwp/nvim-autopairs'
   local has_npairs,npairs = pcall(require, 'nvim-autopairs')
   if has_npairs then
-    npairs.setup({ map_bs = false })
+    npairs.setup({ map_bs = false, map_cr = false })
   end
 
   ---- git signs and hunk actions
@@ -219,6 +219,7 @@ return require('packer').startup(function(use)
   vim.api.nvim_set_keymap('n', '<C-k>', ':cprevious<CR>', {})
   vim.api.nvim_set_keymap('n', '<Leader>cc', ':cclose<CR>', {})
   vim.api.nvim_set_keymap('n', '<Leader>co', ':copen<CR>', {})
+  vim.api.nvim_set_keymap('n', '<esc>', ':cclose<CR>', { silent = true })
 
   ------- Dashboard
   vim.api.nvim_set_keymap('n','<Leader>fb',':DashboardJumpMark<CR>', { noremap = true , silent = false })
