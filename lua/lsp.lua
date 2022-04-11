@@ -17,7 +17,7 @@ return {
 
     -- coq_nvim autocompletion
     use {'ms-jpq/coq_nvim', branch='coq', run=':COQdeps' }
-    vim.g.coq_settings = { auto_start=true, keymap = { recommended = false}, clients = { lsp = { resolve_timeout = 3000 }} }
+    vim.g.coq_settings = { auto_start='shut-up', keymap = { recommended = false}, clients = { lsp = { resolve_timeout = 3000 }} }
 
   use 'windwp/nvim-autopairs'
   local has_npairs,npairs = pcall(require, 'nvim-autopairs')
