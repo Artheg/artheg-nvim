@@ -259,9 +259,6 @@ return require('packer').startup(function(use)
     -- parser_config.c.used_by = { "c" }
   end
 
-  use {'ms-jpq/chadtree', branch='chad', run=':CHADdeps'}
-  local chadtree_settings = { theme = { text_colour_set = 'nord' } }
-  vim.api.nvim_set_var('chadtree_settings', chadtree_settings)
   require('lsp').startup(use)
 
 
@@ -273,9 +270,19 @@ return require('packer').startup(function(use)
   vim.api.nvim_set_keymap('n', '<Leader>ct', ':tabclose<CR>', { silent = true })
   vim.api.nvim_set_keymap('n', '<Leader>nt', ':tabnew<CR>', { silent = true })
 
+  -- center screen when focusing on search occurences
+  vim.api.nvim_set_keymap('n', 'n', 'nzzzv', { noremap = true })
+  vim.api.nvim_set_keymap('n', 'N', 'Nzzzv', { noremap = true })
+
   -- buffer
   vim.api.nvim_set_keymap('n', '<A-j>', ':bnext<CR>', { silent = true })
   vim.api.nvim_set_keymap('n', '<A-k>', ':bprevious<CR>', { silent = true })
+
+  -- better history jumping
+  vim.cmd[[
+    nnoremap <expr> j (v:count > 1 ? "m'" . v:count : "") . 'j'
+    nnoremap <expr> k (v:count > 1 ? "m'" . v:count : "") . 'k'
+  ]]
 
   -- vim.api.nvim_set_keymap('i', '<C-l>', '<Plug>(coc-snippets-vim)', {})
 
@@ -350,21 +357,15 @@ return require('packer').startup(function(use)
     vim.api.nvim_set_keymap('n', '<C-x>', ':call ToggleWindowMaximize()<cr>', {silent=true})
     -----
 
-    ----- CHADTree
-    vim.api.nvim_set_keymap('n', '<c-b>', ':CHADopen<cr>', {silent=true})
-    -----
-
     ----- Edit
-    -- Emacs-like movement for instert mode
+    -- Emacs-like movement for insert mode
     vim.api.nvim_set_keymap('i', '<C-b>', '<C-o>b', {})
-
     vim.api.nvim_set_keymap('i', '<C-f>', '<C-o>w', {})
     vim.api.nvim_set_keymap('i', '<C-a>', '<C-o>I', {})
     vim.api.nvim_set_keymap('i', '<C-e>', '<C-o>A', {})
-    -- go to normal mode
-    vim.api.nvim_set_keymap('i', '<C-l>', '<ESC>', {})
 
-
+    -- make Y behave as other capital letters by default
+    vim.api.nvim_set_keymap('n', 'Y', 'y$', { noremap=true })
     -- save all
     vim.api.nvim_set_keymap('n', '<C-A-s>', ':wall<CR>', {})
     vim.api.nvim_set_keymap('i', '<C-A-s>', ':wall<CR>', {})
@@ -372,6 +373,10 @@ return require('packer').startup(function(use)
     vim.api.nvim_set_keymap('n', '<C-s>', '<ESC>:w<CR>', {})
     vim.api.nvim_set_keymap('i', '<C-s>', '<ESC>:w<CR>', {})
     -----
+
+    ------ Move
+    vim.api.nvim_set_keymap('v', 'J', ':m \'>+1<CR>gv=gv', {})
+    vim.api.nvim_set_keymap('v', 'K', ':m \'<-2<CR>gv=gv', {})
 
     ----- Format
     -- auto indent on paste
