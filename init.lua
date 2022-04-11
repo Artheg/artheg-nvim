@@ -61,6 +61,9 @@ return require('packer').startup(function(use)
   -- Packer can manage itself
   use 'wbthomason/packer.nvim'
 
+  -- vifm integration
+  use 'vifm/vifm.vim'
+
   ---- extends match (matches special words)
   use 'andymass/vim-matchup'
 
