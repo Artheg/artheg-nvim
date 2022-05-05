@@ -61,8 +61,10 @@ return require('packer').startup(function(use)
   -- Packer can manage itself
   use 'wbthomason/packer.nvim'
 
+  use 'ziglang/zig.vim'
+
   -- vifm integration
-  use 'vifm/vifm.vim'
+  -- use 'vifm/vifm.vim'
 
   use {'junegunn/fzf'}
   use {'junegunn/fzf.vim'}
@@ -159,7 +161,7 @@ return require('packer').startup(function(use)
 
   -- opening screen
   -- use 'mhinz/vim-startify'
-  use 'glepnir/dashboard-nvim'
+  -- use 'glepnir/dashboard-nvim'
   vim.g['dashboard_default_executive'] = 'telescope'
   vim.g['dashboard_custom_header'] = {
     [[                                     ]],
@@ -291,14 +293,14 @@ return require('packer').startup(function(use)
   vim.api.nvim_set_keymap('n', '<esc>', ':cclose<CR>', { silent = true })
 
   ------- Dashboard
-  vim.api.nvim_set_keymap('n','<Leader>fb',':DashboardJumpMark<CR>', { noremap = true , silent = false })
-  vim.api.nvim_set_keymap('n','<Leader>tc',':DashboardChangeColorscheme<CR>', { noremap = true , silent = false })
-  vim.api.nvim_set_keymap('n','<Leader>ff',':DashboardFindFile<CR>', { noremap = true , silent = false })
-  vim.api.nvim_set_keymap('n','<Leader>fh',':DashboardFindHistory<CR>', { noremap = true , silent = false })
-  vim.api.nvim_set_keymap('n','<Leader>fa',':DashboardFindHistory<CR>', { noremap = true , silent = false })
-  vim.api.nvim_set_keymap('n','<Leader>sl',':<C-u>SessionLoad<CR>', { noremap = true , silent = false })
-  vim.api.nvim_set_keymap('n','<Leader>fa',':DashboardFindWord<CR>', { noremap = true , silent = false })
-  vim.api.nvim_set_keymap('n','<Leader>cn',':DashboardNewFile<CR>i', { noremap = true , silent = false })
+  -- vim.api.nvim_set_keymap('n','<Leader>fb',':DashboardJumpMark<CR>', { noremap = true , silent = false })
+  -- vim.api.nvim_set_keymap('n','<Leader>tc',':DashboardChangeColorscheme<CR>', { noremap = true , silent = false })
+  -- vim.api.nvim_set_keymap('n','<Leader>ff',':DashboardFindFile<CR>', { noremap = true , silent = false })
+  -- vim.api.nvim_set_keymap('n','<Leader>fh',':DashboardFindHistory<CR>', { noremap = true , silent = false })
+  -- vim.api.nvim_set_keymap('n','<Leader>fa',':DashboardFindHistory<CR>', { noremap = true , silent = false })
+  -- vim.api.nvim_set_keymap('n','<Leader>sl',':<C-u>SessionLoad<CR>', { noremap = true , silent = false })
+  -- vim.api.nvim_set_keymap('n','<Leader>fa',':DashboardFindWord<CR>', { noremap = true , silent = false })
+  -- vim.api.nvim_set_keymap('n','<Leader>cn',':DashboardNewFile<CR>i', { noremap = true , silent = false })
 
   ------- Floaterm
   vim.api.nvim_set_keymap('n', '<F9>', ':FloatermToggle<cr>', {silent=true})
@@ -328,6 +330,8 @@ return require('packer').startup(function(use)
   vim.api.nvim_set_keymap('n', '<Leader>tb', ':Buffers<CR>', {silent=true})
   vim.api.nvim_set_keymap('n', '<Leader>tr', ':Rg:<CR>', {silent=true})
   vim.api.nvim_set_keymap('n', '<Leader>tf', ':Files<CR>', {silent=true})
+  vim.api.nvim_set_keymap('n', '<F1>', ':Telescope oldfiles<CR>', {silent=true, noremap = true})
+  vim.api.nvim_set_keymap('i', '<F1>', ':Telescope oldfiles<CR>', {silent=true, noremap = true})
   -- vim.api.nvim_set_keymap('n', '<Leader>tr', ':Telescope live_grep<CR>', {silent=true})
   -- vim.api.nvim_set_keymap('n', '<Leader>tf', ':Telescope find_files<CR>', {silent=true})
   -- vim.api.nvim_set_keymap('n', '<Leader>tp', ':Telescope projects<CR>', {silent=true})
@@ -415,11 +419,12 @@ return require('packer').startup(function(use)
     vim.g.falcon_inactive = 1
 
     vim.cmd[[colorscheme OceanicNext]]
+    vim.cmd[[colorscheme halflife]]
     -- transparent bg
-    vim.cmd[[autocmd vimenter * hi Normal guibg=none guifg=none ctermbg=none ctermfg=none]]
-    vim.cmd[[autocmd vimenter * hi NormalNC guibg=none guifg=none ctermbg=none ctermfg=none]]
-    vim.cmd[[autocmd vimenter * hi NonText guibg=none guifg=none ctermbg=none ctermfg=none]]
-    vim.cmd[[autocmd vimenter * hi Visual guibg=#333344 guifg=none ctermbg=none ctermfg=none]]
+    -- vim.cmd[[autocmd vimenter * hi Normal guibg=none guifg=none ctermbg=none ctermfg=none]]
+    -- vim.cmd[[autocmd vimenter * hi NormalNC guibg=none guifg=none ctermbg=none ctermfg=none]]
+    -- vim.cmd[[autocmd vimenter * hi NonText guibg=none guifg=none ctermbg=none ctermfg=none]]
+    -- vim.cmd[[autocmd vimenter * hi Visual guibg=#333344 guifg=none ctermbg=none ctermfg=none]]
     -- -- -- coloscheme switcher
     -- use 'xolox/vim-misc'
     -- use 'xolox/vim-colorscheme-switcher'
