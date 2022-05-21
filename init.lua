@@ -18,6 +18,8 @@ vim.opt.shiftwidth = 2
 ---- syntax highlight
 vim.opt.syntax = 'on'
 
+vim.opt.background = "dark"
+
 ---- cursor line
 vim.cmd[[set cursorline]]
 
@@ -287,7 +289,7 @@ return require('packer').startup(function(use)
 
   ----- quickfix
   vim.api.nvim_set_keymap('n', '<C-j>', ':cnext<CR>', {})
-  vim.api.nvim_set_keymap('n', '<C-k>', ':cprevious<CR>', {})
+  vim.api.nvim_set_keymap('n', '<C-k>', ':cprevious<CR>', { noremap = true })
   vim.api.nvim_set_keymap('n', '<Leader>cc', ':cclose<CR>', {})
   vim.api.nvim_set_keymap('n', '<Leader>co', ':copen<CR>', {})
   vim.api.nvim_set_keymap('n', '<esc>', ':cclose<CR>', { silent = true })
@@ -414,12 +416,19 @@ return require('packer').startup(function(use)
     use 'savq/melange'
     use 'fenetikm/falcon'
     use 'ayu-theme/ayu-vim'
+    use 'cocopon/iceberg.vim'
+    use 'EdenEast/nightfox.nvim'
+    use 'fcpg/vim-farout'
+    use 'adigitoleo/vim-mellow'
+    use 'slugbyte/yuejiu'
+    use 'azolus/evernight.nvim'
 
     vim.g.falcon_background = 0
     vim.g.falcon_inactive = 1
 
-    vim.cmd[[colorscheme OceanicNext]]
-    vim.cmd[[colorscheme halflife]]
+    -- vim.cmd[[colorscheme OceanicNext]]
+    -- vim.cmd[[colorscheme blue-moon]]
+    vim.cmd[[colorscheme farout]]
     -- transparent bg
     -- vim.cmd[[autocmd vimenter * hi Normal guibg=none guifg=none ctermbg=none ctermfg=none]]
     -- vim.cmd[[autocmd vimenter * hi NormalNC guibg=none guifg=none ctermbg=none ctermfg=none]]

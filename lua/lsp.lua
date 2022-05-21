@@ -54,6 +54,8 @@ return {
       toggle_key = nil -- toggle signature on and off in insert mode,  e.g. toggle_key = '<M-x>'
     }
 
+    -- lsp signature
+    use 'ray-x/lsp_signature.nvim'
     -- recommended:
     require'lsp_signature'.setup(cfg) -- no need to specify bufnr if you don't use toggle_key
     --
@@ -67,8 +69,6 @@ return {
     --   {"<Leader>ff", snap.config.vimgrep {}},
     -- }
 
-    -- lsp signature
-    use 'ray-x/lsp_signature.nvim'
 
     -- symbols outline
     use 'simrat39/symbols-outline.nvim'
@@ -98,7 +98,7 @@ return {
     vim.g.coq_settings = { 
       auto_start='shut-up',
       limits = { completion_auto_timeout = 1.00 },
-      keymap = { manual_complete="<c-k>" }, 
+      keymap = { manual_complete="<c-i>", recommended = false }, 
     }
 
   use 'windwp/nvim-autopairs'
@@ -227,8 +227,7 @@ remap('i', '<bs>', 'v:lua.MUtils.BS()', { expr = true, noremap = true })
       vim.cmd(
       "command! LspDiagLine lua vim.lsp.diagnostic.show_line_diagnostics()")
       vim.cmd("command! LspSignatureHelp lua vim.lsp.buf.signature_help()")
-      buf_map(bufnr, "n", "gd", ":Definitions<CR>", {silent = true})
-      buf_map(bufnr, "n", "gv", ":TypeDefinitions<CR>", {silent = true})
+      buf_map(bufnr, "n", "gd", ":LspDef<CR>", {silent = true})
       buf_map(bufnr, "n", "gr", ":LspRename<CR>", {silent = true})
       buf_map(bufnr, "n", "gR", ":References<CR>", {silent = true})
       buf_map(bufnr, "n", "gy", ":LspTypeDef<CR>", {silent = true})
@@ -258,6 +257,8 @@ remap('i', '<bs>', 'v:lua.MUtils.BS()', { expr = true, noremap = true })
           on_attach(client, bufnr)
         end
       }
+      nvim_lsp.eslint.setup{}
+
     end
     local filetypes = {
       typescript = "eslint",
