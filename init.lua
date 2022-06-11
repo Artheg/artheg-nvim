@@ -18,6 +18,8 @@ vim.opt.shiftwidth = 2
 ---- syntax highlight
 vim.opt.syntax = 'on'
 
+vim.opt.background = "dark"
+
 ---- cursor line
 vim.cmd[[set cursorline]]
 
@@ -61,8 +63,54 @@ return require('packer').startup(function(use)
   -- Packer can manage itself
   use 'wbthomason/packer.nvim'
 
+  use 'mfussenegger/nvim-dap'
+
+  local dap = require('dap')
+
+  vim.api.nvim_set_keymap( 'n', '<F6>', ':lua require("dap").clear_breakpoints()<CR>', {} )
+  vim.api.nvim_set_keymap( 'n', '<F7>', ':DapContinue<CR>', {} )
+  vim.api.nvim_set_keymap( 'n', '<F8>', ':lua require("dap.ui.widgets").hover()<CR>', {silent=true} )
+  vim.api.nvim_set_keymap( 'n', '<F9>', ':DapToggleBreakpoint<CR>', {silent=true} )
+  vim.api.nvim_set_keymap( 'n', '<F10>', ':DapStepOver<CR>', {} )
+  vim.api.nvim_set_keymap( 'n', '<F11>', ':DapStepInto<CR>', {} )
+  vim.api.nvim_set_keymap( 'n', '<F12>', ':DapStepOut<CR>', {} )
+  dap.adapters.chrome = {
+    type = "executable",
+    command = "node",
+    args = {os.getenv("HOME") .. "/git/vscode-chrome-debug/out/src/chromeDebug.js"} -- TODO adjust
+  }
+  vim.fn.sign_define('DapBreakpoint', {text='🛑', texthl='BP', linehl='LineBreakpoint', numhl=''})
+
+  dap.configurations.javascript = { -- change this to javascript if needed
+  {
+    type = "chrome",
+    request = "attach",
+    program = "${file}",
+    cwd = vim.fn.getcwd(),
+    sourceMaps = true,
+    protocol = "inspector",
+    port = 9222,
+    webRoot = "${workspaceFolder}"
+  }
+}
+
+dap.configurations.typescript = { -- change to typescript if needed
+{
+  type = "chrome",
+  request = "attach",
+  program = "${file}",
+  cwd = vim.fn.getcwd(),
+  sourceMaps = true,
+  protocol = "inspector",
+  port = 9222,
+  webRoot = "${workspaceFolder}",
+}
+}
+
+  use 'ziglang/zig.vim'
+
   -- vifm integration
-  use 'vifm/vifm.vim'
+  -- use 'vifm/vifm.vim'
 
   use {'junegunn/fzf'}
   use {'junegunn/fzf.vim'}
@@ -159,7 +207,7 @@ return require('packer').startup(function(use)
 
   -- opening screen
   -- use 'mhinz/vim-startify'
-  use 'glepnir/dashboard-nvim'
+  -- use 'glepnir/dashboard-nvim'
   vim.g['dashboard_default_executive'] = 'telescope'
   vim.g['dashboard_custom_header'] = {
     [[                                     ]],
@@ -285,24 +333,24 @@ return require('packer').startup(function(use)
 
   ----- quickfix
   vim.api.nvim_set_keymap('n', '<C-j>', ':cnext<CR>', {})
-  vim.api.nvim_set_keymap('n', '<C-k>', ':cprevious<CR>', {})
+  vim.api.nvim_set_keymap('n', '<C-k>', ':cprevious<CR>', { noremap = true })
   vim.api.nvim_set_keymap('n', '<Leader>cc', ':cclose<CR>', {})
   vim.api.nvim_set_keymap('n', '<Leader>co', ':copen<CR>', {})
   vim.api.nvim_set_keymap('n', '<esc>', ':cclose<CR>', { silent = true })
 
   ------- Dashboard
-  vim.api.nvim_set_keymap('n','<Leader>fb',':DashboardJumpMark<CR>', { noremap = true , silent = false })
-  vim.api.nvim_set_keymap('n','<Leader>tc',':DashboardChangeColorscheme<CR>', { noremap = true , silent = false })
-  vim.api.nvim_set_keymap('n','<Leader>ff',':DashboardFindFile<CR>', { noremap = true , silent = false })
-  vim.api.nvim_set_keymap('n','<Leader>fh',':DashboardFindHistory<CR>', { noremap = true , silent = false })
-  vim.api.nvim_set_keymap('n','<Leader>fa',':DashboardFindHistory<CR>', { noremap = true , silent = false })
-  vim.api.nvim_set_keymap('n','<Leader>sl',':<C-u>SessionLoad<CR>', { noremap = true , silent = false })
-  vim.api.nvim_set_keymap('n','<Leader>fa',':DashboardFindWord<CR>', { noremap = true , silent = false })
-  vim.api.nvim_set_keymap('n','<Leader>cn',':DashboardNewFile<CR>i', { noremap = true , silent = false })
+  -- vim.api.nvim_set_keymap('n','<Leader>fb',':DashboardJumpMark<CR>', { noremap = true , silent = false })
+  -- vim.api.nvim_set_keymap('n','<Leader>tc',':DashboardChangeColorscheme<CR>', { noremap = true , silent = false })
+  -- vim.api.nvim_set_keymap('n','<Leader>ff',':DashboardFindFile<CR>', { noremap = true , silent = false })
+  -- vim.api.nvim_set_keymap('n','<Leader>fh',':DashboardFindHistory<CR>', { noremap = true , silent = false })
+  -- vim.api.nvim_set_keymap('n','<Leader>fa',':DashboardFindHistory<CR>', { noremap = true , silent = false })
+  -- vim.api.nvim_set_keymap('n','<Leader>sl',':<C-u>SessionLoad<CR>', { noremap = true , silent = false })
+  -- vim.api.nvim_set_keymap('n','<Leader>fa',':DashboardFindWord<CR>', { noremap = true , silent = false })
+  -- vim.api.nvim_set_keymap('n','<Leader>cn',':DashboardNewFile<CR>i', { noremap = true , silent = false })
 
   ------- Floaterm
-  vim.api.nvim_set_keymap('n', '<F9>', ':FloatermToggle<cr>', {silent=true})
-  vim.api.nvim_set_keymap('t', '<F9>', '<C-\\><C-n>:FloatermToggle<CR>', {silent=true, noremap=true})
+  vim.api.nvim_set_keymap('n', '<F2>', ':FloatermToggle<cr>', {silent=true})
+  vim.api.nvim_set_keymap('t', '<F2>', '<C-\\><C-n>:FloatermToggle<CR>', {silent=true, noremap=true})
   vim.g.floaterm_opener = 'drop'
 
   ------- Git
@@ -328,6 +376,8 @@ return require('packer').startup(function(use)
   vim.api.nvim_set_keymap('n', '<Leader>tb', ':Buffers<CR>', {silent=true})
   vim.api.nvim_set_keymap('n', '<Leader>tr', ':Rg:<CR>', {silent=true})
   vim.api.nvim_set_keymap('n', '<Leader>tf', ':Files<CR>', {silent=true})
+  vim.api.nvim_set_keymap('n', '<F1>', ':Telescope oldfiles<CR>', {silent=true, noremap = true})
+  vim.api.nvim_set_keymap('i', '<F1>', ':Telescope oldfiles<CR>', {silent=true, noremap = true})
   -- vim.api.nvim_set_keymap('n', '<Leader>tr', ':Telescope live_grep<CR>', {silent=true})
   -- vim.api.nvim_set_keymap('n', '<Leader>tf', ':Telescope find_files<CR>', {silent=true})
   -- vim.api.nvim_set_keymap('n', '<Leader>tp', ':Telescope projects<CR>', {silent=true})
@@ -382,7 +432,7 @@ return require('packer').startup(function(use)
     -- vim.api.nvim_set_keymap('n', '<C-p>', ']p', { noremap=true })
     -- vim.api.nvim_set_keymap('n', '<C-P>', 'P', { noremap=true })
 
-    vim.api.nvim_set_keymap('n', '<F10>', '<ESC>:Neoformat | ALEFix<CR>', {})
+    vim.api.nvim_set_keymap('n', '<F3>', '<ESC>:Neoformat | ALEFix<CR>', {})
     vim.api.nvim_set_keymap('n', '<C-S-i>', '<ESC>:Neoformat<CR>a', { noremap=true })
     vim.api.nvim_set_keymap('i', '<C-S-i>', '<ESC>:Neoformat<CR>a', { noremap=true })
     -----
@@ -410,16 +460,27 @@ return require('packer').startup(function(use)
     use 'savq/melange'
     use 'fenetikm/falcon'
     use 'ayu-theme/ayu-vim'
+    use 'cocopon/iceberg.vim'
+    use 'EdenEast/nightfox.nvim'
+    use 'fcpg/vim-farout'
+    use 'adigitoleo/vim-mellow'
+    use 'slugbyte/yuejiu'
+    use 'azolus/evernight.nvim'
 
     vim.g.falcon_background = 0
     vim.g.falcon_inactive = 1
 
-    vim.cmd[[colorscheme OceanicNext]]
+    -- vim.cmd[[colorscheme OceanicNext]]
+    -- vim.cmd[[colorscheme blue-moon]]
+    vim.cmd[[colorscheme farout]]
+    vim.highlight.create('LineBreakpoint', { ctermbg=0, guibg='#511111' }, false)
+    vim.highlight.create('DapStopped', { ctermbg=0, guifg='#98c379', guibg='#31353f' }, false)
+
     -- transparent bg
-    vim.cmd[[autocmd vimenter * hi Normal guibg=none guifg=none ctermbg=none ctermfg=none]]
-    vim.cmd[[autocmd vimenter * hi NormalNC guibg=none guifg=none ctermbg=none ctermfg=none]]
-    vim.cmd[[autocmd vimenter * hi NonText guibg=none guifg=none ctermbg=none ctermfg=none]]
-    vim.cmd[[autocmd vimenter * hi Visual guibg=#333344 guifg=none ctermbg=none ctermfg=none]]
+    -- vim.cmd[[autocmd vimenter * hi Normal guibg=none guifg=none ctermbg=none ctermfg=none]]
+    -- vim.cmd[[autocmd vimenter * hi NormalNC guibg=none guifg=none ctermbg=none ctermfg=none]]
+    -- vim.cmd[[autocmd vimenter * hi NonText guibg=none guifg=none ctermbg=none ctermfg=none]]
+    -- vim.cmd[[autocmd vimenter * hi Visual guibg=#333344 guifg=none ctermbg=none ctermfg=none]]
     -- -- -- coloscheme switcher
     -- use 'xolox/vim-misc'
     -- use 'xolox/vim-colorscheme-switcher'
