@@ -17,14 +17,14 @@ return {
       -- This setting only take effect in insert mode, it does not affect signature help in normal
       -- mode, 10 by default
 
-      floating_window = true, -- show hint in a floating window, set to false for virtual text only mode
+      floating_window = false, -- show hint in a floating window, set to false for virtual text only mode
 
       floating_window_above_cur_line = true, -- try to place the floating above the current line when possible Note:
       -- will set to true when fully tested, set to false will use whichever side has more space
       -- this setting will be helpful if you do not want the PUM and floating win overlap
 
       floating_window_off_x = 1, -- adjust float windows x position.
-      floating_window_off_y = 1, -- adjust float windows y position.
+      floating_window_off_y = -1, -- adjust float windows y position.
 
 
       fix_pos = false,  -- set to true, the floating window will not auto-close until finish all parameters
@@ -98,7 +98,7 @@ return {
     vim.g.coq_settings = { 
       auto_start='shut-up',
       limits = { completion_auto_timeout = 1.00 },
-      keymap = { manual_complete="<c-i>", recommended = false }, 
+      keymap = { manual_complete="<c-k>", recommended = false }, 
     }
 
   use 'windwp/nvim-autopairs'
@@ -228,8 +228,8 @@ remap('i', '<bs>', 'v:lua.MUtils.BS()', { expr = true, noremap = true })
       "command! LspDiagLine lua vim.lsp.diagnostic.show_line_diagnostics()")
       vim.cmd("command! LspSignatureHelp lua vim.lsp.buf.signature_help()")
       buf_map(bufnr, "n", "gd", ":LspDef<CR>", {silent = true})
-      buf_map(bufnr, "n", "gr", ":LspRename<CR>", {silent = true})
-      buf_map(bufnr, "n", "gR", ":References<CR>", {silent = true})
+      buf_map(bufnr, "n", "gR", ":LspRename<CR>", {silent = true})
+      buf_map(bufnr, "n", "gr", ":References<CR>", {silent = true})
       buf_map(bufnr, "n", "gy", ":LspTypeDef<CR>", {silent = true})
       buf_map(bufnr, "n", "K", ":LspHover<CR>", {silent = true})
       buf_map(bufnr, "n", "gs", ":LspOrganize<CR>", {silent = true})

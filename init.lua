@@ -120,11 +120,12 @@ dap.configurations.typescript = { -- change to typescript if needed
   vim.g['switch_custom_definitions'] = { 
     { "width", "height"}, 
     { "x", "y", "z" },
-    { "top", "bottom", "Top", "Bottom" }
+    { "top", "bottom", "Top", "Bottom" },
+    { "addChild", "removeChild" },
   }
   vim.cmd[[
     nnoremap <silent> <Plug>(SwitchInLine) :<C-u>call SwitchLine(v:count1)<cr>
-    nmap <F3> <Plug>(SwitchInLine)w
+    nmap <F4> <Plug>(SwitchInLine)w
 
     fun! SwitchLine(cnt)
         let tick = b:changedtick
@@ -248,6 +249,15 @@ dap.configurations.typescript = { -- change to typescript if needed
   -- vim.g.lightline = { colorscheme='melange' }
   ----
 
+  -- highlight other uses of words
+  use 'RRethy/vim-illuminate'
+  vim.cmd
+  [[
+    augroup illuminate_augroup
+      autocmd!
+      autocmd VimEnter * hi illuminatedWord ctermbg=DarkBlue guibg=DarkBlue
+    augroup END
+  ]]
   ---- formatter
   use 'sbdchd/neoformat'
 
@@ -265,6 +275,8 @@ dap.configurations.typescript = { -- change to typescript if needed
 
   ---- highlight hex colors
   use 'chrisbra/Colorizer'
+  vim.api.nvim_set_keymap('n', '<leader>c', ':ColorHighlight<CR>', { silent = true, noremap = true })
+
 
   ---- better surrounding chars edit
   use 'tpope/vim-surround'
@@ -304,6 +316,7 @@ dap.configurations.typescript = { -- change to typescript if needed
     -- parser_config.c.used_by = { "c" }
   end
 
+  -- require('ascii_bg').set_ascii_bg()
   require('lsp').startup(use)
 
 
@@ -466,13 +479,16 @@ dap.configurations.typescript = { -- change to typescript if needed
     use 'adigitoleo/vim-mellow'
     use 'slugbyte/yuejiu'
     use 'azolus/evernight.nvim'
+    use 'yonlu/omni.vim'
 
-    vim.g.falcon_background = 0
-    vim.g.falcon_inactive = 1
+    -- vim.g.falcon_background = 1
+    -- vim.g.falcon_inactive = 1
 
     -- vim.cmd[[colorscheme OceanicNext]]
     -- vim.cmd[[colorscheme blue-moon]]
-    vim.cmd[[colorscheme farout]]
+    -- vim.cmd[[colorscheme farout]]
+    -- vim.cmd[[colorscheme deus]]
+    vim.cmd[[colorscheme falcon]]
     vim.highlight.create('LineBreakpoint', { ctermbg=0, guibg='#511111' }, false)
     vim.highlight.create('DapStopped', { ctermbg=0, guifg='#98c379', guibg='#31353f' }, false)
 
