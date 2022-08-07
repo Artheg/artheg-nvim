@@ -102,10 +102,16 @@ return {
     use 'Shougo/ddc-sorter_rank'
     use 'Shougo/ddc-nvim-lsp'
     use 'matsui54/ddc-buffer'
+    use 'tani/ddc-fuzzy'
 
     vim.call('ddc#custom#patch_global', {
       sources = { 'nvim-lsp', 'around', 'buffer' },
       sourceOptions = {
+        ['_'] = {
+          matchers = {'matcher_fuzzy'},
+          sorters = {'sorter_rank'},
+          converters = {'converter_fuzzy'}
+        },
         ['nvim-lsp'] = {
           mark = 'LSP',
           forceCompletionPattern = '\\.|:|->',
