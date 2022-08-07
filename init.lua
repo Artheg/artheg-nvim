@@ -319,6 +319,9 @@ dap.configurations.typescript = { -- change to typescript if needed
   -- require('ascii_bg').set_ascii_bg()
   require('lsp').startup(use)
 
+  vim.cmd[[
+    set completeopt=menuone,noinsert,noselect
+  ]]
 
   -- Keybindings
 

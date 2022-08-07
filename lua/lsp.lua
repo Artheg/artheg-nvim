@@ -93,13 +93,57 @@ return {
       })
     end
 
+    -- ddc.vim completion
+    use 'Shougo/ddc.vim'
+    use 'vim-denops/denops.vim'
+
+    use 'Shougo/ddc-around'
+    use 'Shougo/ddc-matcher_head'
+    use 'Shougo/ddc-sorter_rank'
+    use 'Shougo/ddc-nvim-lsp'
+    use 'matsui54/ddc-buffer'
+
+    vim.call('ddc#custom#patch_global', {
+      sources = { 'nvim-lsp', 'around', 'buffer' },
+      sourceOptions = {
+        ['nvim-lsp'] = {
+          mark = 'LSP',
+          forceCompletionPattern = '\\.|:|->',
+          maxCandidates = 15,
+        },
+        around = {
+          mark = 'AROUND',
+          maxCandidates = 5,
+        },
+        buffer = {
+          mark = 'BUFFER',
+          maxCandidates = 5,
+        },
+      },
+    })
+    vim.cmd[[
+
+    " <TAB>: completion.
+    inoremap <silent><expr> <TAB>
+    \ ddc#map#pum_visible() ? '<C-n>' :
+    \ (col('.') <= 1 <Bar><Bar> getline('.')[col('.') - 2] =~# '\s') ?
+    \ '<TAB>' : ddc#map#manual_complete()
+
+    " <S-TAB>: completion back.
+    inoremap <expr><S-TAB>  ddc#map#pum_visible() ? '<C-p>' : '<C-h>'
+
+    ]]
+    -- Enable on startup
+    -- vim.call('popup_preview#enable')
+    vim.call('ddc#enable')
+
     -- coq_nvim autocompletion
-    use {'ms-jpq/coq_nvim', branch='coq', run=':COQdeps' }
-    vim.g.coq_settings = { 
-      auto_start='shut-up',
-      limits = { completion_auto_timeout = 1.00 },
-      keymap = { manual_complete="<c-k>", recommended = false }, 
-    }
+    -- use {'ms-jpq/coq_nvim', branch='coq', run=':COQdeps' }
+    -- vim.g.coq_settings = { 
+    --   auto_start='shut-up',
+    --   limits = { completion_auto_timeout = 1.00 },
+    --   keymap = { manual_complete="<c-k>", recommended = false }, 
+    -- }
 
   use 'windwp/nvim-autopairs'
   local has_npairs,npairs = pcall(require, 'nvim-autopairs')
@@ -313,6 +357,9 @@ remap('i', '<bs>', 'v:lua.MUtils.BS()', { expr = true, noremap = true })
       nvim_lsp.html.setup {
         capabilities = capabilities,
       }
+      nvim_lsp.haxe_language_server.setup({
+        cmd = {"node", "/home/artheg/git/haxe-language-server/bin/server.js"}
+      })
     end
 
     -- Angular
@@ -332,9 +379,11 @@ remap('i', '<bs>', 'v:lua.MUtils.BS()', { expr = true, noremap = true })
     }
 
     if has_nvim_lsp then
-      nvim_lsp.cmake.setup{
-        on_attach = on_attach
-      }
+      -- nvim_lsp.cmake.setup{
+      --   on_attach = on_attach
+      -- }
+
+      -- nvim_lsp.clangd.setup{}
 
       nvim_lsp.ccls.setup {
         on_attach = on_attach,
