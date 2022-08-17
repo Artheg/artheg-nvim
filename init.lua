@@ -60,11 +60,15 @@ end
 
 return require('packer').startup(function(use)
 
-  -- Packer can manage itself
-  use 'wbthomason/packer.nvim'
+  require('plugin-list').startup(use)
+  if packer_bootstrap then
+    require('packer').sync()
+  end
 
-  use 'mfussenegger/nvim-dap'
 
+  require('lsp-config')
+
+  -- 'mfussenegger/nvim-dap' (debugger)
   local dap = require('dap')
 
   vim.api.nvim_set_keymap( 'n', '<F6>', ':lua require("dap").clear_breakpoints()<CR>', {} )
@@ -82,41 +86,32 @@ return require('packer').startup(function(use)
   vim.fn.sign_define('DapBreakpoint', {text='🛑', texthl='BP', linehl='LineBreakpoint', numhl=''})
 
   dap.configurations.javascript = { -- change this to javascript if needed
-  {
-    type = "chrome",
-    request = "attach",
-    program = "${file}",
-    cwd = vim.fn.getcwd(),
-    sourceMaps = true,
-    protocol = "inspector",
-    port = 9222,
-    webRoot = "${workspaceFolder}"
+    {
+      type = "chrome",
+      request = "attach",
+      program = "${file}",
+      cwd = vim.fn.getcwd(),
+      sourceMaps = true,
+      protocol = "inspector",
+      port = 9222,
+      webRoot = "${workspaceFolder}"
+    }
   }
-}
 
-dap.configurations.typescript = { -- change to typescript if needed
-{
-  type = "chrome",
-  request = "attach",
-  program = "${file}",
-  cwd = vim.fn.getcwd(),
-  sourceMaps = true,
-  protocol = "inspector",
-  port = 9222,
-  webRoot = "${workspaceFolder}",
-}
-}
+  dap.configurations.typescript = { -- change to typescript if needed
+    {
+      type = "chrome",
+      request = "attach",
+      program = "${file}",
+      cwd = vim.fn.getcwd(),
+      sourceMaps = true,
+      protocol = "inspector",
+      port = 9222,
+      webRoot = "${workspaceFolder}",
+    }
+  }
 
-  use 'ziglang/zig.vim'
-
-  -- vifm integration
-  -- use 'vifm/vifm.vim'
-
-  use {'junegunn/fzf'}
-  use {'junegunn/fzf.vim'}
-
-  ---- automatically replaces words
-  use 'AndrewRadev/switch.vim'
+  ---- switch.vim (automatically replaces words)
   vim.g['switch_custom_definitions'] = { 
     { "width", "height"}, 
     { "x", "y", "z" },
@@ -125,67 +120,47 @@ dap.configurations.typescript = { -- change to typescript if needed
     { "add", "remove" },
   }
   vim.cmd[[
-    nnoremap <silent> <Plug>(SwitchInLine) :<C-u>call SwitchLine(v:count1)<cr>
-    nmap <F4> <Plug>(SwitchInLine)w
+  nnoremap <silent> <Plug>(SwitchInLine) :<C-u>call SwitchLine(v:count1)<cr>
+  nmap <F4> <Plug>(SwitchInLine)w
 
-    fun! SwitchLine(cnt)
-        let tick = b:changedtick
-        let start = getcurpos()
-        for n in range(a:cnt)
+  fun! SwitchLine(cnt)
+  let tick = b:changedtick
+  let start = getcurpos()
+  for n in range(a:cnt)
+    Switch
+    endfor
+    if b:changedtick != tick
+      return
+      endif
+      while v:true
+        let pos = getcurpos()
+        normal! w
+        if pos[1] != getcurpos()[1] || pos == getcurpos()
+          break
+          endif
+          for n in range(a:cnt)
             Switch
-        endfor
-        if b:changedtick != tick
-            return
-        endif
-        while v:true
-            let pos = getcurpos()
-            normal! w
-            if pos[1] != getcurpos()[1] || pos == getcurpos()
-                break
-            endif
-            for n in range(a:cnt)
-                Switch
             endfor
             if b:changedtick != tick
-                return
-            endif
-        endwhile
-        call setpos('.', start)
-    endfun
+              return
+              endif
+              endwhile
+              call setpos('.', start)
+              endfun
   ]]
 
-  ---- extends match (matches special words)
-  use 'andymass/vim-matchup'
+  ---- lewis6991/gitsigns.nvim (git signs and hunk actions)
+  local gitsigns = require('gitsigns')
+  gitsigns.setup()
 
-  ---- create themes with live preview
-  use {'rktjmp/lush.nvim'}
+  -- ahmedkhalf/project.nvim (Rooter)
+  local project_nvim = require('project_nvim')
+  project_nvim.setup{
+    patterns = { ".git", "_darcs", ".hg", ".bzr", ".svn", "Makefile", "package.json", "tsconfig.json", "angular.json" },
+    detection_methods = { "pattern", "lsp" }
+  }
 
-  ---- lexima (autocomplete {} () etc.)
-  ---- use 'cohama/lexima.vim'
-  -- use 'windwp/nvim-autopairs'
-  -- local has_npairs,npairs = pcall(require, 'nvim-autopairs')
-  -- if has_npairs then
-  --   npairs.setup({ map_bs = false, map_cr = false })
-  -- end
-
-  ---- git signs and hunk actions
-  use {'lewis6991/gitsigns.nvim', requires = 'nvim-lua/plenary.nvim'}
-  use {'airblade/vim-gitgutter'}
-  local has_gitsigns,gitsigns = pcall(require, 'gitsigns')
-  if has_gitsigns then gitsigns.setup() end
-
-  ---- Rooter
-  use 'ahmedkhalf/project.nvim'
-  local has_project_nvim,project_nvim = pcall(require, 'project_nvim')
-  if has_project_nvim then
-    project_nvim.setup{
-      patterns = { ".git", "_darcs", ".hg", ".bzr", ".svn", "Makefile", "package.json", "tsconfig.json", "angular.json" },
-      detection_methods = { "pattern", "lsp" }
-    }
-  end
-
-  ---- ALE
-  use 'dense-analysis/ale'
+  -- dense-analysis/ale
   vim.g['ale_fixers'] = {'eslint'}
   vim.g['ale_linters'] = { javascript = {'eslint'}, typescript = {'eslintd'} }
   vim.g['ale_javascript_eslint_executable'] = 'eslint_d'
@@ -193,101 +168,40 @@ dap.configurations.typescript = { -- change to typescript if needed
   vim.g['ale_typescript_eslint_executable'] = 'eslint_d'
   vim.g['ale_typescript_eslint_use_global'] = 1
   vim.g['ale_fix_on_save'] = 1
-  ----
+  --
 
-  ---- better word motion (e.g. CamelCase)
-  use 'chaoren/vim-wordmotion'
 
-  -- lf file manager
-  use 'ptzz/lf.vim'
+  -- ptzz/lf.vim (lf file manager)
   vim.g['lf_replace_netrw'] = 1
   vim.g['lf_map_keys'] = 0
+  --
 
-  -- floating terminal
-  use 'voldikss/vim-floaterm'
+  -- voldikss/vim-floaterm (floating terminal)
   vim.api.nvim_set_keymap( 'n', '<leader>e', ':Lf<CR>', {silent=true} )
   --
 
-  -- opening screen
-  -- use 'mhinz/vim-startify'
-  -- use 'glepnir/dashboard-nvim'
-  vim.g['dashboard_default_executive'] = 'telescope'
-  vim.g['dashboard_custom_header'] = {
-    [[                                     ]],
-    [[                                     ]],
-    [[            &&&&&&&&&&&&&%           ]],
-    [[        %&&&#            &&&%        ]],
-    [[      &&%&                  &&&      ]],
-    [[     %&&                      &&     ]],
-    [[    %&%                       *&&    ]],
-    [[    &&%        &&&&%&&&&&%     &&    ]],
-    [[    &&&        &&&&&&&&&&&&&   &&    ]],
-    [[     &&#       &&&&&&&&&&&&&&&&&%    ]],
-    [[      &&%,,,,,,&&&&&&&&&&&&&&&&%     ]],
-    [[       (&&&&&&&&&&&&&&&&&&&&&%       ]],
-    [[          %&&&&&&&&&&&&&&&&          ]],
-    [[                #%%&&#               ]],
-    [[                                     ]],
-    [[      Right man in the wrong place   ]],
-    [[      can make all the difference    ]],
-    [[             in the world            ]],
-    [[              ⠉⠉⠛⠛⠛⠛⠛⠛⠉⠉             ]],
-    [[                                     ]],
-    [[                                     ]],
-    [[                                     ]],
-    [[                                     ]],
-    [[                                     ]],
-    [[                                     ]],
-    [[                                     ]],
-    [[                                     ]],
-    [[                                     ]]
-  }
-  vim.g['dashboard_custom_footer'] = {}
-
-  ---- status line
-  -- use 'adelarsq/neoline.vim'
-  -- use 'vimpostor/vim-tpipeline'
-  -- use 'itchyny/lightline.vim'
-  -- vim.g.lightline = { colorscheme='melange' }
-  ----
-
-  -- highlight other uses of words
-  use 'RRethy/vim-illuminate'
+  -- RRethy/vim-illuminate (highlight other uses of words)
   vim.cmd
   [[
     augroup illuminate_augroup
-      autocmd!
-      autocmd VimEnter * hi illuminatedWord ctermbg=DarkBlue guibg=DarkBlue
+    autocmd!
+    autocmd VimEnter * hi illuminatedWord ctermbg=DarkBlue guibg=DarkBlue
     augroup END
   ]]
-  ---- formatter
-  use 'sbdchd/neoformat'
 
-  ---- commenter
-  use 'tpope/vim-commentary'
 
-  ---- Telescope (highly extendable fuzzy finder over lists. Built on the latest awesome features from neovim)
-  use {'nvim-telescope/telescope.nvim', requires = 'nvim-lua/plenary.nvim'}
-  local has_telescope,telescope = pcall(require, 'telescope')
-  if has_telescope then telescope.load_extension('projects') end
-  use {'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }  
-  use {'nvim-telescope/telescope-fzy-native.nvim' }  
+  ---- nvim-telescope/telescope.nvim 
+  local telescope = require('telescope')
+  telescope.load_extension('projects')
   require('telescope').load_extension('fzf')
   require('telescope').load_extension('fzy_native')
 
-  ---- highlight hex colors
-  use 'chrisbra/Colorizer'
+  ---- chrisbra/Colorizer
   vim.api.nvim_set_keymap('n', '<leader>c', ':ColorHighlight<CR>', { silent = true, noremap = true })
 
 
-  ---- better surrounding chars edit
-  use 'tpope/vim-surround'
 
-  ------- git
-  ----
-  ---- blamer
-  -- use 'APZelos/blamer.nvim'
-  use 'f-person/git-blame.nvim'
+  ---- f-person/git-blame.nvim (git blamer)
   vim.g.gitblame_date_format = "%d.%m.%y %H:%M"
   vim.g.gitblame_message_template = "<author> (<committer-date>) • <summary>"
   ----
@@ -296,34 +210,17 @@ dap.configurations.typescript = { -- change to typescript if needed
 
   ------- LSP
 
-  -- use {'neoclide/coc.nvim', branch='release'}
-
-  use {'ms-jpq/coq.artifacts', branch='artifacts' }
-  use {'nvim-treesitter/nvim-treesitter', run=':TSUpdate'}
-  local has_nvim_treesitter,nvim_treesitter = pcall(require, 'nvim-treesitter.configs')
-  if has_nvim_treesitter then
-    nvim_treesitter.setup{
-      highlight = {
-        enable = true
-      },
-      matchup = {
-        enable = true
-      }
+  local nvim_treesitter = require('nvim-treesitter.configs')
+  nvim_treesitter.setup{
+    highlight = {
+      enable = true
+    },
+    matchup = {
+      enable = true
     }
-  end
-  -- use 'tree-sitter/tree-sitter-typescript'
-  if has_nvim_treesitter then
-    local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
-    -- parser_config.typescript.used_by = { "typescript" }
-    -- parser_config.c.used_by = { "c" }
-  end
+  }
 
-  -- require('ascii_bg').set_ascii_bg()
-  require('lsp').startup(use)
-
-  vim.cmd[[
-    set completeopt=menuone,noinsert,noselect
-  ]]
+  -----
 
   -- Keybindings
 
@@ -343,8 +240,8 @@ dap.configurations.typescript = { -- change to typescript if needed
 
   -- better history jumping
   vim.cmd[[
-    nnoremap <expr> j (v:count > 1 ? "m'" . v:count : "") . 'j'
-    nnoremap <expr> k (v:count > 1 ? "m'" . v:count : "") . 'k'
+  nnoremap <expr> j (v:count > 1 ? "m'" . v:count : "") . 'j'
+  nnoremap <expr> k (v:count > 1 ? "m'" . v:count : "") . 'k'
   ]]
 
   -- vim.api.nvim_set_keymap('i', '<C-l>', '<Plug>(coc-snippets-vim)', {})
@@ -355,16 +252,6 @@ dap.configurations.typescript = { -- change to typescript if needed
   vim.api.nvim_set_keymap('n', '<Leader>cc', ':cclose<CR>', {})
   vim.api.nvim_set_keymap('n', '<Leader>co', ':copen<CR>', {})
   vim.api.nvim_set_keymap('n', '<esc>', ':cclose<CR>', { silent = true })
-
-  ------- Dashboard
-  -- vim.api.nvim_set_keymap('n','<Leader>fb',':DashboardJumpMark<CR>', { noremap = true , silent = false })
-  -- vim.api.nvim_set_keymap('n','<Leader>tc',':DashboardChangeColorscheme<CR>', { noremap = true , silent = false })
-  -- vim.api.nvim_set_keymap('n','<Leader>ff',':DashboardFindFile<CR>', { noremap = true , silent = false })
-  -- vim.api.nvim_set_keymap('n','<Leader>fh',':DashboardFindHistory<CR>', { noremap = true , silent = false })
-  -- vim.api.nvim_set_keymap('n','<Leader>fa',':DashboardFindHistory<CR>', { noremap = true , silent = false })
-  -- vim.api.nvim_set_keymap('n','<Leader>sl',':<C-u>SessionLoad<CR>', { noremap = true , silent = false })
-  -- vim.api.nvim_set_keymap('n','<Leader>fa',':DashboardFindWord<CR>', { noremap = true , silent = false })
-  -- vim.api.nvim_set_keymap('n','<Leader>cn',':DashboardNewFile<CR>i', { noremap = true , silent = false })
 
   ------- Floaterm
   vim.api.nvim_set_keymap('n', '<F2>', ':FloatermToggle<cr>', {silent=true})
@@ -416,89 +303,68 @@ dap.configurations.typescript = { -- change to typescript if needed
     let g:windowMaximized = 1
     endif
     endfunction
-    ]]
-    vim.api.nvim_set_keymap('n', 'L', '<c-w><c-w>', {silent=true})
-    vim.api.nvim_set_keymap('n', 'H', '<c-w>W', {silent=true})
-    vim.api.nvim_set_keymap('n', '<C-x>', ':call ToggleWindowMaximize()<cr>', {silent=true})
-    -----
+  ]]
 
-    ----- Edit
-    -- Emacs-like movement for insert mode
-    vim.api.nvim_set_keymap('i', '<C-b>', '<C-o>b', {})
-    vim.api.nvim_set_keymap('i', '<C-f>', '<C-o>w', {})
-    vim.api.nvim_set_keymap('i', '<C-a>', '<C-o>I', {})
-    vim.api.nvim_set_keymap('i', '<C-e>', '<C-o>A', {})
+  vim.api.nvim_set_keymap('n', 'L', '<c-w><c-w>', {silent=true})
+  vim.api.nvim_set_keymap('n', 'H', '<c-w>W', {silent=true})
+  vim.api.nvim_set_keymap('n', '<C-x>', ':call ToggleWindowMaximize()<cr>', {silent=true})
+  -----
 
-    -- make Y behave as other capital letters by default
-    vim.api.nvim_set_keymap('n', 'Y', 'y$', { noremap=true })
-    -- save all
-    vim.api.nvim_set_keymap('n', '<C-A-s>', ':wall<CR>', {})
-    vim.api.nvim_set_keymap('i', '<C-A-s>', ':wall<CR>', {})
-    -- save current
-    vim.api.nvim_set_keymap('n', '<C-s>', '<ESC>:w<CR>', {})
-    vim.api.nvim_set_keymap('i', '<C-s>', '<ESC>:w<CR>', {})
-    -----
+  ----- Edit
+  -- Emacs-like movement for insert mode
+  vim.api.nvim_set_keymap('i', '<C-b>', '<C-o>b', {})
+  vim.api.nvim_set_keymap('i', '<C-f>', '<C-o>w', {})
+  vim.api.nvim_set_keymap('i', '<C-a>', '<C-o>I', {})
+  vim.api.nvim_set_keymap('i', '<C-e>', '<C-o>A', {})
 
-    ------ Move
-    vim.api.nvim_set_keymap('v', 'J', ':m \'>+1<CR>gv=gv', {})
-    vim.api.nvim_set_keymap('v', 'K', ':m \'<-2<CR>gv=gv', {})
+  -- make Y behave as other capital letters by default
+  vim.api.nvim_set_keymap('n', 'Y', 'y$', { noremap=true })
+  -- save all
+  vim.api.nvim_set_keymap('n', '<C-A-s>', ':wall<CR>', {})
+  vim.api.nvim_set_keymap('i', '<C-A-s>', ':wall<CR>', {})
+  -- save current
+  vim.api.nvim_set_keymap('n', '<C-s>', '<ESC>:w<CR>', {})
+  vim.api.nvim_set_keymap('i', '<C-s>', '<ESC>:w<CR>', {})
+  -----
 
-    ----- Format
-    -- auto indent on paste
-    vim.api.nvim_set_keymap('n', 'p', 'p`[v`]=', { noremap=true })
-    vim.api.nvim_set_keymap('n', 'P', 'P`[v`]=', { noremap=true })
-    -- vim.api.nvim_set_keymap('n', '<C-p>', ']p', { noremap=true })
-    -- vim.api.nvim_set_keymap('n', '<C-P>', 'P', { noremap=true })
+  ------ Move
+  vim.api.nvim_set_keymap('v', 'J', ':m \'>+1<CR>gv=gv', {})
+  vim.api.nvim_set_keymap('v', 'K', ':m \'<-2<CR>gv=gv', {})
 
-    vim.api.nvim_set_keymap('n', '<F3>', '<ESC>:Neoformat | ALEFix<CR>', {})
-    vim.api.nvim_set_keymap('n', '<C-S-i>', '<ESC>:Neoformat<CR>a', { noremap=true })
-    vim.api.nvim_set_keymap('i', '<C-S-i>', '<ESC>:Neoformat<CR>a', { noremap=true })
-    -----
+  ----- Format
+  -- auto indent on paste
+  vim.api.nvim_set_keymap('n', 'p', 'p`[v`]=', { noremap=true })
+  vim.api.nvim_set_keymap('n', 'P', 'P`[v`]=', { noremap=true })
+  -- vim.api.nvim_set_keymap('n', '<C-p>', ']p', { noremap=true })
+  -- vim.api.nvim_set_keymap('n', '<C-P>', 'P', { noremap=true })
 
-    ----- Clipboard
-    vim.api.nvim_set_keymap('i', '<C-v>', '<ESC>"+p<S-v>==ea', {noremap=true})
-    vim.api.nvim_set_keymap('v', '<C-c>', '"+y', {noremap=true})
-    vim.api.nvim_set_keymap('n', '<C-S-v>', '"+p', {noremap=true})
-    vim.api.nvim_set_keymap('v', '<C-v>', '"+p<S-v>==ea', {noremap=true})
+  vim.api.nvim_set_keymap('n', '<F3>', '<ESC>:Neoformat | ALEFix<CR>', {})
+  vim.api.nvim_set_keymap('n', '<C-S-i>', '<ESC>:Neoformat<CR>a', { noremap=true })
+  vim.api.nvim_set_keymap('i', '<C-S-i>', '<ESC>:Neoformat<CR>a', { noremap=true })
+  -----
 
-    ----- colorschemes
-    use 'kyazdani42/blue-moon'
-    use 'bluz71/vim-nightfly-guicolors'
-    use 'Pocco81/Catppuccino.nvim'
-    use 'kdheepak/monochrome.nvim'
-    use 'flazz/vim-colorschemes'
-    use 'savq/melange'
-    use 'fenetikm/falcon'
-    use 'ayu-theme/ayu-vim'
-    use 'cocopon/iceberg.vim'
-    use 'EdenEast/nightfox.nvim'
-    use 'fcpg/vim-farout'
-    use 'adigitoleo/vim-mellow'
-    use 'slugbyte/yuejiu'
-    use 'azolus/evernight.nvim'
-    use 'yonlu/omni.vim'
+  ----- Clipboard
+  vim.api.nvim_set_keymap('i', '<C-v>', '<ESC>"+p<S-v>==ea', {noremap=true})
+  vim.api.nvim_set_keymap('v', '<C-c>', '"+y', {noremap=true})
+  vim.api.nvim_set_keymap('n', '<C-S-v>', '"+p', {noremap=true})
+  vim.api.nvim_set_keymap('v', '<C-v>', '"+p<S-v>==ea', {noremap=true})
 
-    -- vim.g.falcon_background = 1
-    -- vim.g.falcon_inactive = 1
+  -- vim.g.falcon_background = 1
+  -- vim.g.falcon_inactive = 1
 
-    -- vim.cmd[[colorscheme OceanicNext]]
-    -- vim.cmd[[colorscheme blue-moon]]
-    -- vim.cmd[[colorscheme farout]]
-    -- vim.cmd[[colorscheme deus]]
-    vim.cmd[[colorscheme falcon]]
-    vim.highlight.create('LineBreakpoint', { ctermbg=0, guibg='#511111' }, false)
-    vim.highlight.create('DapStopped', { ctermbg=0, guifg='#98c379', guibg='#31353f' }, false)
+  -- vim.cmd[[colorscheme OceanicNext]]
+  -- vim.cmd[[colorscheme blue-moon]]
+  -- vim.cmd[[colorscheme farout]]
+  -- vim.cmd[[colorscheme deus]]
+  vim.cmd[[colorscheme falcon]]
+  vim.highlight.create('LineBreakpoint', { ctermbg=0, guibg='#511111' }, false)
+  vim.highlight.create('DapStopped', { ctermbg=0, guifg='#98c379', guibg='#31353f' }, false)
 
-    -- transparent bg
-    -- vim.cmd[[autocmd vimenter * hi Normal guibg=none guifg=none ctermbg=none ctermfg=none]]
-    -- vim.cmd[[autocmd vimenter * hi NormalNC guibg=none guifg=none ctermbg=none ctermfg=none]]
-    -- vim.cmd[[autocmd vimenter * hi NonText guibg=none guifg=none ctermbg=none ctermfg=none]]
-    -- vim.cmd[[autocmd vimenter * hi Visual guibg=#333344 guifg=none ctermbg=none ctermfg=none]]
-    -- -- -- coloscheme switcher
-    -- use 'xolox/vim-misc'
-    -- use 'xolox/vim-colorscheme-switcher'
+  -- transparent bg
+  -- vim.cmd[[autocmd vimenter * hi Normal guibg=none guifg=none ctermbg=none ctermfg=none]]
+  -- vim.cmd[[autocmd vimenter * hi NormalNC guibg=none guifg=none ctermbg=none ctermfg=none]]
+  -- vim.cmd[[autocmd vimenter * hi NonText guibg=none guifg=none ctermbg=none ctermfg=none]]
+  -- vim.cmd[[autocmd vimenter * hi Visual guibg=#333344 guifg=none ctermbg=none ctermfg=none]]
 
-    if packer_bootstrap then
-      require('packer').sync()
-    end
-  end)
+end)
+
