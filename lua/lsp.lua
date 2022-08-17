@@ -3,7 +3,7 @@ return {
 
     -- lsp signature
     use 'ray-x/lsp_signature.nvim'
-    require'lsp_signature'.setup(cfg) -- no need to specify bufnr if you don't use toggle_key
+    require'lsp_signature'.setup(cfg)
 
     -- symbols outline
     use 'simrat39/symbols-outline.nvim'
@@ -124,6 +124,7 @@ return {
       buf_map(bufnr, "n", "ga", ":LspCodeAction<CR>", {silent = true})
       buf_map(bufnr, "v", "ga", ":RangeCodeActions<CR>", {silent = true})
       buf_map(bufnr, "n", "gf", ":LspFormatting<CR>", {silent = true})
+      buf_map(bufnr, 'n', '<Leader>ld', ':Lspsaga show_line_diagnostics<CR>', { silent = true })
       buf_map(bufnr, "n", "<Leader>a", ":Diagnostics<CR>", {silent = true})
       buf_map(bufnr, "i", "<C-x><C-x>", "<cmd> LspSignatureHelp<CR>",
       {silent = true})

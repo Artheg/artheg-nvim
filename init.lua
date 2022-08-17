@@ -461,14 +461,6 @@ dap.configurations.typescript = { -- change to typescript if needed
     vim.api.nvim_set_keymap('n', '<C-S-v>', '"+p', {noremap=true})
     vim.api.nvim_set_keymap('v', '<C-v>', '"+p<S-v>==ea', {noremap=true})
 
-    ----- Terminal
-    -- vim.api.nvim_set_keymap('n', '<A-t>', ':terminal tig<cr>i', {noremap=true, silent=true})
-
-    ----- coc.nvim
-    -- vim.api.nvim_set_keymap('n', 'K', ':call CocAction("doHover")<CR>', {silent=true} )
-    -- vim.api.nvim_set_keymap('n', 'gd', ':call CocAction("jumpDefinition")<CR>', {silent=true} )
-
-
     ----- colorschemes
     use 'kyazdani42/blue-moon'
     use 'bluz71/vim-nightfly-guicolors'
@@ -505,26 +497,6 @@ dap.configurations.typescript = { -- change to typescript if needed
     -- -- -- coloscheme switcher
     -- use 'xolox/vim-misc'
     -- use 'xolox/vim-colorscheme-switcher'
-    -- -- use 'honza/vim-snippets'
-    vim.cmd[[
-    " Open multiple lines (insert empty lines) before or after current line,
-    " and position cursor in the new space, with at least one blank line
-    " before and after the cursor.
-
-    function! OpenLines(nrlines, dir)
-    let nrlines = a:nrlines < 3 ? 3 : a:nrlines
-    let start = line('.') + a:dir
-    call append(start, repeat([''], nrlines))
-    if a:dir < 0
-      normal! 2k
-    else
-      normal! 2j
-      endif
-      endfunction
-      " Mappings to open multiple lines and enter insert mode.
-      nnoremap <Leader>o :<C-u>call OpenLines(v:count, 0)<CR>S
-      nnoremap <Leader>O :<C-u>call OpenLines(v:count, -1)<CR>S
-    ]]
 
     if packer_bootstrap then
       require('packer').sync()
