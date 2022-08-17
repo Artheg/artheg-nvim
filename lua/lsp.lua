@@ -93,55 +93,105 @@ return {
       })
     end
 
-    -- ddc.vim completion
-    use 'Shougo/ddc.vim'
-    use 'vim-denops/denops.vim'
+    -- nvim-cmp completion
+    use 'hrsh7th/cmp-nvim-lsp'
+    use 'hrsh7th/cmp-buffer'
+    use 'hrsh7th/cmp-path'
+    use 'hrsh7th/cmp-cmdline'
+    use 'hrsh7th/nvim-cmp'
+    -- For vsnip users.
+    use 'hrsh7th/cmp-vsnip'
+    use 'hrsh7th/vim-vsnip'
+    vim.cmd[[set completeopt=menu,menuone,noselect]]
 
-    use 'Shougo/ddc-around'
-    use 'Shougo/ddc-matcher_head'
-    use 'Shougo/ddc-sorter_rank'
-    use 'Shougo/ddc-nvim-lsp'
-    use 'matsui54/ddc-buffer'
-    use 'tani/ddc-fuzzy'
+    -- Setup nvim-cmp.
+    local cmp = require'cmp'
 
-    vim.call('ddc#custom#patch_global', {
-      sources = { 'nvim-lsp', 'around', 'buffer' },
-      sourceOptions = {
-        ['_'] = {
-          matchers = {'matcher_fuzzy'},
-          sorters = {'sorter_rank'},
-          converters = {'converter_fuzzy'}
-        },
-        ['nvim-lsp'] = {
-          mark = 'LSP',
-          forceCompletionPattern = '\\.|:|->',
-          maxCandidates = 15,
-        },
-        around = {
-          mark = 'AROUND',
-          maxCandidates = 5,
-        },
-        buffer = {
-          mark = 'BUFFER',
-          maxCandidates = 5,
-        },
+    cmp.setup({
+      snippet = {
+        -- REQUIRED - you must specify a snippet engine
+        expand = function(args)
+          vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+          -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+          -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
+          -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
+        end,
       },
+      window = {
+        -- completion = cmp.config.window.bordered(),
+        -- documentation = cmp.config.window.bordered(),
+      },
+      mapping = cmp.mapping.preset.insert({
+        ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+        ['<C-f>'] = cmp.mapping.scroll_docs(4),
+        ['<C-Space>'] = cmp.mapping.complete(),
+        ['<C-e>'] = cmp.mapping.abort(),
+        ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+      }),
+      sources = cmp.config.sources({
+        { name = 'nvim_lsp' },
+        { name = 'vsnip' }, -- For vsnip users.
+        -- { name = 'luasnip' }, -- For luasnip users.
+        -- { name = 'ultisnips' }, -- For ultisnips users.
+        -- { name = 'snippy' }, -- For snippy users.
+      }, {
+        { name = 'buffer' },
+      })
     })
-    vim.cmd[[
 
-    " <TAB>: completion.
-    inoremap <silent><expr> <TAB>
-    \ ddc#map#pum_visible() ? '<C-n>' :
-    \ (col('.') <= 1 <Bar><Bar> getline('.')[col('.') - 2] =~# '\s') ?
-    \ '<TAB>' : ddc#map#manual_complete()
 
-    " <S-TAB>: completion back.
-    inoremap <expr><S-TAB>  ddc#map#pum_visible() ? '<C-p>' : '<C-h>'
+    -- Setup lspconfig.
+    -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
 
-    ]]
+    -- ddc.vim completion
+    -- use 'Shougo/ddc.vim'
+    -- use 'vim-denops/denops.vim'
+
+    -- use 'Shougo/ddc-around'
+    -- use 'Shougo/ddc-matcher_head'
+    -- use 'Shougo/ddc-sorter_rank'
+    -- use 'Shougo/ddc-nvim-lsp'
+    -- use 'matsui54/ddc-buffer'
+    -- use 'tani/ddc-fuzzy'
+
+    -- vim.call('ddc#custom#patch_global', {
+    --   sources = { 'nvim-lsp', 'around', 'buffer' },
+    --   sourceOptions = {
+    --     ['_'] = {
+    --       matchers = {'matcher_fuzzy'},
+    --       sorters = {'sorter_rank'},
+    --       converters = {'converter_fuzzy'}
+    --     },
+    --     ['nvim-lsp'] = {
+    --       mark = 'LSP',
+    --       forceCompletionPattern = '\\.|:|->',
+    --       maxCandidates = 15,
+    --     },
+    --     around = {
+    --       mark = 'AROUND',
+    --       maxCandidates = 5,
+    --     },
+    --     buffer = {
+    --       mark = 'BUFFER',
+    --       maxCandidates = 5,
+    --     },
+    --   },
+    -- })
+    -- vim.cmd[[
+
+    -- " <TAB>: completion.
+    -- inoremap <silent><expr> <TAB>
+    -- \ ddc#map#pum_visible() ? '<C-n>' :
+    -- \ (col('.') <= 1 <Bar><Bar> getline('.')[col('.') - 2] =~# '\s') ?
+    -- \ '<TAB>' : ddc#map#manual_complete()
+
+    -- " <S-TAB>: completion back.
+    -- inoremap <expr><S-TAB>  ddc#map#pum_visible() ? '<C-p>' : '<C-h>'
+
+    -- ]]
     -- Enable on startup
     -- vim.call('popup_preview#enable')
-    vim.call('ddc#enable')
+    -- vim.call('ddc#enable')
 
     -- coq_nvim autocompletion
     -- use {'ms-jpq/coq_nvim', branch='coq', run=':COQdeps' }
@@ -189,35 +239,35 @@ npairs.add_rules {
 }
 
 -- these mappings are coq recommended mappings unrelated to nvim-autopairs
-remap('i', '<esc>', [[pumvisible() ? "<c-e><esc>" : "<esc>"]], { expr = true, noremap = true })
-remap('i', '<c-c>', [[pumvisible() ? "<c-e><c-c>" : "<c-c>"]], { expr = true, noremap = true })
-remap('i', '<tab>', [[pumvisible() ? "<c-n>" : "<tab>"]], { expr = true, noremap = true })
-remap('i', '<s-tab>', [[pumvisible() ? "<c-p>" : "<bs>"]], { expr = true, noremap = true })
+-- remap('i', '<esc>', [[pumvisible() ? "<c-e><esc>" : "<esc>"]], { expr = true, noremap = true })
+-- remap('i', '<c-c>', [[pumvisible() ? "<c-e><c-c>" : "<c-c>"]], { expr = true, noremap = true })
+-- remap('i', '<tab>', [[pumvisible() ? "<c-n>" : "<tab>"]], { expr = true, noremap = true })
+-- remap('i', '<s-tab>', [[pumvisible() ? "<c-p>" : "<bs>"]], { expr = true, noremap = true })
 
 -- skip it, if you use another global object
-_G.MUtils= {}
+-- _G.MUtils= {}
 
-MUtils.CR = function()
-  if vim.fn.pumvisible() ~= 0 then
-    if vim.fn.complete_info({ 'selected' }).selected ~= -1 then
-      return npairs.esc('<c-y>')
-    else
-      return npairs.esc('<c-e>') .. npairs.autopairs_cr()
-    end
-  else
-    return npairs.autopairs_cr()
-  end
-end
-remap('i', '<cr>', 'v:lua.MUtils.CR()', { expr = true, noremap = true })
+-- MUtils.CR = function()
+--   if vim.fn.pumvisible() ~= 0 then
+--     if vim.fn.complete_info({ 'selected' }).selected ~= -1 then
+--       return npairs.esc('<c-y>')
+--     else
+--       return npairs.esc('<c-e>') .. npairs.autopairs_cr()
+--     end
+--   else
+--     return npairs.autopairs_cr()
+--   end
+-- end
+-- remap('i', '<cr>', 'v:lua.MUtils.CR()', { expr = true, noremap = true })
 
-MUtils.BS = function()
-  if vim.fn.pumvisible() ~= 0 and vim.fn.complete_info({ 'mode' }).mode == 'eval' then
-    return npairs.esc('<c-e>') .. npairs.autopairs_bs()
-  else
-    return npairs.autopairs_bs()
-  end
-end
-remap('i', '<bs>', 'v:lua.MUtils.BS()', { expr = true, noremap = true })
+-- MUtils.BS = function()
+--   if vim.fn.pumvisible() ~= 0 and vim.fn.complete_info({ 'mode' }).mode == 'eval' then
+--     return npairs.esc('<c-e>') .. npairs.autopairs_bs()
+--   else
+--     return npairs.autopairs_bs()
+--   end
+-- end
+-- remap('i', '<bs>', 'v:lua.MUtils.BS()', { expr = true, noremap = true })
     -- lots of snippets from ms-jpg
     -- use {'ms-jpq/coq.artifacts', branch='artifacts' }
 
@@ -300,14 +350,23 @@ remap('i', '<bs>', 'v:lua.MUtils.BS()', { expr = true, noremap = true })
       --   ]], true)
       -- end
     end
+    local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+    use 'jose-elias-alvarez/typescript.nvim';
     if has_nvim_lsp then
+      nvim_lsp.rust_analyzer.setup{
+        on_attach = on_attach
+      }
+      require('typescript').setup()
       nvim_lsp.tsserver.setup {
+        capabilities = capabilities,
         on_attach = function(client, bufnr)
           client.resolved_capabilities.document_formatting = false
           on_attach(client, bufnr)
         end
       }
-      nvim_lsp.eslint.setup{}
+      nvim_lsp.eslint.setup{
+        on_attach = on_attach
+      }
 
     end
     local filetypes = {
@@ -356,17 +415,17 @@ remap('i', '<bs>', 'v:lua.MUtils.BS()', { expr = true, noremap = true })
     -----
 
     -- HTML
-    local capabilities = vim.lsp.protocol.make_client_capabilities()
-    capabilities.textDocument.completion.completionItem.snippetSupport = true
+    -- local capabilities = vim.lsp.protocol.make_client_capabilities()
+    -- capabilities.textDocument.completion.completionItem.snippetSupport = true
 
-    if has_nvim_lsp then
-      nvim_lsp.html.setup {
-        capabilities = capabilities,
-      }
-      nvim_lsp.haxe_language_server.setup({
-        cmd = {"node", "/home/artheg/git/haxe-language-server/bin/server.js"}
-      })
-    end
+    -- if has_nvim_lsp then
+    --   nvim_lsp.html.setup {
+    --     capabilities = capabilities,
+    --   }
+    --   nvim_lsp.haxe_language_server.setup({
+    --     cmd = {"node", "/home/artheg/git/haxe-language-server/bin/server.js"}
+    --   })
+    -- end
 
     -- Angular
     -- local project_library_path = "/usr/lib/node_modules"

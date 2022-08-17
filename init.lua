@@ -121,7 +121,8 @@ dap.configurations.typescript = { -- change to typescript if needed
     { "width", "height"}, 
     { "x", "y", "z" },
     { "top", "bottom", "Top", "Bottom" },
-    { "addChild", "removeChild" },
+    { "left", "right" },
+    { "add", "remove" },
   }
   vim.cmd[[
     nnoremap <silent> <Plug>(SwitchInLine) :<C-u>call SwitchLine(v:count1)<cr>
