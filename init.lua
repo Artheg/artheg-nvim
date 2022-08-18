@@ -188,7 +188,14 @@ return require('packer').startup(function(use)
     autocmd VimEnter * hi illuminatedWord ctermbg=DarkBlue guibg=DarkBlue
     augroup END
   ]]
-
+  --
+  
+  -- nvim-treesitter/nvim-treesitter
+  local treesitter = require('nvim-treesitter.configs')
+  treesitter.setup {
+    ensure_installed = { "c", "lua", "typescript", "zig" }
+  }
+  --
 
   ---- nvim-telescope/telescope.nvim 
   local telescope = require('telescope')
