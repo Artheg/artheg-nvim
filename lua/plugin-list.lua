@@ -84,6 +84,9 @@ return {
     use 'tpope/vim-surround'
     --
 
+    -- adds indentation guides 
+    use 'lukas-reineke/indent-blankline.nvim'
+
     -- colorschemes
     use 'kyazdani42/blue-moon'
     use 'bluz71/vim-nightfly-guicolors'

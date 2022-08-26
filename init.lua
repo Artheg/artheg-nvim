@@ -85,7 +85,7 @@ return require('packer').startup(function(use)
   }
   vim.fn.sign_define('DapBreakpoint', {text='🛑', texthl='BP', linehl='LineBreakpoint', numhl=''})
 
-  dap.configurations.javascript = { -- change this to javascript if needed
+  dap.configurations.javascript = {
     {
       type = "chrome",
       request = "attach",
@@ -98,7 +98,7 @@ return require('packer').startup(function(use)
     }
   }
 
-  dap.configurations.typescript = { -- change to typescript if needed
+  dap.configurations.typescript = {
     {
       type = "chrome",
       request = "attach",
@@ -114,6 +114,7 @@ return require('packer').startup(function(use)
   ---- switch.vim (automatically replaces words)
   vim.g['switch_custom_definitions'] = { 
     { "width", "height"}, 
+    { "Width", "Height"}, 
     { "x", "y", "z" },
     { "top", "bottom", "Top", "Bottom" },
     { "left", "right" },
@@ -200,13 +201,25 @@ return require('packer').startup(function(use)
   ---- nvim-telescope/telescope.nvim 
   local telescope = require('telescope')
   telescope.load_extension('projects')
-  require('telescope').load_extension('fzf')
-  require('telescope').load_extension('fzy_native')
+  telescope.load_extension('fzf')
+  telescope.load_extension('fzy_native')
 
   ---- chrisbra/Colorizer
   vim.api.nvim_set_keymap('n', '<leader>c', ':ColorHighlight<CR>', { silent = true, noremap = true })
 
 
+  -- 'lukas-reineke/indent-blankline.nvim'
+  vim.opt.list = true
+  vim.opt.listchars:append "space:⋅"
+  vim.opt.listchars:append "eol:↴"
+
+  local indent_blankline = require('indent_blankline')
+  indent_blankline.setup {
+    show_end_of_line = true,
+    space_char_blankline = " ",
+    show_current_context = true,
+    show_current_context_start = true
+  }
 
   ---- f-person/git-blame.nvim (git blamer)
   vim.g.gitblame_date_format = "%d.%m.%y %H:%M"
