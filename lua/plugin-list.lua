@@ -105,6 +105,10 @@ return {
     use 'yonlu/omni.vim'
     --
 
+    -- godot support
+    use 'habamax/vim-godot'
+    --
+
     -- -- coloscheme switcher
     -- use 'xolox/vim-misc'
     -- use 'xolox/vim-colorscheme-switcher'

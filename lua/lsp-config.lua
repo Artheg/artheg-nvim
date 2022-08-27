@@ -107,6 +107,9 @@ nvim_lsp.rust_analyzer.setup{
   on_attach = on_attach
 }
 require('typescript').setup()
+nvim_lsp.gdscript.setup{
+  on_attach = on_attach
+}
 nvim_lsp.tsserver.setup {
   capabilities = capabilities,
   on_attach = function(client, bufnr)
@@ -168,6 +171,7 @@ nvim_lsp.zls.setup {
 nvim_lsp.ccls.setup {
   on_attach = on_attach,
   init_options = {
+    single_file_support = true;
     compilationDatabaseDirectory = "build";
     index = {
       threads = 0;
