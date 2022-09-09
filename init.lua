@@ -330,6 +330,10 @@ return require('packer').startup(function(use)
   vim.api.nvim_set_keymap('n', '<C-x>', ':call ToggleWindowMaximize()<cr>', {silent=true})
   -----
 
+  ----- vim-snip
+  vim.api.nvim_set_keymap('i', '<Tab>', 'vsnip#jumpable(1) ? \'<Plug>(vsnip-jump-next)\' : \'<Tab>\'', {silent=true, expr=true})
+  vim.api.nvim_set_keymap('i', '<S-Tab>', 'vsnip#jumpable(-1) ? \'<Plug>(vsnip-jump-prev)\' : \'<S-Tab>\'', {silent=true, expr=true})
+
   ----- Edit
   -- Emacs-like movement for insert mode
   vim.api.nvim_set_keymap('i', '<C-b>', '<C-o>b', {})
