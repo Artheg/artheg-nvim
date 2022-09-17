@@ -134,7 +134,7 @@ return {
     --
 
     -- lsp saga (fancier hover, actions lots of other things)
-    use 'tami5/lspsaga.nvim'
+    use { 'glepnir/lspsaga.nvim', branch='main' }
     --
 
     -- [], {}, (), etc.

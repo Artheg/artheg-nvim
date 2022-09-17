@@ -108,7 +108,6 @@ local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protoco
 nvim_lsp.rust_analyzer.setup{
   on_attach = on_attach
 }
-require('typescript').setup()
 nvim_lsp.gdscript.setup{
   on_attach = on_attach
 }
