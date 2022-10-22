@@ -125,7 +125,8 @@ return {
     --
 
     -- symbols outline
-    use 'simrat39/symbols-outline.nvim'
+    -- use 'simrat39/symbols-outline.nvim'
+    use 'stevearc/aerial.nvim'
     --
 
     -- Neovim LSP Integration
@@ -134,8 +135,31 @@ return {
     --
 
     -- lsp saga (fancier hover, actions lots of other things)
-    use { 'glepnir/lspsaga.nvim', branch='main' }
+    -- use { 'glepnir/lspsaga.nvim', branch='main' }
+    -- noice, experimental UI
     --
+    use({
+      "folke/noice.nvim",
+      event = "VimEnter",
+      config = function()
+        require("noice").setup()
+      end,
+      requires = {
+        -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+        "MunifTanjim/nui.nvim",
+        -- OPTIONAL:
+        --   `nvim-notify` is only needed, if you want to use the notification view.
+        --   If not available, we use `mini` as the fallback
+        "rcarriga/nvim-notify",
+      }
+    })
+    --
+
+    -- status line
+    use {
+      'nvim-lualine/lualine.nvim',
+      requires = { 'kyazdani42/nvim-web-devicons', opt = true }
+    }
 
     -- [], {}, (), etc.
     use 'windwp/nvim-autopairs'
@@ -153,6 +177,12 @@ return {
     use 'hrsh7th/nvim-cmp'
     use 'hrsh7th/cmp-vsnip'
     use 'hrsh7th/vim-vsnip'
+    use {
+      'David-Kunz/cmp-npm',
+      requires = {
+        'nvim-lua/plenary.nvim'
+      }
+    }
     --
 
     -- Treesitter for better highlight

@@ -198,6 +198,14 @@ return require('packer').startup(function(use)
   }
   --
 
+  -- status line (lualine)
+  require('lualine').setup{}
+  --
+
+  -- symbols outline
+  require('aerial').setup({})
+  --
+
   ---- nvim-telescope/telescope.nvim 
   local telescope = require('telescope')
   telescope.load_extension('projects')
@@ -267,10 +275,10 @@ return require('packer').startup(function(use)
   -- vim.api.nvim_set_keymap('i', '<C-l>', '<Plug>(coc-snippets-vim)', {})
 
   ----- quickfix
-  vim.api.nvim_set_keymap('n', '<C-j>', ':cnext<CR>', {})
-  vim.api.nvim_set_keymap('n', '<C-k>', ':cprevious<CR>', { noremap = true })
-  vim.api.nvim_set_keymap('n', '<Leader>cc', ':cclose<CR>', {})
-  vim.api.nvim_set_keymap('n', '<Leader>co', ':copen<CR>', {})
+  vim.api.nvim_set_keymap('n', '<C-j>', ':cnext<CR>', { silent = true })
+  vim.api.nvim_set_keymap('n', '<C-k>', ':cprevious<CR>', { noremap = true, silent = true })
+  vim.api.nvim_set_keymap('n', '<Leader>cc', ':cclose<CR>', { silent = true })
+  vim.api.nvim_set_keymap('n', '<Leader>co', ':copen<CR>', { silent = true })
   vim.api.nvim_set_keymap('n', '<esc>', ':cclose<CR>', { silent = true })
 
   ------- Floaterm
@@ -368,10 +376,10 @@ return require('packer').startup(function(use)
   -----
 
   ----- Clipboard
-  vim.api.nvim_set_keymap('i', '<C-v>', '<ESC>"+p<S-v>==ea', {noremap=true})
+  vim.api.nvim_set_keymap('i', '<C-v>', '<ESC>"+p<S-v>==ea<ESC>', {noremap=true})
   vim.api.nvim_set_keymap('v', '<C-c>', '"+y', {noremap=true})
   vim.api.nvim_set_keymap('n', '<C-S-v>', '"+p', {noremap=true})
-  vim.api.nvim_set_keymap('v', '<C-v>', '"+p<S-v>==ea', {noremap=true})
+  vim.api.nvim_set_keymap('v', '<C-v>', '"+p<S-v>==ea<ESC>', {noremap=true})
 
   -- vim.g.falcon_background = 1
   -- vim.g.falcon_inactive = 1
@@ -381,8 +389,8 @@ return require('packer').startup(function(use)
   -- vim.cmd[[colorscheme farout]]
   -- vim.cmd[[colorscheme deus]]
   vim.cmd[[colorscheme falcon]]
-  vim.highlight.create('LineBreakpoint', { ctermbg=0, guibg='#511111' }, false)
-  vim.highlight.create('DapStopped', { ctermbg=0, guifg='#98c379', guibg='#31353f' }, false)
+  vim.api.nvim_set_hl(0, 'LineBreakpoint', { ctermbg=0, bg='#511111' })
+  vim.api.nvim_set_hl(0, 'DapStopped', { ctermbg=0, fg='#98c379', bg='#31353f' })
 
   -- transparent bg
   -- vim.cmd[[autocmd vimenter * hi Normal guibg=none guifg=none ctermbg=none ctermfg=none]]

@@ -35,7 +35,8 @@ cmp.setup({
     { name = 'nvim_lsp' },
     { name = 'buffer' },
     { name = 'path' },
-    { name = 'vsnip' }, -- For vsnip users.
+    { name = 'vsnip' }, 
+    { name = 'npm', keyword_length = 3 }, 
     -- { name = 'luasnip' }, -- For luasnip users.
     -- { name = 'ultisnips' }, -- For ultisnips users.
     -- { name = 'snippy' }, -- For snippy users.
@@ -72,6 +73,7 @@ _G.fix_issues = function ()
   })
 end
 local on_attach = function(client, bufnr)
+  require('aerial').on_attach(client, bufnr)
   local buf_map = vim.api.nvim_buf_set_keymap
   vim.cmd("command! LspDef lua vim.lsp.buf.definition()")
   vim.cmd("command! LspFormatting lua vim.lsp.buf.formatting()")
@@ -88,23 +90,23 @@ local on_attach = function(client, bufnr)
   "command! LspDiagLine lua vim.lsp.diagnostic.show_line_diagnostics()")
   vim.cmd("command! LspSignatureHelp lua vim.lsp.buf.signature_help()")
   buf_map(bufnr, "n", "gd", ":LspDef<CR>", {silent = true})
-  buf_map(bufnr, "n", "gR", ":Lspsaga rename<CR>", {silent = true})
-  buf_map(bufnr, "n", "gr", ":LspRefs<CR>", {silent = true})
+  buf_map(bufnr, "n", "gR", ":LspRename<CR>", {silent = true})
+  buf_map(bufnr, "n", "gr", ":Telescope lsp_references<CR>", {silent = true})
   buf_map(bufnr, "n", "gy", ":LspTypeDef<CR>", {silent = true})
-  buf_map(bufnr, "n", "K",  ":Lspsaga hover_doc<CR>", {silent = true})
+  buf_map(bufnr, "n", "K",  ":LspHover<CR>", {silent = true})
   buf_map(bufnr, "n", "gs", ":LspOrganize<CR>", {silent = true})
   buf_map(bufnr, "n", "[a", ":LspDiagPrev<CR>", {silent = true})
   buf_map(bufnr, "n", "]a", ":LspDiagNext<CR>", {silent = true})
   buf_map(bufnr, "n", "ga", ":LspCodeAction<CR>", {silent = true})
   buf_map(bufnr, "v", "ga", ":RangeCodeActions<CR>", {silent = true})
   buf_map(bufnr, "n", "gf", ":LspFormatting<CR>", {silent = true})
-  buf_map(bufnr, 'n', '<Leader>ld', ':Lspsaga show_line_diagnostics<CR>', { silent = true })
+  buf_map(bufnr, 'n', '<Leader>ld', ':LspDiagLine<CR>', { silent = true })
   buf_map(bufnr, "n", "<Leader>a", ":Diagnostics<CR>", {silent = true})
   buf_map(bufnr, "i", "<C-x><C-x>", "<cmd> LspSignatureHelp<CR>",
   {silent = true})
 end
 
-local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
 nvim_lsp.rust_analyzer.setup{
   on_attach = on_attach
 }
@@ -114,7 +116,7 @@ nvim_lsp.gdscript.setup{
 nvim_lsp.tsserver.setup {
   capabilities = capabilities,
   on_attach = function(client, bufnr)
-    client.resolved_capabilities.document_formatting = false
+    client.server_capabilities.document_formatting = false
     on_attach(client, bufnr)
   end
 }
