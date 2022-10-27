@@ -194,7 +194,7 @@ return require('packer').startup(function(use)
   -- nvim-treesitter/nvim-treesitter
   local treesitter = require('nvim-treesitter.configs')
   treesitter.setup {
-    ensure_installed = { "c", "lua", "typescript", "zig" }
+    ensure_installed = { "regex", "c", "lua", "typescript", "zig" }
   }
   --
 
