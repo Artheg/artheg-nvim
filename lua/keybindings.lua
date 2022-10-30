@@ -100,6 +100,13 @@ vim.api.nvim_set_keymap( 'n', '<F10>', ':DapStepOver<CR>', {} )
 vim.api.nvim_set_keymap( 'n', '<F11>', ':DapStepInto<CR>', {} )
 vim.api.nvim_set_keymap( 'n', '<F12>', ':DapStepOut<CR>', {} )
 
+----- dap-ui
+vim.api.nvim_set_keymap('n', '<leader>dt', ':lua require(\'dapui\').toggle()<CR>', {silent=true})
+
+----- neovim-tasks
+vim.api.nvim_set_keymap('n', '<F5>', ':Task start auto run<CR>', {silent=true})
+vim.api.nvim_set_keymap('n', '<F17>', ':Task start auto debug<CR>', {silent=true})
+
 vim.api.nvim_set_hl(0, 'LineBreakpoint', { ctermbg=0, bg='#511111' })
 vim.api.nvim_set_hl(0, 'DapStopped', { ctermbg=0, fg='#98c379', bg='#31353f' })
 -----

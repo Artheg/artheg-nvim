@@ -39,7 +39,7 @@ return {
         vim.g.gitblame_date_format = "%d.%m.%y %H:%M"
         vim.g.gitblame_message_template = "<author> (<committer-date>) • <summary>"
       end
-      }
+    }
 
     -- git signs and hunk actions
     use {
@@ -106,6 +106,12 @@ return {
     }
     --
 
+    -- build system
+    use { 
+      'Shatur/neovim-tasks',
+      requires = { 'plenary.nvim' }
+    }
+
     -- fuzzy file search
     use {'junegunn/fzf'}
     use {'junegunn/fzf.vim'}
@@ -117,12 +123,30 @@ return {
       config = function()
         local dap = require('dap')
 
+        -- vim.fn.sign_define('DapBreakpoint', {text='⭕', texthl='BP', linehl='LineBreakpoint', numhl=''})
+        vim.fn.sign_define('DapBreakpoint', {text='', texthl='LineBreakpoint', linehl='LineBreakpoint', numhl='LineBreakpoint'})
+        vim.fn.sign_define('DapStopped', {text='', texthl='DapStopped', linehl='DapStopped', numhl='DapStopped'})
+        vim.api.nvim_set_hl(0, 'LineBreakpoint', { ctermbg=0, bg='#511111' })
+        vim.api.nvim_set_hl(0, 'DapStopped', { ctermbg=0, bg='#934111' })
+
+        dap.adapters.lldb = {
+          type = 'executable',
+          command = 'lldb-vscode',
+          name = 'lldb'
+        }
+        
         dap.adapters.chrome = {
           type = "executable",
           command = "node",
           args = {os.getenv("HOME") .. "/git/vscode-chrome-debug/out/src/chromeDebug.js"} -- TODO adjust
         }
-        vim.fn.sign_define('DapBreakpoint', {text='🛑', texthl='BP', linehl='LineBreakpoint', numhl=''})
+
+        dap.configurations.c = {
+          type = 'lldb',
+          request = 'launch',
+          cwd = '${workspaceFolder}',
+          stopOnEntry = false
+        }
 
         dap.configurations.javascript = {
           {
@@ -152,6 +176,15 @@ return {
       end
     }
     --
+
+    -- experimental ui for dap
+    use { 
+      'rcarriga/nvim-dap-ui', 
+      requires = {'mfussenegger/nvim-dap'},
+      config = function() 
+        require("dapui").setup()
+      end
+    }
 
     -- zig support
     use 'ziglang/zig.vim'
@@ -188,7 +221,7 @@ return {
           augroup END
         ]]
       end
-      }
+    }
     --
     
     -- formatter
