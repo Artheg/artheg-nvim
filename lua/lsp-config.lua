@@ -45,9 +45,6 @@ cmp.setup({
   })
 })
 
-local npairs = require('nvim-autopairs')
-npairs.setup()
-
 local nvim_lsp = require('lspconfig')
 
 _G.lsp_organize_imports = function()
@@ -73,7 +70,6 @@ _G.fix_issues = function ()
   })
 end
 local on_attach = function(client, bufnr)
-  require('aerial').on_attach(client, bufnr)
   local buf_map = vim.api.nvim_buf_set_keymap
   vim.cmd("command! LspDef lua vim.lsp.buf.definition()")
   vim.cmd("command! LspFormatting lua vim.lsp.buf.formatting()")

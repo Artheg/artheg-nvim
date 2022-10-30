@@ -6,18 +6,49 @@ return {
     --
 
     -- ALE
-    use 'dense-analysis/ale'
+    use {
+      'dense-analysis/ale',
+      config = function()
+        vim.g['ale_fixers'] = {'eslint'}
+        vim.g['ale_linters'] = { javascript = {'eslint'}, typescript = {'eslintd'} }
+        vim.g['ale_javascript_eslint_executable'] = 'eslint_d'
+        vim.g['ale_javascript_eslint_use_global'] = 1
+        vim.g['ale_typescript_eslint_executable'] = 'eslint_d'
+        vim.g['ale_typescript_eslint_use_global'] = 1
+        vim.g['ale_fix_on_save'] = 1
+      end
+      }
     --
 
-    -- Rooter
-    use 'ahmedkhalf/project.nvim'
+    -- project managament, Rooter
+    use {
+      "ahmedkhalf/project.nvim",
+      config = function()
+        require("project_nvim").setup {
+          patterns = { ".git", "_darcs", ".hg", ".bzr", ".svn", "Makefile", "package.json", "tsconfig.json", "angular.json" },
+          detection_methods = { "pattern", "lsp" }
+        }
+      end
+    }
     --
 
     -- git blamer 
-    use 'f-person/git-blame.nvim'
+    use {
+      'f-person/git-blame.nvim',
+      config = function()
+        vim.g.gitblame_date_format = "%d.%m.%y %H:%M"
+        vim.g.gitblame_message_template = "<author> (<committer-date>) • <summary>"
+      end
+      }
 
     -- git signs and hunk actions
-    use {'lewis6991/gitsigns.nvim', requires = 'nvim-lua/plenary.nvim'}
+    use {
+      'lewis6991/gitsigns.nvim',
+      requires = 'nvim-lua/plenary.nvim',
+      config = function()
+        require('gitsigns').setup()
+      end
+    }
     use {'airblade/vim-gitgutter'}
     --
 
@@ -30,7 +61,49 @@ return {
     --
 
     -- automatically replaces words
-    use 'AndrewRadev/switch.vim'
+    use {
+      'AndrewRadev/switch.vim',
+      config = function()
+        vim.g['switch_custom_definitions'] = { 
+          { "width", "height"}, 
+          { "Width", "Height"}, 
+          { "x", "y", "z" },
+          { "top", "bottom", "Top", "Bottom" },
+          { "left", "right" },
+          { "add", "remove" },
+        }
+        vim.cmd[[
+          nnoremap <silent> <Plug>(SwitchInLine) :<C-u>call SwitchLine(v:count1)<cr>
+          nmap <F4> <Plug>(SwitchInLine)w
+
+          fun! SwitchLine(cnt)
+          let tick = b:changedtick
+          let start = getcurpos()
+          for n in range(a:cnt)
+            Switch
+            endfor
+            if b:changedtick != tick
+              return
+              endif
+              while v:true
+                let pos = getcurpos()
+                normal! w
+                if pos[1] != getcurpos()[1] || pos == getcurpos()
+                  break
+                  endif
+                  for n in range(a:cnt)
+                    Switch
+                    endfor
+                    if b:changedtick != tick
+                      return
+                      endif
+                      endwhile
+                      call setpos('.', start)
+                      endfun
+        ]]
+
+      end
+    }
     --
 
     -- fuzzy file search
@@ -39,7 +112,45 @@ return {
     --
 
     -- Debugger 
-    use 'mfussenegger/nvim-dap'
+    use {
+      'mfussenegger/nvim-dap',
+      config = function()
+        local dap = require('dap')
+
+        dap.adapters.chrome = {
+          type = "executable",
+          command = "node",
+          args = {os.getenv("HOME") .. "/git/vscode-chrome-debug/out/src/chromeDebug.js"} -- TODO adjust
+        }
+        vim.fn.sign_define('DapBreakpoint', {text='🛑', texthl='BP', linehl='LineBreakpoint', numhl=''})
+
+        dap.configurations.javascript = {
+          {
+            type = "chrome",
+            request = "attach",
+            program = "${file}",
+            cwd = vim.fn.getcwd(),
+            sourceMaps = true,
+            protocol = "inspector",
+            port = 9222,
+            webRoot = "${workspaceFolder}"
+          }
+        }
+
+        dap.configurations.typescript = {
+          {
+            type = "chrome",
+            request = "attach",
+            program = "${file}",
+            cwd = vim.fn.getcwd(),
+            sourceMaps = true,
+            protocol = "inspector",
+            port = 9222,
+            webRoot = "${workspaceFolder}",
+          }
+        }
+      end
+    }
     --
 
     -- zig support
@@ -51,15 +162,33 @@ return {
     --
 
     -- lf file manager
-    use 'ptzz/lf.vim'
+    use {
+      'ptzz/lf.vim',
+      config = function()
+        vim.g['lf_replace_netrw'] = 1
+        vim.g['lf_map_keys'] = 0
+      end
+    }
     --
 
     -- floating terminal
-    use 'voldikss/vim-floaterm'
+    use {
+      'voldikss/vim-floaterm'
+    }
     --
 
     -- highlight other uses of words
-    use 'RRethy/vim-illuminate'
+    use {
+      'RRethy/vim-illuminate',
+      config = function()
+        vim.cmd[[
+          augroup illuminate_augroup
+          autocmd!
+          autocmd VimEnter * hi illuminatedWord ctermbg=DarkBlue guibg=DarkBlue
+          augroup END
+        ]]
+      end
+      }
     --
     
     -- formatter
@@ -71,13 +200,27 @@ return {
     --
 
     -- Telescope (highly extendable fuzzy finder over lists. Built on the latest awesome features from neovim)
-    use {'nvim-telescope/telescope.nvim', requires = 'nvim-lua/plenary.nvim'}
+    use {
+      'nvim-telescope/telescope.nvim',
+      requires = 'nvim-lua/plenary.nvim',
+      config = function()
+        local telescope = require('telescope')
+        telescope.load_extension('projects')
+        telescope.load_extension('fzf')
+        telescope.load_extension('fzy_native')
+        telescope.load_extension('projects')
+      end
+    }
     use {'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }  
     use {'nvim-telescope/telescope-fzy-native.nvim' }  
     --
 
     -- highlight hex colors
-    use 'chrisbra/Colorizer'
+    use {
+      'chrisbra/Colorizer',
+      config = function()
+      end
+    }
     --
 
     -- better surrounding chars edit
@@ -85,7 +228,21 @@ return {
     --
 
     -- adds indentation guides 
-    use 'lukas-reineke/indent-blankline.nvim'
+    use {
+      'lukas-reineke/indent-blankline.nvim',
+      config = function()
+        vim.opt.list = true
+        vim.opt.listchars:append "space:⋅"
+        vim.opt.listchars:append "eol:↴"
+
+        require('indent_blankline').setup{
+          show_end_of_line = true,
+          space_char_blankline = " ",
+          show_current_context = true,
+          show_current_context_start = true
+        }
+      end
+    }
 
     -- colorschemes
     use 'kyazdani42/blue-moon'
@@ -126,7 +283,12 @@ return {
 
     -- symbols outline
     -- use 'simrat39/symbols-outline.nvim'
-    use 'stevearc/aerial.nvim'
+    use {
+      'stevearc/aerial.nvim',
+      config = function()
+        require('aerial').setup({})
+      end
+    }
     --
 
     -- Neovim LSP Integration
@@ -158,11 +320,19 @@ return {
     -- status line
     use {
       'nvim-lualine/lualine.nvim',
-      requires = { 'kyazdani42/nvim-web-devicons', opt = true }
+      requires = { 'kyazdani42/nvim-web-devicons', opt = true },
+      config = function() 
+        require('lualine').setup{}
+      end
     }
 
     -- [], {}, (), etc.
-    use 'windwp/nvim-autopairs'
+    use {
+      'windwp/nvim-autopairs',
+      config = function()
+        require('nvim-autopairs').setup()
+      end
+    }
     --
 
     -- better typescript support (???)
@@ -186,7 +356,22 @@ return {
     --
 
     -- Treesitter for better highlight
-    use {'nvim-treesitter/nvim-treesitter', run=':TSUpdate'}
+    use {
+      'nvim-treesitter/nvim-treesitter',
+      config = function() 
+        require('nvim-treesitter.configs').setup {
+          ensure_installed = { "regex", "c", "lua", "typescript", "zig", "javascript" },
+          highlight = {
+            enable = true
+          },
+          matchup = {
+            enable = true
+          }
+        }
+
+      end,
+      run=':TSUpdate',
+    }
 
     -----
 
