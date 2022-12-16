@@ -11,8 +11,8 @@ vim.api.nvim_set_keymap('n', 'n', 'nzzzv', { noremap = true })
 vim.api.nvim_set_keymap('n', 'N', 'Nzzzv', { noremap = true })
 
 -- buffer
-vim.api.nvim_set_keymap('n', '<A-j>', ':bnext<CR>', { silent = true })
-vim.api.nvim_set_keymap('n', '<A-k>', ':bprevious<CR>', { silent = true })
+-- vim.api.nvim_set_keymap('n', '<A-k>', ':bprevious<CR>', { silent = true, noremap = true })
+-- vim.api.nvim_set_keymap('n', '<A-j>', ':bnext<CR>', { silent = true, noremap = true })
 
 -- better history jumping
 vim.cmd[[
@@ -58,6 +58,7 @@ vim.api.nvim_set_keymap('n', '<Leader>tt', ':Telescope<CR>', {silent=true})
 vim.api.nvim_set_keymap('n', '<Leader>tb', ':Buffers<CR>', {silent=true})
 vim.api.nvim_set_keymap('n', '<Leader>tr', ':Rg:<CR>', {silent=true})
 vim.api.nvim_set_keymap('n', '<Leader>tf', ':Files<CR>', {silent=true})
+vim.api.nvim_set_keymap('n', '<Leader>to', ':Telescope oldfiles<CR>', {silent=true})
 -- vim.api.nvim_set_keymap('n', '<Leader>tr', ':Telescope live_grep<CR>', {silent=true})
 -- vim.api.nvim_set_keymap('n', '<Leader>tf', ':Telescope find_files<CR>', {silent=true})
 -- vim.api.nvim_set_keymap('n', '<Leader>tp', ':Telescope projects<CR>', {silent=true}) vim.api.nvim_set_keymap('n', '<Leader>tgb', ':Telescope git_branches<CR>', {silent=true}) vim.api.nvim_set_keymap('n', '<Leader>tgc', ':Telescope git_commits<CR>', {silent=true})
