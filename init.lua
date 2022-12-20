@@ -73,7 +73,8 @@ return require('packer').startup(function(use)
   -- vim.cmd[[colorscheme blue-moon]]
   -- vim.cmd[[colorscheme farout]]
   -- vim.cmd[[colorscheme deus]]
-  vim.cmd[[colorscheme falcon]]
+  -- vim.cmd[[colorscheme falcon]]
+  vim.cmd[[colorscheme no-clown-fiesta]]
 
   -- transparent bg
   -- vim.cmd[[autocmd vimenter * hi Normal guibg=none guifg=none ctermbg=none ctermfg=none]]

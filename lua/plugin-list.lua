@@ -293,6 +293,7 @@ return {
     use 'slugbyte/yuejiu'
     use 'azolus/evernight.nvim'
     use 'yonlu/omni.vim'
+    use 'aktersnurra/no-clown-fiesta.nvim'
     --
 
     -- godot support
