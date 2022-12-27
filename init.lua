@@ -68,13 +68,15 @@ return require('packer').startup(function(use)
 
   require('lsp-config')
   require('keybindings')
+  require("no-clown-fiesta").setup({ variables = { bold = true, italic = true }, keywords = { bold = true, italic = true, standout = true } })
 
   -- vim.cmd[[colorscheme OceanicNext]]
   -- vim.cmd[[colorscheme blue-moon]]
   -- vim.cmd[[colorscheme farout]]
   -- vim.cmd[[colorscheme deus]]
   -- vim.cmd[[colorscheme falcon]]
-  vim.cmd[[colorscheme no-clown-fiesta]]
+  vim.cmd[[colorscheme kanagawabones]]
+
 
   -- transparent bg
   -- vim.cmd[[autocmd vimenter * hi Normal guibg=none guifg=none ctermbg=none ctermfg=none]]
