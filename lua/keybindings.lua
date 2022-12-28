@@ -56,7 +56,8 @@ vim.api.nvim_set_keymap('n', '<Leader>ld', ':LspDiagLine<CR>', { silent = true }
 vim.api.nvim_set_keymap('n', '<Leader>tt', ':Telescope<CR>', {silent=true})
 
 vim.api.nvim_set_keymap('n', '<Leader>tb', ':Buffers<CR>', {silent=true})
-vim.api.nvim_set_keymap('n', '<Leader>tr', ':Rg:<CR>', {silent=true})
+vim.api.nvim_set_keymap('n', '<Leader>tr', ':Telescope live_grep<CR>', {silent=true})
+vim.api.nvim_set_keymap('v', '<Leader>tr', 'y<ESC>:Telescope live_grep default_text=<c-r>0<CR>', {silent=true})
 vim.api.nvim_set_keymap('n', '<Leader>tf', ':Files<CR>', {silent=true})
 vim.api.nvim_set_keymap('n', '<Leader>to', ':Telescope oldfiles<CR>', {silent=true})
 -- vim.api.nvim_set_keymap('n', '<Leader>tr', ':Telescope live_grep<CR>', {silent=true})
