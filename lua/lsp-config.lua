@@ -163,9 +163,11 @@ nvim_lsp.diagnosticls.setup {
 }
 
 nvim_lsp.zls.setup {
-  on_attach = on_attach
+  on_attach = on_attach,
+  cmd = { vim.fn.expand("/home/artheg/git/zig/zls/zig-out/bin/zls")}
 }
 
+nvim_lsp.ols.setup {}
 
 nvim_lsp.ccls.setup {
   on_attach = on_attach,

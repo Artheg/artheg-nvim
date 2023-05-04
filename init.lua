@@ -1,5 +1,7 @@
 -- options
 --
+-- extend selection on right click instead of popup menu
+vim.opt.mousemodel = 'extend'
 -- relative and absolute number simultaneously
 vim.opt.relativenumber = true
 vim.opt.number = true
