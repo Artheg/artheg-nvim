@@ -52,6 +52,11 @@ return {
     use {'airblade/vim-gitgutter'}
     --
 
+    -- git conflict helper
+    use {'akinsho/git-conflict.nvim', tag = "*", config = function()
+      require('git-conflict').setup()
+    end}
+
     ---- create themes with live preview
     -- use {'rktjmp/lush.nvim'}
     ----
