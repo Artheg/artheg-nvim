@@ -8,10 +8,6 @@ return {
     -- lspkind (vscode-like pictograms to neovim built-in lsp)
     use 'onsails/lspkind.nvim'
 
-    -- markdown editing live preview
-    use({ "iamcco/markdown-preview.nvim", run = "cd app && npm install", setup = function() vim.g.mkdp_filetypes = { "markdown" } end, ft = { "markdown" }, })
-    --
-
     -- project managament, Rooter
     use {
       "ahmedkhalf/project.nvim",
@@ -32,7 +28,7 @@ return {
       'f-person/git-blame.nvim',
       config = function()
         vim.g.gitblame_date_format = "%d.%m.%y %H:%M"
-        vim.g.gitblame_message_template = "<author> (<committer-date>) • <summary>"
+        vim.g.gitblame_message_template = "// <author> (<committer-date>) • <summary>"
       end
     }
 
@@ -46,6 +42,11 @@ return {
     }
     use {'airblade/vim-gitgutter'}
     --
+
+    -- git conflict helper
+    use {'akinsho/git-conflict.nvim', tag = "*", config = function()
+      require('git-conflict').setup()
+    end}
 
     ---- create themes with live preview
     -- use {'rktjmp/lush.nvim'}
