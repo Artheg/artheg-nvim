@@ -5,20 +5,8 @@ return {
     use 'wbthomason/packer.nvim'
     --
 
-    -- ALE
-    use {
-      'dense-analysis/ale',
-      config = function()
-        vim.g['ale_fixers'] = {'eslint'}
-        vim.g['ale_linters'] = { javascript = {'eslint'}, typescript = {'eslintd'} }
-        vim.g['ale_javascript_eslint_executable'] = 'eslint_d'
-        vim.g['ale_javascript_eslint_use_global'] = 1
-        vim.g['ale_typescript_eslint_executable'] = 'eslint_d'
-        vim.g['ale_typescript_eslint_use_global'] = 1
-        vim.g['ale_fix_on_save'] = 1
-      end
-      }
-    --
+    -- lspkind (vscode-like pictograms to neovim built-in lsp)
+    use 'onsails/lspkind.nvim'
 
     -- markdown editing live preview
     use({ "iamcco/markdown-preview.nvim", run = "cd app && npm install", setup = function() vim.g.mkdp_filetypes = { "markdown" } end, ft = { "markdown" }, })
@@ -35,6 +23,9 @@ return {
       end
     }
     --
+
+    -- null-ls
+    use 'jose-elias-alvarez/null-ls.nvim'
 
     -- git blamer 
     use {
@@ -227,10 +218,6 @@ return {
       end
     }
     --
-    
-    -- formatter
-    use 'sbdchd/neoformat'
-    --
 
     -- commenter
     use 'tpope/vim-commentary'
@@ -299,6 +286,7 @@ return {
     use 'yonlu/omni.vim'
     use 'aktersnurra/no-clown-fiesta.nvim'
     use { 'mcchrish/zenbones.nvim', requires = 'rktjmp/lush.nvim' }
+    use 'kwsp/halcyon-neovim'
     --
 
     -- godot support
@@ -403,9 +391,6 @@ return {
           highlight = {
             enable = true
           },
-          matchup = {
-            enable = true
-          }
         }
 
       end,

@@ -3,8 +3,9 @@
 ----- Navigation
 vim.api.nvim_set_keymap('n', '<A-h>', ':tabprev<CR>', { silent = true, noremap = true })
 vim.api.nvim_set_keymap('n', '<A-l>', ':tabnext<CR>', { silent = true, noremap = true })
-vim.api.nvim_set_keymap('n', '<Leader>ct', ':tabclose<CR>', { silent = true })
-vim.api.nvim_set_keymap('n', '<Leader>nt', ':tabnew<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>tc', ':tabclose<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>tn', ':tabnew<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>ct', '/class<CR>j', { silent = true })
 
 -- center screen when focusing on search occurences
 vim.api.nvim_set_keymap('n', 'n', 'nzzzv', { noremap = true })
@@ -142,9 +143,7 @@ vim.api.nvim_set_keymap('n', 'P', 'P`[v`]=', { noremap=true })
 -- vim.api.nvim_set_keymap('n', '<C-p>', ']p', { noremap=true })
 -- vim.api.nvim_set_keymap('n', '<C-P>', 'P', { noremap=true })
 
-vim.api.nvim_set_keymap('n', '<F3>', '<ESC>:Neoformat | ALEFix<CR>', {})
-vim.api.nvim_set_keymap('n', '<C-S-i>', '<ESC>:Neoformat<CR>a', { noremap=true })
-vim.api.nvim_set_keymap('i', '<C-S-i>', '<ESC>:Neoformat<CR>a', { noremap=true })
+vim.api.nvim_set_keymap('n', '<F3>', '<ESC>:lua vim.lsp.buf.format()<CR>', {})
 -----
 
 ----- Clipboard
@@ -152,4 +151,8 @@ vim.api.nvim_set_keymap('i', '<C-v>', '<ESC>"+p<S-v>==ea<ESC>', {noremap=true})
 vim.api.nvim_set_keymap('v', '<C-c>', '"+y', {noremap=true})
 vim.api.nvim_set_keymap('n', '<C-S-v>', '"+pgv=', {noremap=true})
 vim.api.nvim_set_keymap('v', '<C-v>', '"+p<S-v>==ea<ESC>', {noremap=true})
+-----
+
+----- Aerial (outline symbols)
+vim.api.nvim_set_keymap('n', '<C-a>', ':AerialToggle<CR>', { silent = true })
 -----

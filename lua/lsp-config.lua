@@ -47,7 +47,7 @@ cmp.setup({
 
 local nvim_lsp = require('lspconfig')
 
-_G.lsp_organize_imports = function()
+local lsp_organize_imports = function()
   local params = {
     command = "_typescript.organizeImports",
     arguments = {vim.api.nvim_buf_get_name(0)},
@@ -55,28 +55,17 @@ _G.lsp_organize_imports = function()
   }
   vim.lsp.buf.execute_command(params)
 end
-_G.fix_issues = function ()
-  vim.lsp.buf.execute_command({
-    command = '_typescript.organizeImports',
-    arguments = {vim.api.nvim_buf_get_name(0)}
-  })
-  vim.lsp.buf.execute_command({
-    command = 'Neoformat',
-    arguments = {vim.api.nvim_buf_get_name(0)},
-  })
-  vim.lsp.buf.execute_command({
-    command = 'ALEFix',
-    arguments = {vim.api.nvim_buf_get_name(0)},
-  })
-end
+_G.lsp_organize_imports = lsp_organize_imports;
 local on_attach = function(client, bufnr)
+  client.server_capabilities.documentFormattingProvider = true
+  require('lspkind').init()
   local buf_map = vim.api.nvim_buf_set_keymap
   vim.cmd("command! LspDef lua vim.lsp.buf.definition()")
-  vim.cmd("command! LspFormatting lua vim.lsp.buf.formatting()")
+  vim.cmd("command! LspFormatting lua vim.lsp.buf.format({ async = true })")
   vim.cmd("command! LspCodeAction lua vim.lsp.buf.code_action()")
   vim.cmd("command! LspHover lua vim.lsp.buf.hover()")
   vim.cmd("command! LspRename lua vim.lsp.buf.rename()")
-  vim.cmd("command! LspOrganize lua fix_issues()")
+  vim.cmd("command! LspOrganize lua lsp_organize_imports()")
   vim.cmd("command! LspRefs lua vim.lsp.buf.references()")
   vim.cmd("command! LspTypeDef lua vim.lsp.buf.type_definition()")
   vim.cmd("command! LspImplementation lua vim.lsp.buf.implementation()")
@@ -101,8 +90,11 @@ local on_attach = function(client, bufnr)
   buf_map(bufnr, "i", "<C-x><C-x>", "<cmd> LspSignatureHelp<CR>",
   {silent = true})
 end
-
+--
 local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
+nvim_lsp.java_language_server.setup{
+  cmd = {"/Users/artem.shtukert/git/java-language-server/dist/lang_server_mac.sh"}
+}
 nvim_lsp.rust_analyzer.setup{
   on_attach = on_attach
 }
@@ -115,51 +107,6 @@ nvim_lsp.tsserver.setup {
     client.server_capabilities.document_formatting = false
     on_attach(client, bufnr)
   end
-}
-nvim_lsp.eslint.setup{
-  on_attach = on_attach
-}
-
-local filetypes = {
-  typescript = "eslint",
-  typescriptreact = "eslint",
-  html = "eslint"
-}
-local linters = {
-  eslint = {
-    sourceName = "eslint_d",
-    command = "eslint_d",
-    rootPatterns = {".eslintrc.json", "package.json"},
-    debounce = 100,
-    args = {"--stdin", "--stdin-filename", "%filepath", "--format", "json"},
-    parseJson = {
-      errorsRoot = "[0].messages",
-      line = "line",
-      column = "column",
-      endLine = "endLine",
-      endColumn = "endColumn",
-      message = "${message} [${ruleId}]",
-      security = "severity"
-    },
-    securities = {[2] = "error", [1] = "warning"}
-  }
-}
-local formatters = {
-  prettier = {command = "prettierd", args = {"--stdin-filepath", vim.api.nvim_buf_get_name(0)}, rootPatterns = {".eslintrc.json", "package.json"}}
-}
-local formatFiletypes = {
-  typescript = "prettierd",
-  typescriptreact = "prettierd"
-}
-nvim_lsp.diagnosticls.setup {
-  on_attach = on_attach,
-  filetypes = vim.tbl_keys(filetypes),
-  init_options = {
-    filetypes = filetypes,
-    linters = linters,
-    formatters = formatters,
-    formatFiletypes = formatFiletypes
-  }
 }
 
 nvim_lsp.zls.setup {
@@ -181,6 +128,64 @@ nvim_lsp.ccls.setup {
     single_file_support = true;
   };
 }
+
+
+local null_ls = require("null-ls")
+
+local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+
+local async_formatting = function(bufnr)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+
+  vim.lsp.buf_request(
+  bufnr,
+  "textDocument/formatting",
+  vim.lsp.util.make_formatting_params({}),
+  function(err, res, ctx)
+    if err then
+      local err_msg = type(err) == "string" and err or err.message
+      -- you can modify the log message / level (or ignore it completely)
+      vim.notify("formatting: " .. err_msg, vim.log.levels.WARN)
+      return
+    end
+
+    -- don't apply results if buffer is unloaded or has been modified
+    if not vim.api.nvim_buf_is_loaded(bufnr) or vim.api.nvim_buf_get_option(bufnr, "modified") then
+      return
+    end
+
+    if res then
+      local client = vim.lsp.get_client_by_id(ctx.client_id)
+      vim.lsp.util.apply_text_edits(res, bufnr, client and client.offset_encoding or "utf-16")
+      vim.api.nvim_buf_call(bufnr, function()
+        vim.cmd("silent noautocmd update")
+      end)
+    end
+  end
+  )
+end
+
+null_ls.setup({
+    -- add your sources / config options here
+    sources = {
+      null_ls.builtins.code_actions.eslint_d,
+      null_ls.builtins.diagnostics.eslint_d,
+      null_ls.builtins.formatting.eslint_d,
+    },
+    debug = false,
+    on_attach = function(client, bufnr)
+        if client.supports_method("textDocument/formatting") then
+            vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
+            vim.api.nvim_create_autocmd("BufWritePost", {
+                group = augroup,
+                buffer = bufnr,
+                callback = function()
+                    async_formatting(bufnr)
+                end,
+            })
+        end
+    end,
+})
 
 -- icons for lsp
 -- https://github.com/folke/trouble.nvim/issues/52#issuecomment-863885779
