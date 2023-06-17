@@ -1,5 +1,7 @@
 -- options
 --
+-- extend selection on right click instead of popup menu
+vim.opt.mousemodel = 'extend'
 -- relative and absolute number simultaneously
 vim.opt.relativenumber = true
 vim.opt.number = true
@@ -15,8 +17,7 @@ vim.opt.expandtab = true
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
 
----- syntax highlight
-vim.opt.syntax = 'on'
+---- syntax highlight vim.opt.syntax = 'on'
 
 vim.opt.background = "dark"
 
@@ -51,6 +52,12 @@ vim.cmd[[autocmd VimEnter,VimLeave * silent !tmux set status]]
 -- Close quickfix and location list after selecting item
 vim.cmd[[:autocmd FileType qf nnoremap <buffer> <CR> <CR>:cclose<CR>]]
 
+-- Update Floaterm on vim resize
+vim.api.nvim_create_autocmd('VimResized', {
+  command = 'silent FloatermUpdate',
+  group = vim.api.nvim_create_augroup('Floaterm', {}),
+})
+
 ----------------- packer plugin manager
 local fn = vim.fn
 local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
@@ -66,7 +73,7 @@ return require('packer').startup(function(use)
   end
 
 
-  require('lsp-config')
+  -- require('lsp-config')
   require('keybindings')
   require("no-clown-fiesta").setup({ variables = { bold = true, italic = true }, keywords = { bold = true, italic = true, standout = true } })
 
@@ -76,6 +83,8 @@ return require('packer').startup(function(use)
   -- vim.cmd[[colorscheme deus]]
   -- vim.cmd[[colorscheme falcon]]
   vim.cmd[[colorscheme kanagawabones]]
+   -- vim.cmd[[colorscheme halcyon]]
+   -- vim.cmd[[colorscheme no-clown-fiesta]]
 
 
   -- transparent bg

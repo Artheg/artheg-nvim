@@ -39,7 +39,7 @@ vim.g.floaterm_opener = 'drop'
 
 ------- Git
 vim.api.nvim_set_keymap('n', '<Leader>gg', ':!git gui<cr><cr>', {silent=true})
-vim.api.nvim_set_keymap('n', '<Leader>gt', ':tabnew | :edit term://tig<CR>i', {silent=true})
+vim.api.nvim_set_keymap('n', '<Leader>gt', ':tabnew | :edit term://lazygit<CR>i', {silent=true})
 -----
 
 ----- Colorizer
