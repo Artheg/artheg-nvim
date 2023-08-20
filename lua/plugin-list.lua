@@ -88,48 +88,15 @@ return {
       'AndrewRadev/switch.vim',
       config = function()
         vim.g['switch_custom_definitions'] = {
-          { "width", "height" },
-          { "Width", "Height" },
-          { "x",     "y",      "z" },
-          { "top",   "bottom", "Top", "Bottom" },
-          { "left",  "right" },
-          { "add",   "remove" },
+          { "width",  "height" },
+          { "Width",  "Height" },
+          { "x",      "y",      "z" },
+          { "top",    "bottom", "Top", "Bottom" },
+          { "left",   "right" },
+          { "remove", "remove" },
         }
-        local function SwitchLine(cnt)
-          local tick = vim.b.changedtick
-          local start = vim.fn.getcurpos()
 
-          for n = 1, cnt do
-            vim.cmd('Switch')
-          end
-
-          if vim.b.changedtick ~= tick then
-            return
-          end
-
-          while true do
-            local pos = vim.fn.getcurpos()
-            vim.cmd('normal! w')
-
-            if pos[2] ~= vim.fn.getcurpos()[2] or vim.fn.deep_equal(pos, vim.fn.getcurpos()) then
-              break
-            end
-
-            for n = 1, cnt do
-              vim.cmd('Switch')
-            end
-
-            if vim.b.changedtick ~= tick then
-              return
-            end
-          end
-
-          vim.fn.setpos('.', start)
-        end
-
-        vim.api.nvim_set_keymap('n', '<F4>', '<Plug>(SwitchInLine)w', {})
-        vim.api.nvim_set_keymap('n', '<Plug>(SwitchInLine)', SwitchLine(1),
-          { noremap = true, silent = true })
+        vim.keymap.set('n', '<F4>', '<ESC>:Switch<CR>w', { silent = true })
       end
     }
     --
@@ -473,32 +440,6 @@ return {
     }
     --
 
-    -- Neovim LSP Integration
-    -- use 'neovim/nvim-lspconfig'
-    -- use 'gfanto/fzf-lsp.nvim'
-    --
-
-    -- lsp saga (fancier hover, actions lots of other things)
-    -- use { 'glepnir/lspsaga.nvim', branch='main' }
-    -- noice, experimental UI
-    --
-    -- use({
-    --   "folke/noice.nvim",
-    --   event = "VimEnter",
-    --   config = function()
-    --     require("noice").setup()
-    --   end,
-    --   requires = {
-    --     -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
-    --     "MunifTanjim/nui.nvim",
-    --     -- OPTIONAL:
-    --     --   `nvim-notify` is only needed, if you want to use the notification view.
-    --     --   If not available, we use `mini` as the fallback
-    --     "rcarriga/nvim-notify",
-    --   }
-    -- })
-    --
-
     -- status line
     use {
       'nvim-lualine/lualine.nvim',
@@ -515,26 +456,6 @@ return {
         require('nvim-autopairs').setup()
       end
     }
-    --
-
-    -- better typescript support (???)
-    use 'jose-elias-alvarez/typescript.nvim';
-    --
-
-    -- nvim-cmp completion
-    -- use 'hrsh7th/cmp-nvim-lsp'
-    -- use 'hrsh7th/cmp-buffer'
-    -- use 'hrsh7th/cmp-path'
-    -- use 'hrsh7th/cmp-cmdline'
-    -- use 'hrsh7th/nvim-cmp'
-    -- use 'hrsh7th/cmp-vsnip'
-    -- use 'hrsh7th/vim-vsnip'
-    -- use {
-    --   'David-Kunz/cmp-npm',
-    --   requires = {
-    --     'nvim-lua/plenary.nvim'
-    --   }
-    -- }
     --
 
     -- Treesitter for better highlight
