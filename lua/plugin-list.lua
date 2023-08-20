@@ -23,13 +23,13 @@ return {
     use 'jose-elias-alvarez/null-ls.nvim'
 
     -- better typescript lsp
-    -- use {
-    --   "pmizio/typescript-tools.nvim",
-    --   requires = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
-    --   config = function()
-    --     require("typescript-tools").setup {}
-    --   end,
-    -- }
+    use {
+      "pmizio/typescript-tools.nvim",
+      requires = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+      config = function()
+        require("typescript-tools").setup {}
+      end,
+    }
 
 
     -- git blamer
@@ -344,11 +344,12 @@ return {
           },
           servers = {
             ['null-ls'] = { 'javascript', 'typescript', 'lua' },
-          }
+          },
         })
 
         lsp.ensure_installed({
-          'tsserver',
+          'lua_ls',
+          'rust_analyzer'
         })
 
         -- Fix Undefined global 'vim'
@@ -389,7 +390,6 @@ return {
           vim.keymap.set("n", "<leader>vd", function() vim.diagnostic.open_float() end, opts)
           vim.keymap.set("n", "[d", function() vim.diagnostic.goto_next() end, opts)
           vim.keymap.set("n", "]d", function() vim.diagnostic.goto_prev() end, opts)
-          vim.keymap.set("n", "ld", function() vim.diagnostic.open_float() end, opts)
           vim.keymap.set("n", "<leader>ga", function() vim.lsp.buf.code_action() end, opts)
           vim.keymap.set("n", "gr", function() vim.cmd('Telescope lsp_references') end, opts)
           vim.keymap.set("n", "gR", function() vim.lsp.buf.rename() end, opts)
@@ -401,7 +401,10 @@ return {
           cmd = { vim.fn.expand('$HOME/git/zig/zls/zig-out/bin/zls') }
         })
 
+        lsp.skip_server_setup({ 'tsserver' })
+
         lsp.setup()
+
 
         local null_ls = require('null-ls');
         null_ls.setup({
