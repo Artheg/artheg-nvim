@@ -68,7 +68,7 @@ return require('packer').startup(function(use)
   end
 
 
-  require('lsp-config')
+  -- require('lsp-config')
   require('keybindings')
   require("no-clown-fiesta").setup({ variables = { bold = true, italic = true }, keywords = { bold = true, italic = true, standout = true } })
 
@@ -78,6 +78,8 @@ return require('packer').startup(function(use)
   -- vim.cmd[[colorscheme deus]]
   -- vim.cmd[[colorscheme falcon]]
   vim.cmd[[colorscheme kanagawabones]]
+   -- vim.cmd[[colorscheme halcyon]]
+   -- vim.cmd[[colorscheme no-clown-fiesta]]
 
 
   -- transparent bg

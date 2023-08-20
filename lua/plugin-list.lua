@@ -1,19 +1,18 @@
 return {
-  startup = function (use) 
-
+  startup = function(use)
     -- Packer (plugin manager)
     use 'wbthomason/packer.nvim'
     --
 
     -- lspkind (vscode-like pictograms to neovim built-in lsp)
     use 'onsails/lspkind.nvim'
-
     -- project managament, Rooter
     use {
       "ahmedkhalf/project.nvim",
       config = function()
         require("project_nvim").setup {
-          patterns = { ".git", "_darcs", ".hg", ".bzr", ".svn", "Makefile", "package.json", "tsconfig.json", "angular.json" },
+          patterns = { ".git", "_darcs", ".hg", ".bzr", ".svn", "Makefile", "package.json", "tsconfig.json",
+            "angular.json" },
           detection_methods = { "pattern", "lsp" }
         }
       end
@@ -22,8 +21,55 @@ return {
 
     -- null-ls
     use 'jose-elias-alvarez/null-ls.nvim'
+    -- use { 'jose-elias-alvarez/null-ls.nvim',
+    --   config = function()
+    --     local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
 
-    -- git blamer 
+    --     local null_ls = require('null-ls');
+    --     null_ls.setup({
+    --       -- add your sources / config options here
+    --       sources = {
+    --         null_ls.builtins.code_actions.eslint_d,
+    --         null_ls.builtins.diagnostics.eslint_d,
+    --         null_ls.builtins.formatting.eslint_d,
+    --         null_ls.builtins.formatting.prettier,
+    --       },
+    --       debug = false,
+    --       on_attach = function(client, bufnr)
+    --         if client.supports_method("textDocument/formatting") then
+    --           vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
+    --           vim.api.nvim_create_autocmd("BufWritePost", {
+    --             group = augroup,
+    --             buffer = bufnr,
+    --             callback = function()
+    --               if vim.bo.filetype == 'typescript' or vim.bo.filetype == 'typescriptreact' then
+    --                 local original = "@gsbaltic/telesis/src/modules"
+    --                 local replacement = "@telesis"
+    --                 vim.api.nvim_command("silent! :%s/" ..
+    --                 vim.fn.escape(original, "/") .. "/" .. vim.fn.escape(replacement, "/") .. "/g")
+    --                 vim.api.nvim_command("silent! :%s/" ..
+    --                 vim.fn.escape('@gsbaltic/telesis/src/engines', "/") .. "/" .. vim.fn.escape(replacement, "/") .. "/g")
+    --               end
+    --               async_formatting(bufnr)
+    --             end,
+    --           })
+    --         end
+    --       end,
+    --     })
+    --   end }
+    --
+
+    -- better typescript lsp
+    -- use {
+    --   "pmizio/typescript-tools.nvim",
+    --   requires = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+    --   config = function()
+    --     require("typescript-tools").setup {}
+    --   end,
+    -- }
+
+
+    -- git blamer
     use {
       'f-person/git-blame.nvim',
       config = function()
@@ -31,6 +77,7 @@ return {
         vim.g.gitblame_message_template = "// <author> (<committer-date>) • <summary>"
       end
     }
+    --
 
     -- git signs and hunk actions
     use {
@@ -40,13 +87,13 @@ return {
         require('gitsigns').setup()
       end
     }
-    use {'airblade/vim-gitgutter'}
+    use { 'airblade/vim-gitgutter' }
     --
 
     -- git conflict helper
-    use {'akinsho/git-conflict.nvim', tag = "*", config = function()
+    use { 'akinsho/git-conflict.nvim', tag = "*", config = function()
       require('git-conflict').setup()
-    end}
+    end }
 
     ---- create themes with live preview
     -- use {'rktjmp/lush.nvim'}
@@ -60,15 +107,15 @@ return {
     use {
       'AndrewRadev/switch.vim',
       config = function()
-        vim.g['switch_custom_definitions'] = { 
-          { "width", "height"}, 
-          { "Width", "Height"}, 
-          { "x", "y", "z" },
-          { "top", "bottom", "Top", "Bottom" },
-          { "left", "right" },
-          { "add", "remove" },
+        vim.g['switch_custom_definitions'] = {
+          { "width", "height" },
+          { "Width", "Height" },
+          { "x",     "y",      "z" },
+          { "top",   "bottom", "Top", "Bottom" },
+          { "left",  "right" },
+          { "add",   "remove" },
         }
-        vim.cmd[[
+        vim.cmd [[
           nnoremap <silent> <Plug>(SwitchInLine) :<C-u>call SwitchLine(v:count1)<cr>
           nmap <F4> <Plug>(SwitchInLine)w
 
@@ -97,44 +144,50 @@ return {
                       call setpos('.', start)
                       endfun
         ]]
-
       end
     }
     --
 
     -- build system
-    use { 
+    use {
       'Shatur/neovim-tasks',
       requires = { 'plenary.nvim' }
     }
 
     -- fuzzy file search
-    use {'junegunn/fzf'}
-    use {'junegunn/fzf.vim'}
+    use { 'junegunn/fzf' }
+    use { 'junegunn/fzf.vim' }
     --
 
-    -- Debugger 
+    -- Debugger
     use {
       'mfussenegger/nvim-dap',
       config = function()
         local dap = require('dap')
 
         -- vim.fn.sign_define('DapBreakpoint', {text='⭕', texthl='BP', linehl='LineBreakpoint', numhl=''})
-        vim.fn.sign_define('DapBreakpoint', {text='', texthl='LineBreakpoint', linehl='LineBreakpoint', numhl='LineBreakpoint'})
-        vim.fn.sign_define('DapStopped', {text='', texthl='DapStopped', linehl='DapStopped', numhl='DapStopped'})
-        vim.api.nvim_set_hl(0, 'LineBreakpoint', { ctermbg=0, bg='#511111' })
-        vim.api.nvim_set_hl(0, 'DapStopped', { ctermbg=0, bg='#934111' })
+        vim.fn.sign_define('DapBreakpoint',
+          { text = '', texthl = 'LineBreakpoint', linehl = 'LineBreakpoint', numhl = 'LineBreakpoint' })
+        vim.fn.sign_define('DapStopped', {
+          text = '',
+          texthl = 'DapStopped',
+          linehl = 'DapStopped',
+          numhl =
+          'DapStopped'
+        })
+        vim.api.nvim_set_hl(0, 'LineBreakpoint', { ctermbg = 0, bg = '#511111' })
+        vim.api.nvim_set_hl(0, 'DapStopped', { ctermbg = 0, bg = '#934111' })
 
         dap.adapters.lldb = {
           type = 'executable',
           command = 'lldb-vscode',
           name = 'lldb'
         }
-        
+
         dap.adapters.chrome = {
           type = "executable",
           command = "node",
-          args = {os.getenv("HOME") .. "/git/vscode-chrome-debug/out/src/chromeDebug.js"} -- TODO adjust
+          args = { os.getenv("HOME") .. "/git/vscode-chrome-debug/out/src/chromeDebug.js" } -- TODO adjust
         }
 
         dap.configurations.c = {
@@ -174,10 +227,10 @@ return {
     --
 
     -- experimental ui for dap
-    use { 
-      'rcarriga/nvim-dap-ui', 
-      requires = {'mfussenegger/nvim-dap'},
-      config = function() 
+    use {
+      'rcarriga/nvim-dap-ui',
+      requires = { 'mfussenegger/nvim-dap' },
+      config = function()
         require("dapui").setup()
       end
     }
@@ -210,7 +263,7 @@ return {
     use {
       'RRethy/vim-illuminate',
       config = function()
-        vim.cmd[[
+        vim.cmd [[
           augroup illuminate_augroup
           autocmd!
           autocmd VimEnter * hi illuminatedWord ctermbg=DarkBlue guibg=DarkBlue
@@ -236,8 +289,8 @@ return {
         telescope.load_extension('projects')
       end
     }
-    use {'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }  
-    use {'nvim-telescope/telescope-fzy-native.nvim' }  
+    use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
+    use { 'nvim-telescope/telescope-fzy-native.nvim' }
     --
 
     -- highlight hex colors
@@ -252,7 +305,7 @@ return {
     use 'tpope/vim-surround'
     --
 
-    -- adds indentation guides 
+    -- adds indentation guides
     use {
       'lukas-reineke/indent-blankline.nvim',
       config = function()
@@ -260,7 +313,7 @@ return {
         vim.opt.listchars:append "space:⋅"
         vim.opt.listchars:append "eol:↴"
 
-        require('indent_blankline').setup{
+        require('indent_blankline').setup {
           show_end_of_line = true,
           space_char_blankline = " ",
           show_current_context = true,
@@ -305,8 +358,176 @@ return {
     -- LSP
     ------
 
+    use {
+      'VonHeikemen/lsp-zero.nvim',
+      branch = 'v1.x',
+      requires = {
+        -- LSP Support
+        { 'neovim/nvim-lspconfig' },
+        { 'williamboman/mason.nvim' },
+        { 'williamboman/mason-lspconfig.nvim' },
+
+        -- Autocompletion
+        { 'hrsh7th/nvim-cmp' },
+        { 'hrsh7th/cmp-buffer' },
+        { 'hrsh7th/cmp-path' },
+        { 'saadparwaiz1/cmp_luasnip' },
+        { 'hrsh7th/cmp-nvim-lsp' },
+        { 'hrsh7th/cmp-nvim-lua' },
+
+        -- Snippets
+        { 'L3MON4D3/LuaSnip' },
+        { 'rafamadriz/friendly-snippets' },
+
+        -- Formatting
+        { 'lukas-reineke/lsp-format.nvim' }
+      },
+      config = function()
+        local lsp = require("lsp-zero")
+
+        local null_ls = require('null-ls');
+        null_ls.setup({
+          -- add your sources / config options here
+          sources = {
+            null_ls.builtins.code_actions.eslint_d,
+            null_ls.builtins.diagnostics.eslint_d,
+            null_ls.builtins.formatting.eslint_d,
+            null_ls.builtins.formatting.prettier,
+          },
+        })
+        lsp.preset("recommended")
+
+        lsp.format_on_save({
+          format_opts = {
+            async = false,
+            timeout_ms = 10000,
+          },
+          servers = {
+            ['lua_ls'] = { 'lua' },
+            ['rust_analyzer'] = { 'rust' },
+            -- if you have a working setup with null-ls
+            -- you can specify filetypes it can format.
+            ['null-ls'] = { 'javascript', 'typescript' },
+          }
+        })
+        lsp.format_mapping('gq', {
+          format_opts = {
+            async = false,
+            timeout_ms = 10000,
+          },
+          servers = {
+            ['null-ls'] = { 'javascript', 'typescript', 'lua' },
+          }
+        })
+
+        lsp.ensure_installed({
+          'tsserver',
+          'rust_analyzer',
+          'null-ls'
+        })
+
+        -- Fix Undefined global 'vim'
+        lsp.nvim_workspace()
+
+        local cmp = require('cmp')
+        local cmp_select = { behavior = cmp.SelectBehavior.Select }
+        local cmp_mappings = lsp.defaults.cmp_mappings({
+          ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
+          ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
+          ['<C-y>'] = cmp.mapping.confirm({ select = true }),
+          ["<C-Space>"] = cmp.mapping.complete(),
+        })
+
+        cmp_mappings['<Tab>'] = nil
+        cmp_mappings['<S-Tab>'] = nil
+
+        lsp.setup_nvim_cmp({
+          mapping = cmp_mappings
+        })
+
+        lsp.set_preferences({
+          suggest_lsp_servers = true,
+          sign_icons = {
+            error = 'E',
+            warn = 'W',
+            hint = 'H',
+            info = 'I'
+          }
+        })
+
+        local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+        local async_formatting = function(bufnr)
+          bufnr = bufnr or vim.api.nvim_get_current_buf()
+
+          vim.lsp.buf_request(
+            bufnr,
+            "textDocument/formatting",
+            vim.lsp.util.make_formatting_params({}),
+            function(err, res, ctx)
+              if err then
+                local err_msg = type(err) == "string" and err or err.message
+                -- you can modify the log message / level (or ignore it completely)
+                vim.notify("formatting: " .. err_msg, vim.log.levels.WARN)
+                return
+              end
+
+              -- don't apply results if buffer is unloaded or has been modified
+              if not vim.api.nvim_buf_is_loaded(bufnr) or vim.api.nvim_buf_get_option(bufnr, "modified") then
+                return
+              end
+
+              if res then
+                local client = vim.lsp.get_client_by_id(ctx.client_id)
+                vim.lsp.util.apply_text_edits(res, bufnr, client and client.offset_encoding or "utf-16")
+                vim.api.nvim_buf_call(bufnr, function()
+                  vim.cmd("silent noautocmd update")
+                end)
+              end
+            end
+          )
+        end
+        lsp.on_attach(function(client, bufnr)
+          local opts = { buffer = bufnr, remap = false }
+
+          if client.supports_method("textDocument/formatting") then
+            vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
+            -- vim.api.nvim_create_autocmd("BufWritePost", {
+            --   group = augroup,
+            --   buffer = bufnr,
+            --   callback = function()
+            --     -- async_formatting(bufnr)
+            --   end
+            -- })
+          end
+          vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
+          vim.keymap.set("n", "gy", function() vim.lsp.buf.type_definition() end, opts)
+          vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts)
+          vim.keymap.set("n", "<leader>vd", function() vim.diagnostic.open_float() end, opts)
+          vim.keymap.set("n", "[d", function() vim.diagnostic.goto_next() end, opts)
+          vim.keymap.set("n", "]d", function() vim.diagnostic.goto_prev() end, opts)
+          vim.keymap.set("n", "ld", function() vim.diagnostic.open_float() end, opts)
+          vim.keymap.set("n", "<leader>ga", function() vim.lsp.buf.code_action() end, opts)
+          vim.keymap.set("n", "<leader>gr", function() vim.lsp.buf.references() end, opts)
+          vim.keymap.set("n", "<leader>gR", function() vim.lsp.buf.rename() end, opts)
+          vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts)
+        end)
+
+        lsp.setup()
+
+        vim.diagnostic.config({
+          virtual_text = true
+        })
+      end
+    }
+
+
     -- lsp signature (displays signature params as you type)
-    use 'ray-x/lsp_signature.nvim'
+    use {
+      'ray-x/lsp_signature.nvim',
+      config = function()
+        require('lsp_signature').setup()
+      end
+    }
     --
 
     -- symbols outline
@@ -320,12 +541,12 @@ return {
     --
 
     -- Neovim LSP Integration
-    use 'neovim/nvim-lspconfig'
-    use 'gfanto/fzf-lsp.nvim'
+    -- use 'neovim/nvim-lspconfig'
+    -- use 'gfanto/fzf-lsp.nvim'
     --
 
     -- lsp saga (fancier hover, actions lots of other things)
-    use { 'glepnir/lspsaga.nvim', branch='main' }
+    -- use { 'glepnir/lspsaga.nvim', branch='main' }
     -- noice, experimental UI
     --
     -- use({
@@ -349,8 +570,8 @@ return {
     use {
       'nvim-lualine/lualine.nvim',
       requires = { 'kyazdani42/nvim-web-devicons', opt = true },
-      config = function() 
-        require('lualine').setup{}
+      config = function()
+        require('lualine').setup {}
       end
     }
 
@@ -368,37 +589,39 @@ return {
     --
 
     -- nvim-cmp completion
-    use 'hrsh7th/cmp-nvim-lsp'
-    use 'hrsh7th/cmp-buffer'
-    use 'hrsh7th/cmp-path'
-    use 'hrsh7th/cmp-cmdline'
-    use 'hrsh7th/nvim-cmp'
-    use 'hrsh7th/cmp-vsnip'
-    use 'hrsh7th/vim-vsnip'
-    use {
-      'David-Kunz/cmp-npm',
-      requires = {
-        'nvim-lua/plenary.nvim'
-      }
-    }
+    -- use 'hrsh7th/cmp-nvim-lsp'
+    -- use 'hrsh7th/cmp-buffer'
+    -- use 'hrsh7th/cmp-path'
+    -- use 'hrsh7th/cmp-cmdline'
+    -- use 'hrsh7th/nvim-cmp'
+    -- use 'hrsh7th/cmp-vsnip'
+    -- use 'hrsh7th/vim-vsnip'
+    -- use {
+    --   'David-Kunz/cmp-npm',
+    --   requires = {
+    --     'nvim-lua/plenary.nvim'
+    --   }
+    -- }
     --
 
     -- Treesitter for better highlight
     use {
       'nvim-treesitter/nvim-treesitter',
-      config = function() 
+      config = function()
         require('nvim-treesitter.configs').setup {
           ensure_installed = { "regex", "c", "lua", "typescript", "zig", "javascript" },
           highlight = {
             enable = true
           },
         }
-
       end,
-      run=':TSUpdate',
+      run = ':TSUpdate',
     }
 
     -----
-
-end
+    use({
+      "iamcco/markdown-preview.nvim",
+      run = function() vim.fn["mkdp#util#install"]() end,
+    })
+  end
 }
