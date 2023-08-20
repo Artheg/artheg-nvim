@@ -95,35 +95,41 @@ return {
           { "left",  "right" },
           { "add",   "remove" },
         }
-        vim.cmd [[
-          nnoremap <silent> <Plug>(SwitchInLine) :<C-u>call SwitchLine(v:count1)<cr>
-          nmap <F4> <Plug>(SwitchInLine)w
+        local function SwitchLine(cnt)
+          local tick = vim.b.changedtick
+          local start = vim.fn.getcurpos()
 
-          fun! SwitchLine(cnt)
-          let tick = b:changedtick
-          let start = getcurpos()
-          for n in range(a:cnt)
-            Switch
-            endfor
-            if b:changedtick != tick
+          for n = 1, cnt do
+            vim.cmd('Switch')
+          end
+
+          if vim.b.changedtick ~= tick then
+            return
+          end
+
+          while true do
+            local pos = vim.fn.getcurpos()
+            vim.cmd('normal! w')
+
+            if pos[2] ~= vim.fn.getcurpos()[2] or vim.fn.deep_equal(pos, vim.fn.getcurpos()) then
+              break
+            end
+
+            for n = 1, cnt do
+              vim.cmd('Switch')
+            end
+
+            if vim.b.changedtick ~= tick then
               return
-              endif
-              while v:true
-                let pos = getcurpos()
-                normal! w
-                if pos[1] != getcurpos()[1] || pos == getcurpos()
-                  break
-                  endif
-                  for n in range(a:cnt)
-                    Switch
-                    endfor
-                    if b:changedtick != tick
-                      return
-                      endif
-                      endwhile
-                      call setpos('.', start)
-                      endfun
-        ]]
+            end
+          end
+
+          vim.fn.setpos('.', start)
+        end
+
+        vim.api.nvim_set_keymap('n', '<F4>', '<Plug>(SwitchInLine)w', {})
+        vim.api.nvim_set_keymap('n', '<Plug>(SwitchInLine)', SwitchLine(1),
+          { noremap = true, silent = true })
       end
     }
     --
