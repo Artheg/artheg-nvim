@@ -50,9 +50,6 @@ vim.api.nvim_set_keymap('n', '<leader>c', ':ColorHighlight<CR>', { silent = true
 vim.api.nvim_set_keymap('n', '<Leader>ac', '/constructor<Esc>:nohl<cr>f(a<cr>', { silent = true })
 -------
 
----- LSP
-vim.api.nvim_set_keymap('n', '<Leader>ld', ':Trouble<CR>', { silent = true })
-
 ------- Telescope
 vim.api.nvim_set_keymap('n', '<Leader>tt', ':Telescope<CR>', { silent = true })
 

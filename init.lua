@@ -22,7 +22,7 @@ vim.opt.shiftwidth = 2
 vim.opt.background = "dark"
 
 ---- cursor line
-vim.cmd[[set cursorline]]
+vim.cmd [[set cursorline]]
 
 ---- confirm save on q
 vim.opt.confirm = true
@@ -30,7 +30,7 @@ vim.opt.confirm = true
 vim.opt.hidden = true
 
 ---- disable highlight search
-vim.cmd[[set nohlsearch]]
+vim.cmd [[set nohlsearch]]
 
 ---- change active directory based on current active file
 -- vim.opt.autochdir = true
@@ -39,18 +39,18 @@ vim.cmd[[set nohlsearch]]
 -- vim.filetype.plugin = 'on'
 
 ---- start scrolling before reaching n*th line
-vim.opt.scrolloff=25
+vim.opt.scrolloff = 25
 ----
 -- vim.opt.updatetime=500
 
 ---- Resize vim's windows automatically on the terminal window resize
-vim.cmd[[autocmd VimResized * wincmd =]]
+vim.cmd [[autocmd VimResized * wincmd =]]
 
 ---- Toggle tmux panel when entering/exiting vim
-vim.cmd[[autocmd VimEnter,VimLeave * silent !tmux set status]]
+vim.cmd [[autocmd VimEnter,VimLeave * silent !tmux set status]]
 
 -- Close quickfix and location list after selecting item
-vim.cmd[[:autocmd FileType qf nnoremap <buffer> <CR> <CR>:cclose<CR>]]
+vim.cmd [[:autocmd FileType qf nnoremap <buffer> <CR> <CR>:cclose<CR>]]
 
 -- Update Floaterm on vim resize
 vim.api.nvim_create_autocmd('VimResized', {
@@ -60,13 +60,13 @@ vim.api.nvim_create_autocmd('VimResized', {
 
 ----------------- packer plugin manager
 local fn = vim.fn
-local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
+local install_path = fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
 if fn.empty(fn.glob(install_path)) > 0 then
-  packer_bootstrap = fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
+  packer_bootstrap = fn.system({ 'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim',
+    install_path })
 end
 
 return require('packer').startup(function(use)
-
   require('plugin-list').startup(use)
   if packer_bootstrap then
     require('packer').sync()
@@ -75,16 +75,15 @@ return require('packer').startup(function(use)
 
   -- require('lsp-config')
   require('keybindings')
-  require("no-clown-fiesta").setup({ variables = { bold = true, italic = true }, keywords = { bold = true, italic = true, standout = true } })
 
   -- vim.cmd[[colorscheme OceanicNext]]
   -- vim.cmd[[colorscheme blue-moon]]
   -- vim.cmd[[colorscheme farout]]
   -- vim.cmd[[colorscheme deus]]
   -- vim.cmd[[colorscheme falcon]]
-  vim.cmd[[colorscheme kanagawabones]]
-   -- vim.cmd[[colorscheme halcyon]]
-   -- vim.cmd[[colorscheme no-clown-fiesta]]
+  vim.cmd [[colorscheme kanagawabones]]
+  -- vim.cmd[[colorscheme halcyon]]
+  -- vim.cmd[[colorscheme no-clown-fiesta]]
 
 
   -- transparent bg
@@ -92,6 +91,4 @@ return require('packer').startup(function(use)
   -- vim.cmd[[autocmd vimenter * hi NormalNC guibg=none guifg=none ctermbg=none ctermfg=none]]
   -- vim.cmd[[autocmd vimenter * hi NonText guibg=none guifg=none ctermbg=none ctermfg=none]]
   -- vim.cmd[[autocmd vimenter * hi Visual guibg=#333344 guifg=none ctermbg=none ctermfg=none]]
-
 end)
-

@@ -58,7 +58,7 @@ return {
       "folke/trouble.nvim",
 
       config = function()
-        vim.keymap.set("n", "<leader>xx", function() require("trouble").open() end)
+        vim.keymap.set("n", "<leader>xx", function() require("trouble").toggle() end)
         vim.keymap.set("n", "<leader>xw", function() require("trouble").open("workspace_diagnostics") end)
         vim.keymap.set("n", "<leader>xd", function() require("trouble").open("document_diagnostics") end)
         vim.keymap.set("n", "<leader>xq", function() require("trouble").open("quickfix") end)
@@ -384,12 +384,10 @@ return {
         lsp.on_attach(function(client, bufnr)
           local opts = { buffer = bufnr, remap = false }
 
+          vim.keymap.set('n', '<leader>ld', function() vim.diagnostic.open_float() end, { silent = true })
           vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
           vim.keymap.set("n", "gy", function() vim.lsp.buf.type_definition() end, opts)
           vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts)
-          vim.keymap.set("n", "<leader>vd", function() vim.diagnostic.open_float() end, opts)
-          vim.keymap.set("n", "[d", function() vim.diagnostic.goto_next() end, opts)
-          vim.keymap.set("n", "]d", function() vim.diagnostic.goto_prev() end, opts)
           vim.keymap.set("n", "<leader>ga", function() vim.lsp.buf.code_action() end, opts)
           vim.keymap.set("n", "gr", function() vim.cmd('Telescope lsp_references') end, opts)
           vim.keymap.set("n", "gR", function() vim.lsp.buf.rename() end, opts)
