@@ -86,13 +86,6 @@ vim.api.nvim_set_keymap('n', 'H', '<c-w>W', { silent = true })
 vim.api.nvim_set_keymap('n', '<C-x>', ':call ToggleWindowMaximize()<cr>', { silent = true })
 -----
 
------ vim-snip
-vim.api.nvim_set_keymap('i', '<Tab>', 'vsnip#jumpable(1) ? \'<Plug>(vsnip-jump-next)\' : \'<Tab>\'',
-  { silent = true, expr = true })
-vim.api.nvim_set_keymap('i', '<S-Tab>', 'vsnip#jumpable(-1) ? \'<Plug>(vsnip-jump-prev)\' : \'<S-Tab>\'',
-  { silent = true, expr = true })
------
-
 ----- nvim-dap
 vim.api.nvim_set_keymap('n', '<F6>', ':lua require("dap").clear_breakpoints()<CR>', {})
 vim.api.nvim_set_keymap('n', '<F7>', ':DapContinue<CR>', {})
