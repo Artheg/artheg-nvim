@@ -1,6 +1,8 @@
 -- Keybindings
 
 ----- Navigation
+vim.api.nvim_set_keymap('n', '<A-j>', '10jzz', { silent = true, noremap = true })
+vim.api.nvim_set_keymap('n', '<A-k>', '10kzz', { silent = true, noremap = true })
 vim.api.nvim_set_keymap('n', '<A-h>', ':tabprev<CR>', { silent = true, noremap = true })
 vim.api.nvim_set_keymap('n', '<A-l>', ':tabnext<CR>', { silent = true, noremap = true })
 vim.api.nvim_set_keymap('n', '<Leader>tc', ':tabclose<CR>', { silent = true })
@@ -58,6 +60,7 @@ vim.api.nvim_set_keymap('n', '<Leader>tr', ':Telescope live_grep<CR>', { silent 
 vim.api.nvim_set_keymap('v', '<Leader>tr', 'y<ESC>:Telescope live_grep default_text=<c-r>0<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '<Leader>tf', ':Files<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '<Leader>to', ':Telescope oldfiles<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>ta', ':Telescope aerial<CR>', { silent = true })
 -- vim.api.nvim_set_keymap('n', '<Leader>tr', ':Telescope live_grep<CR>', {silent=true})
 -- vim.api.nvim_set_keymap('n', '<Leader>tf', ':Telescope find_files<CR>', {silent=true})
 -- vim.api.nvim_set_keymap('n', '<Leader>tp', ':Telescope projects<CR>', {silent=true}) vim.api.nvim_set_keymap('n', '<Leader>tgb', ':Telescope git_branches<CR>', {silent=true}) vim.api.nvim_set_keymap('n', '<Leader>tgc', ':Telescope git_commits<CR>', {silent=true})
