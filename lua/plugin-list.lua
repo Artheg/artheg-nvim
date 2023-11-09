@@ -417,7 +417,7 @@ return {
           cmd = { vim.fn.expand("$HOME/git/zig/zls/zig-out/bin/zls") },
         })
 
-        -- lsp.skip_server_setup({ 'tsserver' })
+        lsp.skip_server_setup({ 'tsserver' })
 
         lsp.setup()
 
