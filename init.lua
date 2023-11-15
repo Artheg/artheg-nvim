@@ -24,6 +24,10 @@ vim.opt.background = "dark"
 ---- cursor line
 vim.cmd [[set cursorline]]
 
+-- persistend undo
+vim.opt.undofile = true
+vim.opt.undodir = '~/.nvim/undodir'
+
 ---- confirm save on q
 vim.opt.confirm = true
 ---- hide buffers instead of closing them
