@@ -26,7 +26,7 @@ vim.cmd [[set cursorline]]
 
 -- persistend undo
 vim.opt.undofile = true
-vim.opt.undodir = '~/.nvim/undodir'
+vim.opt.undodir = os.getenv('HOME') .. '/.nvim/undodir'
 
 ---- confirm save on q
 vim.opt.confirm = true
