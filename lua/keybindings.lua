@@ -102,7 +102,7 @@ vim.api.nvim_set_keymap('n', '<F12>', ':DapStepOut<CR>', {})
 vim.api.nvim_set_keymap('n', '<leader>dt', ':lua require(\'dapui\').toggle()<CR>', { silent = true })
 
 ----- neovim-tasks
-vim.api.nvim_set_keymap('n', '<F5>', ':Task start auto run<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<F5>', ':OverseerToggle<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '<F17>', ':Task start auto debug<CR>', { silent = true })
 
 vim.api.nvim_set_hl(0, 'LineBreakpoint', { ctermbg = 0, bg = '#511111' })

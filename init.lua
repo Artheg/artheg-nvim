@@ -17,6 +17,9 @@ vim.opt.expandtab = true
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
 
+vim.o.guifont = "mono"
+vim.g.neovide_transparency = 0.85
+
 ---- syntax highlight vim.opt.syntax = 'on'
 
 vim.opt.background = "dark"
@@ -89,10 +92,16 @@ return require('packer').startup(function(use)
   -- vim.cmd[[colorscheme halcyon]]
   -- vim.cmd[[colorscheme no-clown-fiesta]]
 
+  vim.api.nvim_create_autocmd({ "VimLeave" }, {
+    callback = function()
+      vim.cmd("!notify-send ''")
+      vim.cmd("sleep 10m")
+    end,
+  })
 
   -- transparent bg
-  vim.cmd[[autocmd vimenter * hi Normal guibg=none guifg=none ctermbg=none ctermfg=none]]
-  vim.cmd[[autocmd vimenter * hi NormalNC guibg=none guifg=none ctermbg=none ctermfg=none]]
-  vim.cmd[[autocmd vimenter * hi NonText guibg=none guifg=none ctermbg=none ctermfg=none]]
-  vim.cmd[[autocmd vimenter * hi Visual guibg=#333344 guifg=none ctermbg=none ctermfg=none]]
+  vim.cmd [[autocmd vimenter * hi Normal guibg=none guifg=none ctermbg=none ctermfg=none]]
+  vim.cmd [[autocmd vimenter * hi NormalNC guibg=none guifg=none ctermbg=none ctermfg=none]]
+  vim.cmd [[autocmd vimenter * hi NonText guibg=none guifg=none ctermbg=none ctermfg=none]]
+  vim.cmd [[autocmd vimenter * hi Visual guibg=#333344 guifg=none ctermbg=none ctermfg=none]]
 end)
