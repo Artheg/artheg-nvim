@@ -41,7 +41,7 @@ vim.g.floaterm_opener = 'drop'
 
 ------- Git
 vim.api.nvim_set_keymap('n', '<Leader>gg', ':!git gui<cr><cr>', { silent = true })
-vim.api.nvim_set_keymap('n', '<Leader>gt', ':tabnew | :edit term://lazygit<CR>i', { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>gt', ':tabnew | :terminal lazygit<CR>i', { silent = true })
 -----
 
 ----- Colorizer
@@ -61,6 +61,9 @@ vim.api.nvim_set_keymap('v', '<Leader>tr', 'y<ESC>:Telescope live_grep default_t
 vim.api.nvim_set_keymap('n', '<Leader>tf', ':Files<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '<Leader>to', ':Telescope oldfiles<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '<Leader>ta', ':Telescope aerial<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', 'gr', ':Telescope lsp_references<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>ti', ':Telescope lsp_implementations<CR>', { silent = true })
+
 -- vim.api.nvim_set_keymap('n', '<Leader>tr', ':Telescope live_grep<CR>', {silent=true})
 -- vim.api.nvim_set_keymap('n', '<Leader>tf', ':Telescope find_files<CR>', {silent=true})
 -- vim.api.nvim_set_keymap('n', '<Leader>tp', ':Telescope projects<CR>', {silent=true}) vim.api.nvim_set_keymap('n', '<Leader>tgb', ':Telescope git_branches<CR>', {silent=true}) vim.api.nvim_set_keymap('n', '<Leader>tgc', ':Telescope git_commits<CR>', {silent=true})
@@ -99,7 +102,9 @@ vim.api.nvim_set_keymap('n', '<F11>', ':DapStepInto<CR>', {})
 vim.api.nvim_set_keymap('n', '<F12>', ':DapStepOut<CR>', {})
 
 ----- dap-ui
+vim.api.nvim_set_keymap('n', '<C-k>', ':lua require("dap.ui.widgets").hover()<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '<leader>dt', ':lua require(\'dapui\').toggle()<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<leader>de', ':lua require(\'dapui\').eval()<CR>', { silent = true })
 
 ----- neovim-tasks
 vim.api.nvim_set_keymap('n', '<F5>', ':Task start auto run<CR>', { silent = true })
