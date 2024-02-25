@@ -37,42 +37,8 @@ return {
     --
 
     -- git signs and hunk actions
-    use({
-      "lewis6991/gitsigns.nvim",
-      requires = "nvim-lua/plenary.nvim",
-      config = function()
-        require("gitsigns").setup()
-      end,
-    })
     use({ "airblade/vim-gitgutter", branch = "main" })
     --
-
-    -- display diagnostic lines in a fancy manner
-    use({
-      "folke/trouble.nvim",
-
-      config = function()
-        vim.keymap.set("n", "<leader>xx", function()
-          require("trouble").toggle()
-        end)
-        vim.keymap.set("n", "<leader>xw", function()
-          require("trouble").open("workspace_diagnostics")
-        end)
-        vim.keymap.set("n", "<leader>xd", function()
-          require("trouble").open("document_diagnostics")
-        end)
-        vim.keymap.set("n", "<leader>xq", function()
-          require("trouble").open("quickfix")
-        end)
-        vim.keymap.set("n", "<leader>xl", function()
-          require("trouble").open("loclist")
-        end)
-        -- require("lsp_lines").setup()
-        -- vim.diagnostic.config({
-        --   virtual_text = false
-        -- })
-      end,
-    })
 
     -- git conflict helper
     use({
@@ -82,10 +48,6 @@ return {
         require("git-conflict").setup()
       end,
     })
-
-    ---- create themes with live preview
-    -- use {'rktjmp/lush.nvim'}
-    ----
 
     -- extends match (matches special words)
     use("andymass/vim-matchup")
@@ -101,19 +63,34 @@ return {
           { "x",      "y",      "z" },
           { "top",    "bottom", "Top", "Bottom" },
           { "left",   "right" },
-          { "remove", "remove" },
+          { "remove", "add" },
         }
 
-        vim.keymap.set("n", "<F4>", "<ESC>:Switch<CR>w", { silent = true })
+        local function switchLine()
+          local tick = vim.b.changedtick
+          vim.cmd('Switch')
+          if vim.b.changedtick ~= tick then
+            vim.cmd("normal w")
+            return
+          end
+          while true do
+            local pos = vim.fn.getcurpos()
+            vim.cmd("normal w")
+            if pos[2] ~= vim.fn.getcurpos()[2] or pos == vim.fn.getcurpos() then
+              break
+            end
+            vim.cmd('Switch')
+            if vim.b.changedtick ~= tick then
+              vim.cmd("normal w")
+              return
+            end
+          end
+        end
+
+        vim.keymap.set("n", "<F4>", switchLine, { silent = true })
       end,
     })
     --
-
-    -- build system
-    use({
-      "Shatur/neovim-tasks",
-      requires = { "plenary.nvim" },
-    })
 
     -- fuzzy file search
     use({ "junegunn/fzf" })
@@ -325,8 +302,7 @@ return {
         lsp.preset("recommended")
 
         lsp.ensure_installed({
-          "lua_ls",
-          "rust_analyzer",
+          "lua_ls"
         })
 
         -- Fix Undefined global 'vim'
