@@ -4,8 +4,6 @@ return {
     use("wbthomason/packer.nvim")
     --
 
-    -- lspkind (vscode-like pictograms to neovim built-in lsp)
-    use("onsails/lspkind.nvim")
     -- project managament, Rooter
     use({
       "ahmedkhalf/project.nvim",
@@ -27,38 +25,6 @@ return {
       end,
     })
     --
-
-    -- format
-    use({
-      "mhartington/formatter.nvim",
-      config = function()
-        local filetypes = require("formatter.filetypes")
-        require("formatter").setup({
-          filetype = {
-            html = { filetypes.html.prettier },
-            javascript = { filetypes.javascript.biome },
-            json = { filetypes.json.prettier },
-            lua = { filetypes.lua.stylua },
-            markdown = { require("formatter.filetypes.markdown").prettier },
-            rust = { require("formatter.filetypes.rust").rustfmt },
-            sh = { require("formatter.filetypes.sh").shfmt },
-            toml = { require("formatter.filetypes.toml").taplo },
-            typescript = { require("formatter.filetypes.typescript").biome },
-            typescriptreact = { require("formatter.filetypes.typescriptreact").prettier },
-            zig = { require("formatter.filetypes.zig").zigfmt },
-          },
-        })
-      end,
-    })
-
-    -- better typescript lsp
-    use({
-      "pmizio/typescript-tools.nvim",
-      requires = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
-      config = function()
-        require("typescript-tools").setup({})
-      end,
-    })
 
     -- git blamer
     use({
@@ -231,10 +197,6 @@ return {
       end,
     })
 
-    -- zig support
-    use("ziglang/zig.vim")
-    --
-
     -- better word motion (e.g. CamelCase)
     use("chaoren/vim-wordmotion")
     --
@@ -327,7 +289,15 @@ return {
         { "neovim/nvim-lspconfig" },
         { "williamboman/mason.nvim" },
         { "williamboman/mason-lspconfig.nvim" },
-
+        -- Better typescript integration
+        {
+          "pmizio/typescript-tools.nvim",
+          requires = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+          config = function()
+          end,
+        },
+        -- fancy icons
+        { "onsails/lspkind.nvim" },
         -- Autocompletion
         { "hrsh7th/nvim-cmp" },
         { "hrsh7th/cmp-buffer" },
@@ -342,7 +312,12 @@ return {
         { "rafamadriz/friendly-snippets" },
 
         -- Formatting
-        { "lukas-reineke/lsp-format.nvim" },
+        {
+          "lukas-reineke/lsp-format.nvim",
+          config = function()
+            require("lsp-format").setup()
+          end
+        },
       },
       config = function()
         local lsp = require("lsp-zero")
@@ -383,9 +358,9 @@ return {
           },
         })
 
-        lsp.on_attach(function(client, bufnr)
+        local on_attach = function(client, bufnr)
+          require("lsp-format").on_attach(client, bufnr)
           local opts = { buffer = bufnr, remap = false }
-
           vim.keymap.set("n", "<leader>ld", function()
             vim.diagnostic.open_float()
           end, { silent = true })
@@ -410,6 +385,10 @@ return {
           vim.keymap.set("i", "<C-h>", function()
             vim.lsp.buf.signature_help()
           end, opts)
+        end
+
+        lsp.on_attach(function(client, bufnr)
+          on_attach(client, bufnr)
         end)
 
         lsp.configure("zls", {
@@ -418,30 +397,13 @@ return {
         })
 
         lsp.skip_server_setup({ 'tsserver' })
+        require("typescript-tools").setup({
+          on_attach = function(client, bufnr)
+            on_attach(client, bufnr)
+          end,
+        })
 
         lsp.setup()
-
-        -- local null_ls = require('null-ls');
-        -- null_ls.setup({
-        --   -- add your sources / config options here
-        --   sources = {
-        --     null_ls.builtins.code_actions.eslint_d.with({
-        --       condition = function(utils)
-        --         return utils.root_has_file({ ".eslintrc.json" })
-        --       end
-        --     }),
-        --     null_ls.builtins.diagnostics.eslint_d.with({
-        --       condition = function(utils)
-        --         return utils.root_has_file({ ".eslintrc.json" })
-        --       end
-        --     }),
-        --     null_ls.builtins.formatting.eslint_d.with({
-        --       condition = function(utils)
-        --         return utils.root_has_file({ ".eslintrc.json" })
-        --       end
-        --     }),
-        --   },
-        -- })
 
         vim.diagnostic.config({
           virtual_text = true,
@@ -491,7 +453,7 @@ return {
       "nvim-treesitter/nvim-treesitter",
       config = function()
         require("nvim-treesitter.configs").setup({
-          ensure_installed = { "regex", "c", "lua", "typescript", "zig", "javascript" },
+          ensure_installed = { "regex", "c", "lua", "typescript", "zig", "javascript", "markdown" },
           highlight = {
             enable = true,
           },
@@ -501,11 +463,5 @@ return {
     })
 
     -----
-    use({
-      "iamcco/markdown-preview.nvim",
-      run = function()
-        vim.fn["mkdp#util#install"]()
-      end,
-    })
   end,
 }
