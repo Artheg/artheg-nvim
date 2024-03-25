@@ -168,7 +168,7 @@ return {
     -- experimental ui for dap
     use({
       "rcarriga/nvim-dap-ui",
-      requires = { "mfussenegger/nvim-dap" },
+      requires = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" },
       config = function()
         require("dapui").setup()
       end,
@@ -241,6 +241,7 @@ return {
 
     -- colorschemes
     use({ "mcchrish/zenbones.nvim", requires = "rktjmp/lush.nvim" })
+    use("chriskempson/base16-vim")
     --
 
     -- godot support
@@ -289,15 +290,48 @@ return {
         { "rafamadriz/friendly-snippets" },
 
         -- Formatting
+        -- {
+        --   "lukas-reineke/lsp-format.nvim",
+        -- },
         {
-          "lukas-reineke/lsp-format.nvim",
+          "stevearc/conform.nvim",
           config = function()
-            require("lsp-format").setup()
+            require("conform").setup({
+              formatters_by_ft = {
+                typescript = { "eslint_d", "prettierd" }
+              },
+              format_on_save = function(bufnr)
+                -- Disable with a global or buffer-local variable
+                if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
+                  return
+                end
+                return { timeout_ms = 500, lsp_fallback = true }
+              end,
+            })
+            vim.api.nvim_create_user_command("FormatDisable", function(args)
+              if args.bang then
+                -- FormatDisable! will disable formatting just for this buffer
+                vim.b.disable_autoformat = true
+              else
+                vim.g.disable_autoformat = true
+              end
+            end, {
+              desc = "Disable autoformat-on-save",
+              bang = true,
+            })
+            vim.api.nvim_create_user_command("FormatEnable", function()
+              vim.b.disable_autoformat = false
+              vim.g.disable_autoformat = false
+            end, {
+              desc = "Re-enable autoformat-on-save",
+            })
           end
-        },
+        }
       },
       config = function()
+        -- require("lsp-format").setup()
         local lsp = require("lsp-zero")
+
 
         lsp.preset("recommended")
 
@@ -335,7 +369,7 @@ return {
         })
 
         local on_attach = function(client, bufnr)
-          require("lsp-format").on_attach(client, bufnr)
+          -- require("lsp-format").on_attach(client, bufnr)
           local opts = { buffer = bufnr, remap = false }
           vim.keymap.set("n", "<leader>ld", function()
             vim.diagnostic.open_float()

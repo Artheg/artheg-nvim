@@ -85,14 +85,15 @@ return require('packer').startup(function(use)
   -- vim.cmd[[colorscheme farout]]
   -- vim.cmd[[colorscheme deus]]
   -- vim.cmd[[colorscheme falcon]]
-  vim.cmd [[colorscheme kanagawabones]]
+  -- vim.cmd [[colorscheme kanagawabones]]
+  vim.cmd [[colorscheme base16-grayscale-dark]]
   -- vim.cmd[[colorscheme halcyon]]
   -- vim.cmd[[colorscheme no-clown-fiesta]]
 
 
   -- transparent bg
-  vim.cmd[[autocmd vimenter * hi Normal guibg=none guifg=none ctermbg=none ctermfg=none]]
-  vim.cmd[[autocmd vimenter * hi NormalNC guibg=none guifg=none ctermbg=none ctermfg=none]]
-  vim.cmd[[autocmd vimenter * hi NonText guibg=none guifg=none ctermbg=none ctermfg=none]]
-  vim.cmd[[autocmd vimenter * hi Visual guibg=#333344 guifg=none ctermbg=none ctermfg=none]]
+  -- vim.cmd[[autocmd vimenter * hi Normal guibg=none guifg=none ctermbg=none ctermfg=none]]
+  -- vim.cmd[[autocmd vimenter * hi NormalNC guibg=none guifg=none ctermbg=none ctermfg=none]]
+  -- vim.cmd[[autocmd vimenter * hi NonText guibg=none guifg=none ctermbg=none ctermfg=none]]
+  -- vim.cmd[[autocmd vimenter * hi Visual guibg=#333344 guifg=none ctermbg=none ctermfg=none]]
 end)
