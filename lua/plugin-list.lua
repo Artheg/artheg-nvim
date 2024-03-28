@@ -242,6 +242,7 @@ return {
     -- colorschemes
     use({ "mcchrish/zenbones.nvim", requires = "rktjmp/lush.nvim" })
     use("chriskempson/base16-vim")
+    use("hardselius/warlock")
     --
 
     -- godot support
