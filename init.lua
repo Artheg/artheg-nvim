@@ -133,7 +133,12 @@ require("lazy").setup({
   { "airblade/vim-gitgutter" },
   { "akinsho/git-conflict.nvim" },
   -- extend match (matches special words)
-  { "andymass/vim-matchup",     event = "BufReadPost" },
+  {
+    "andymass/vim-matchup",
+    config = function()
+      vim.g.matchup_matchparen_offscreen = { method = "popup" }
+    end
+  },
   -- automatically replaces words
   {
     "AndrewRadev/switch.vim",
@@ -171,6 +176,18 @@ require("lazy").setup({
       vim.keymap.set("n", "<F4>", switchLine, { silent = true })
     end,
   },
+  -- Treesitter
+  {
+    "nvim-treesitter/nvim-treesitter",
+    build = ":TSUpdate",
+    config = function()
+      require("nvim-treesitter.configs").setup({
+        matchup = {
+          enable = true, -- mandatory, false will disable the whole extension
+        },
+      })
+    end
+  },
   -- fuzzy file search
   { "junegunn/fzf" },
   { "junegunn/fzf.vim" },
@@ -180,10 +197,6 @@ require("lazy").setup({
   {
     "ptzz/lf.vim",
     lazy = false,
-    config = function()
-      vim.g.lf_replace_netrw = 1
-      vim.g.lf_map_keys = 0
-    end,
   },
   -- floating terminal
   { "voldikss/vim-floaterm" },
@@ -220,7 +233,7 @@ require("lazy").setup({
     dependencies = { "kyazdani42/nvim-web-devicons" }
   },
   -- [], {}, (), etc.
-  { "windwp/nvim-autopairs" },
+  { "windwp/nvim-autopairs",  config = [[require("config.autopairs")]] },
   -- colorschemes
   { "mcchrish/zenbones.nvim" },
   { "chriskempson/base16-vim" },
@@ -291,14 +304,18 @@ require("lazy").setup({
       -- symbols outline
       "stevearc/aerial.nvim",
       -- Autocompletion
-      "hrsh7th/nvim-cmp",
-      "hrsh7th/cmp-buffer",
-      "hrsh7th/cmp-path",
-      "hrsh7th/cmp-nvim-lsp-signature-help",
-      "saadparwaiz1/cmp_luasnip",
-      "hrsh7th/cmp-nvim-lsp",
-      "hrsh7th/cmp-nvim-lua",
-      "hrsh7th/cmp-vsnip",
+      {
+        "hrsh7th/nvim-cmp",
+        dependencies = {
+          "hrsh7th/cmp-buffer",
+          "hrsh7th/cmp-path",
+          "hrsh7th/cmp-nvim-lsp-signature-help",
+          "saadparwaiz1/cmp_luasnip",
+          "hrsh7th/cmp-nvim-lsp",
+          "hrsh7th/cmp-nvim-lua",
+          "hrsh7th/cmp-vsnip",
+        }
+      },
 
       -- Snippets
       "L3MON4D3/LuaSnip",
