@@ -1,5 +1,5 @@
--- options
---
+-- {{{ Options
+
 -- extend selection on right click instead of popup menu
 vim.opt.mousemodel = 'extend'
 -- relative and absolute number simultaneously
@@ -65,29 +65,11 @@ vim.api.nvim_create_autocmd('VimResized', {
   group = vim.api.nvim_create_augroup('Floaterm', {}),
 })
 
------------------ packer plugin manager
-
-require('keybindings')
--- vim.cmd [[colorscheme warlock]]
--- vim.cmd[[colorscheme OceanicNext]]
--- vim.cmd[[colorscheme blue-moon]]
--- vim.cmd[[colorscheme farout]]
--- vim.cmd[[colorscheme deus]]
--- vim.cmd[[colorscheme falcon]]
--- vim.cmd [[colorscheme kanagawabones]]
--- vim.cmd[[colorscheme halcyon]]
--- vim.cmd[[colorscheme no-clown-fiesta]]
-
-
--- transparent bg
--- vim.cmd[[autocmd vimenter * hi Normal guibg=none guifg=none ctermbg=none ctermfg=none]]
--- vim.cmd[[autocmd vimenter * hi NormalNC guibg=none guifg=none ctermbg=none ctermfg=none]]
--- vim.cmd[[autocmd vimenter * hi NonText guibg=none guifg=none ctermbg=none ctermfg=none]]
--- vim.cmd[[autocmd vimenter * hi Visual guibg=#333344 guifg=none ctermbg=none ctermfg=none]]
+vim.opt.foldmethod = 'marker'
+-- }}}
 --
+---- {{{ lazy.nvim
 
-
----- lazy.nvim
 -- bootstrap
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -183,7 +165,7 @@ require("lazy").setup({
     config = function()
       require("nvim-treesitter.configs").setup({
         matchup = {
-          enable = true, -- mandatory, false will disable the whole extension
+          enable = true,
         },
       })
     end
@@ -437,3 +419,155 @@ require("lazy").setup({
     end,
   }
 })
+-- }}}
+--
+-- {{{ Keybindings
+
+----- Navigation
+vim.api.nvim_set_keymap('n', '<A-j>', '10jzz', { silent = true, noremap = true })
+vim.api.nvim_set_keymap('n', '<A-k>', '10kzz', { silent = true, noremap = true })
+vim.api.nvim_set_keymap('n', '<A-h>', ':tabprev<CR>', { silent = true, noremap = true })
+vim.api.nvim_set_keymap('n', '<A-l>', ':tabnext<CR>', { silent = true, noremap = true })
+vim.api.nvim_set_keymap('n', '<Leader>tc', ':tabclose<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>tn', ':tabnew<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>ct', '/class<CR>j', { silent = true })
+
+-- center screen when focusing on search occurences
+vim.api.nvim_set_keymap('n', 'n', 'nzzzv', { noremap = true })
+vim.api.nvim_set_keymap('n', 'N', 'Nzzzv', { noremap = true })
+
+-- buffer
+-- vim.api.nvim_set_keymap('n', '<A-k>', ':bprevious<CR>', { silent = true, noremap = true })
+-- vim.api.nvim_set_keymap('n', '<A-j>', ':bnext<CR>', { silent = true, noremap = true })
+
+-- better history jumping
+vim.cmd [[
+nnoremap <expr> j (v:count > 1 ? "m'" . v:count : "") . 'j'
+nnoremap <expr> k (v:count > 1 ? "m'" . v:count : "") . 'k'
+]]
+
+----- quickfix
+vim.api.nvim_set_keymap('n', '<C-j>', ':cnext<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<C-k>', ':cprevious<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>cc', ':cclose<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>co', ':copen<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<esc>', ':cclose<CR>', { silent = true })
+
+------- Floaterm
+vim.api.nvim_set_keymap('n', '<leader>e', ':Lf<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<F2>', ':FloatermToggle<cr>', { silent = true })
+vim.api.nvim_set_keymap('t', '<F2>', '<C-\\><C-n>:FloatermToggle<CR>', { silent = true, noremap = true })
+vim.g.floaterm_opener = 'drop'
+-----
+
+------- Git
+vim.api.nvim_set_keymap('n', '<Leader>gg', ':!git gui<cr><cr>', { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>gt', ':tabnew | :terminal lazygit<CR>i', { silent = true })
+-----
+
+----- Colorizer
+vim.api.nvim_set_keymap('n', '<leader>c', ':ColorHighlight<CR>', { silent = true, noremap = true })
+--
+
+---- Typescript
+vim.api.nvim_set_keymap('n', '<Leader>ac', '/constructor<Esc>:nohl<cr>f(a<cr>', { silent = true })
+-------
+
+------- Telescope
+vim.api.nvim_set_keymap('n', '<Leader>tt', ':Telescope<CR>', { silent = true })
+
+vim.api.nvim_set_keymap('n', '<Leader>tb', ':Buffers<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>tr', ':Telescope live_grep<CR>', { silent = true })
+vim.api.nvim_set_keymap('v', '<Leader>tr', 'y<ESC>:Telescope live_grep default_text=<c-r>0<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>tf', ':Files<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>to', ':Telescope oldfiles<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>ta', ':Telescope aerial<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', 'gr', ':Telescope lsp_references<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>ti', ':Telescope lsp_implementations<CR>', { silent = true })
+
+
+----- Windows
+vim.cmd [[
+let windowMaximized = 1
+function! ToggleWindowMaximize()
+if g:windowMaximized
+  :exe "normal \<C-w>_ \<C-w>|"
+  let g:windowMaximized = 0
+else
+  :exe "normal \<C-w>="
+  let g:windowMaximized = 1
+  endif
+  endfunction
+  ]]
+
+vim.api.nvim_set_keymap('n', 'L', '<c-w><c-w>', { silent = true })
+vim.api.nvim_set_keymap('n', 'H', '<c-w>W', { silent = true })
+vim.api.nvim_set_keymap('n', '<C-x>', ':call ToggleWindowMaximize()<cr>', { silent = true })
+-----
+
+----- nvim-dap
+vim.api.nvim_set_keymap('n', '<F6>', ':lua require("dap").clear_breakpoints()<CR>', {})
+vim.api.nvim_set_keymap('n', '<F7>', ':DapContinue<CR>', {})
+vim.api.nvim_set_keymap('n', '<F8>', ':lua require("dap.ui.widgets").hover()<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<F9>', ':DapToggleBreakpoint<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<F10>', ':DapStepOver<CR>', {})
+vim.api.nvim_set_keymap('n', '<F11>', ':DapStepInto<CR>', {})
+vim.api.nvim_set_keymap('n', '<F12>', ':DapStepOut<CR>', {})
+
+----- dap-ui
+vim.api.nvim_set_keymap('n', '<C-k>', ':lua require("dap.ui.widgets").hover()<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<leader>dt', ':lua require(\'dapui\').toggle()<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<leader>de', ':lua require(\'dapui\').eval()<CR>', { silent = true })
+
+----- neovim-tasks
+vim.api.nvim_set_keymap('n', '<F5>', ':Task start auto run<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<F17>', ':Task start auto debug<CR>', { silent = true })
+
+vim.api.nvim_set_hl(0, 'LineBreakpoint', { ctermbg = 0, bg = '#511111' })
+vim.api.nvim_set_hl(0, 'DapStopped', { ctermbg = 0, fg = '#98c379', bg = '#31353f' })
+-----
+
+
+----- Edit
+-- Emacs-like movement for insert mode
+vim.api.nvim_set_keymap('i', '<C-b>', '<C-o>b', {})
+vim.api.nvim_set_keymap('i', '<C-f>', '<C-o>w', {})
+vim.api.nvim_set_keymap('i', '<C-a>', '<C-o>I', {})
+vim.api.nvim_set_keymap('i', '<C-e>', '<C-o>A', {})
+
+-- make Y behave as other capital letters by default
+vim.api.nvim_set_keymap('n', 'Y', 'y$', { noremap = true })
+-- save all
+vim.api.nvim_set_keymap('n', '<C-A-s>', ':wall<CR>', {})
+vim.api.nvim_set_keymap('i', '<C-A-s>', ':wall<CR>', {})
+-- save current
+vim.api.nvim_set_keymap('n', '<C-s>', '<ESC>:w<CR>', {})
+vim.api.nvim_set_keymap('i', '<C-s>', '<ESC>:w<CR>', {})
+-----
+
+------ Move
+vim.api.nvim_set_keymap('v', 'J', ':m \'>+1<CR>gv=gv', {})
+vim.api.nvim_set_keymap('v', 'K', ':m \'<-2<CR>gv=gv', {})
+
+----- Format
+-- auto indent on paste
+vim.api.nvim_set_keymap('n', 'p', 'p`[v`]=', { noremap = true })
+vim.api.nvim_set_keymap('n', 'P', 'P`[v`]=', { noremap = true })
+-- vim.api.nvim_set_keymap('n', '<C-p>', ']p', { noremap=true })
+-- vim.api.nvim_set_keymap('n', '<C-P>', 'P', { noremap=true })
+
+vim.api.nvim_set_keymap('n', '<F3>', '<ESC>:lua vim.lsp.buf.format({ async = true })<CR>', {})
+-----
+
+----- Clipboard
+vim.api.nvim_set_keymap('i', '<C-v>', '<ESC>"+p<S-v>==ea<ESC>', { noremap = true })
+vim.api.nvim_set_keymap('v', '<C-c>', '"+y', { noremap = true })
+vim.api.nvim_set_keymap('n', '<C-S-v>', '"+pgv=', { noremap = true })
+vim.api.nvim_set_keymap('v', '<C-v>', '"+p<S-v>==ea<ESC>', { noremap = true })
+-----
+
+----- Aerial (outline symbols)
+vim.api.nvim_set_keymap('n', '<C-a>', ':AerialToggle<CR>', { silent = true })
+-----
+
+-- }}}
