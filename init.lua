@@ -316,6 +316,11 @@ require("lazy").setup({
         ensure_installed = {},
         handlers = {
           lsp_zero.default_setup,
+          clangd = function()
+            require('lspconfig').clangd.setup({
+              cmd = { "clangd", "--function-arg-placeholders=0" },
+            })
+          end,
         },
       })
 
