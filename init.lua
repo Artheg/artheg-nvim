@@ -272,6 +272,7 @@ require("lazy").setup({
     dependencies = {
       -- LSP Support
       "neovim/nvim-lspconfig",
+      "Tetralux/odin.vim",
       {
         "williamboman/mason.nvim",
         config = function()
