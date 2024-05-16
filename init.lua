@@ -505,6 +505,11 @@ vim.api.nvim_set_keymap('n', 'gr', ':Telescope lsp_references<CR>', { silent = t
 vim.api.nvim_set_keymap('n', '<Leader>ti', ':Telescope lsp_implementations<CR>', { silent = true })
 
 
+------- LSP
+vim.api.nvim_set_keymap('n', '<Leader>q', ':lua vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())<CR>',
+  { silent = true })
+------
+
 ----- Windows
 vim.cmd [[
 let windowMaximized = 1
