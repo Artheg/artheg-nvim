@@ -235,11 +235,28 @@ require("lazy").setup({
   { "junegunn/fzf.vim" },
   -- better word motion (e.g. CamelCase)
   { "chaoren/vim-wordmotion" },
-  -- lf file manager
+  -- yazi file manager
   {
-    "ptzz/lf.vim",
-    lazy = false,
+    "mikavilpas/yazi.nvim",
+    event = "VeryLazy",
+    keys = {
+      {
+        "<leader>e",
+        function()
+          require("yazi").yazi()
+        end,
+        desc = "Open the file manager",
+      }
+    },
+    opts = {
+      open_for_directories = true
+    }
   },
+  -- lf file manager
+  -- {
+  --   "ptzz/lf.vim",
+  --   lazy = false,
+  -- },
   -- floating terminal
   { "voldikss/vim-floaterm" },
   -- highlight other uses of words
@@ -564,7 +581,7 @@ vim.api.nvim_set_keymap('n', '<Leader>co', ':copen<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '<esc>', ':cclose<CR>', { silent = true })
 
 ------- Floaterm
-vim.api.nvim_set_keymap('n', '<leader>e', ':Lf<CR>', { silent = true })
+-- vim.api.nvim_set_keymap('n', '<leader>e', ':Lf<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '<F2>', ':FloatermToggle<cr>', { silent = true })
 vim.api.nvim_set_keymap('t', '<F2>', '<C-\\><C-n>:FloatermToggle<CR>', { silent = true, noremap = true })
 vim.g.floaterm_opener = 'drop'
