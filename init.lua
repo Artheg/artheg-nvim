@@ -20,6 +20,11 @@ vim.opt.shiftwidth = 2
 vim.g.lf_replace_netrw = 1
 vim.g.lf_map_keys = 0
 
+vim.g.neovide_input_macos_option_key_is_meta="only_left"
+vim.g.guifont = "CozetteVector:h11"
+
+-- vim.cmd.colorscheme[[catppuccin]]
+
 ---- syntax highlight vim.opt.syntax = 'on'
 
 vim.opt.background = "dark"
@@ -54,7 +59,7 @@ vim.opt.scrolloff = 25
 vim.cmd [[autocmd VimResized * wincmd =]]
 
 ---- Toggle tmux panel when entering/exiting vim
-vim.cmd [[autocmd VimEnter,VimLeave * silent !tmux set status]]
+-- vim.cmd [[autocmd VimEnter,VimLeave * silent !tmux set status]]
 
 -- Close quickfix and location list after selecting item
 vim.cmd [[:autocmd FileType qf nnoremap <buffer> <CR> <CR>:cclose<CR>]]
@@ -104,6 +109,18 @@ require("lazy").setup({
       })
     end,
   },
+  -- better lsp experience
+  {
+    'nvimdev/lspsaga.nvim',
+    config = function()
+      require('lspsaga').setup({})
+      vim.keymap.set("n", "<leader>lp", ':Lspsaga peek_definition<CR>')
+    end,
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter', -- optional
+      'nvim-tree/nvim-web-devicons',     -- optional
+    }
+  },
   -- git
   {
     "f-person/git-blame.nvim",
@@ -111,6 +128,9 @@ require("lazy").setup({
       vim.g.gitblame_date_format = "%d.%m.%y %H:%M"
       vim.g.gitblame_message_template = "// <author> (<committer-date>) • <summary>"
     end,
+  },
+  {
+    'Wansmer/symbol-usage.nvim',
   },
   { "airblade/vim-gitgutter" },
   { "akinsho/git-conflict.nvim" },
@@ -121,6 +141,7 @@ require("lazy").setup({
       vim.g.matchup_matchparen_offscreen = { method = "popup" }
     end
   },
+  {'mfussenegger/nvim-jdtls'},
   -- automatically replaces words
   {
     "AndrewRadev/switch.vim",
@@ -170,6 +191,45 @@ require("lazy").setup({
       })
     end
   },
+  {
+    "folke/trouble.nvim",
+    opts = {}, -- for default options, refer to the configuration section for custom setup.
+    cmd = "Trouble",
+    keys = {
+      {
+        "<leader>xx",
+        "<cmd>Trouble diagnostics toggle<cr>",
+        desc = "Diagnostics (Trouble)",
+      },
+      {
+        "<leader>xX",
+        "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
+        desc = "Buffer Diagnostics (Trouble)",
+      },
+      {
+        "<leader>cs",
+        "<cmd>Trouble symbols toggle focus=false<cr>",
+        desc = "Symbols (Trouble)",
+      },
+      {
+        "<leader>cl",
+        "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
+        desc = "LSP Definitions / references / ... (Trouble)",
+      },
+      {
+        "<leader>xL",
+        "<cmd>Trouble loclist toggle<cr>",
+        desc = "Location List (Trouble)",
+      },
+      {
+        "<leader>xQ",
+        "<cmd>Trouble qflist toggle<cr>",
+        desc = "Quickfix List (Trouble)",
+      },
+    },
+  },
+  -- highlight arguments with treesitter
+  { 'm-demare/hlargs.nvim' },
   -- fuzzy file search
   { "junegunn/fzf" },
   { "junegunn/fzf.vim" },
@@ -200,6 +260,13 @@ require("lazy").setup({
     },
     config = function()
       local telescope = require("telescope")
+      telescope.setup({
+        pickers = {
+          colorscheme = {
+            enable_preview = true
+          }
+        },
+      })
       telescope.load_extension("fzf")
       telescope.load_extension("fzy_native")
       telescope.load_extension("projects")
@@ -217,13 +284,30 @@ require("lazy").setup({
   -- [], {}, (), etc.
   { "windwp/nvim-autopairs",  config = [[require("config.autopairs")]] },
   -- colorschemes
-  { "mcchrish/zenbones.nvim" },
+  { "sam4llis/nvim-tundra" },
+  { "sainnhe/everforest" },
+  { "catppuccin/nvim", name = "catppuccin", priority = 1000, config = function() vim.cmd[[colorscheme neobones]] end },
+  { "slugbyte/lackluster.nvim" },
+  { "haystackandroid/carbonized" },
+  { "aliqyan-21/darkvoid.nvim" },
+  {
+    'AlexvZyl/nordic.nvim',
+    lazy = false,
+    priority = 1000,
+  },
+  {
+    "zootedb0t/citruszest.nvim",
+    lazy = false,
+    priority = 1000,
+  },
+  { "paulfrische/reddish.nvim" },
+  { 
+    "mcchrish/zenbones.nvim",
+    dependencies = { "rktjmp/lush.nvim" },
+  },
   { "chriskempson/base16-vim" },
   {
-    "hardselius/warlock",
-    config = function()
-      vim.cmd [[colorscheme warlock]]
-    end
+    "hardselius/warlock"
   },
   -- Formatting
   {
@@ -231,7 +315,7 @@ require("lazy").setup({
     config = function()
       require("conform").setup({
         formatters_by_ft = {
-          typescript = { "eslint_d", "prettierd" }
+          typescript = { "biome" }
         },
         format_on_save = function(bufnr)
           -- Disable with a global or buffer-local variable
@@ -261,10 +345,10 @@ require("lazy").setup({
     end
   },
   -- Better typescript integration
-  {
-    "pmizio/typescript-tools.nvim",
-    dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
-  },
+  -- {
+  --   "pmizio/typescript-tools.nvim",
+  --   dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+  -- },
   -- LSP/Completion
   {
     "VonHeikemen/lsp-zero.nvim",
@@ -305,7 +389,7 @@ require("lazy").setup({
       "rafamadriz/friendly-snippets",
 
       -- Better typescript integration
-      "pmizio/typescript-tools.nvim",
+      -- "pmizio/typescript-tools.nvim",
     },
     config = function()
       -- require("lsp-format").setup()
@@ -387,6 +471,7 @@ require("lazy").setup({
 
       local on_attach = function(client, bufnr)
         -- require("lsp-format").on_attach(client, bufnr)
+        require('symbol-usage').setup()
         local opts = { buffer = bufnr, remap = false }
         vim.keymap.set("n", "<leader>ld", function()
           vim.diagnostic.open_float()
@@ -424,11 +509,17 @@ require("lazy").setup({
       })
 
       -- lsp.skip_server_setup({ 'tsserver' })
-      require("typescript-tools").setup({
-        on_attach = function(client, bufnr)
-          on_attach(client, bufnr)
-        end,
-      })
+      -- require("typescript-tools").setup({
+      --   on_attach = function(client, bufnr)
+      --     on_attach(client, bufnr)
+      --   end,
+      --   settings = {
+      --     tsserver_file_preferences = {
+      --       includeInlayParameterNameHints = "all",
+      --       includeCompletionsForModuleExports = true,
+      --     }
+      --   }
+      -- })
 
       lsp_zero.setup()
 
@@ -495,10 +586,10 @@ vim.api.nvim_set_keymap('n', '<Leader>ac', '/constructor<Esc>:nohl<cr>f(a<cr>', 
 ------- Telescope
 vim.api.nvim_set_keymap('n', '<Leader>tt', ':Telescope<CR>', { silent = true })
 
-vim.api.nvim_set_keymap('n', '<Leader>tb', ':Buffers<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>tb', ':Telescope buffers<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '<Leader>tr', ':Telescope live_grep<CR>', { silent = true })
 vim.api.nvim_set_keymap('v', '<Leader>tr', 'y<ESC>:Telescope live_grep default_text=<c-r>0<CR>', { silent = true })
-vim.api.nvim_set_keymap('n', '<Leader>tf', ':Files<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>tf', ':Telescope find_files<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '<Leader>to', ':Telescope oldfiles<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '<Leader>ta', ':Telescope aerial<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', 'gr', ':Telescope lsp_references<CR>', { silent = true })
