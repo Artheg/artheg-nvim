@@ -20,7 +20,7 @@ vim.opt.shiftwidth = 2
 vim.g.lf_replace_netrw = 1
 vim.g.lf_map_keys = 0
 
-vim.g.neovide_input_macos_option_key_is_meta="only_left"
+vim.g.neovide_input_macos_option_key_is_meta = "only_left"
 vim.g.guifont = "CozetteVector:h11"
 
 -- vim.cmd.colorscheme[[catppuccin]]
@@ -141,7 +141,7 @@ require("lazy").setup({
       vim.g.matchup_matchparen_offscreen = { method = "popup" }
     end
   },
-  {'mfussenegger/nvim-jdtls'},
+  { 'mfussenegger/nvim-jdtls' },
   -- automatically replaces words
   {
     "AndrewRadev/switch.vim",
@@ -299,11 +299,11 @@ require("lazy").setup({
     dependencies = { "kyazdani42/nvim-web-devicons" }
   },
   -- [], {}, (), etc.
-  { "windwp/nvim-autopairs",  config = [[require("config.autopairs")]] },
+  { "windwp/nvim-autopairs",     config = [[require("config.autopairs")]] },
   -- colorschemes
   { "sam4llis/nvim-tundra" },
   { "sainnhe/everforest" },
-  { "catppuccin/nvim", name = "catppuccin", priority = 1000, config = function() vim.cmd[[colorscheme neobones]] end },
+  { "catppuccin/nvim",           name = "catppuccin",                     priority = 1000, config = function() vim.cmd [[colorscheme everforest]] end },
   { "slugbyte/lackluster.nvim" },
   { "haystackandroid/carbonized" },
   { "aliqyan-21/darkvoid.nvim" },
@@ -318,7 +318,7 @@ require("lazy").setup({
     priority = 1000,
   },
   { "paulfrische/reddish.nvim" },
-  { 
+  {
     "mcchrish/zenbones.nvim",
     dependencies = { "rktjmp/lush.nvim" },
   },
@@ -440,7 +440,28 @@ require("lazy").setup({
       })
 
       local cmp = require('cmp')
+      local luasnip = require("luasnip")
       local lspkind = require('lspkind')
+
+
+      local cmp_enabled = false
+      vim.api.nvim_create_user_command("ToggleAutoComplete", function()
+        if cmp_enabled then
+          require("cmp").setup.buffer({ enabled = false })
+          cmp_enabled = false
+          if (cmp.visible()) then
+            cmp.close()
+          end
+        else
+          require("cmp").setup.buffer({ enabled = true })
+          cmp_enabled = true
+          cmp.complete()
+        end
+      end, {})
+
+      vim.keymap.set({ "n", "v", "i" }, "<M-i>", function()
+        vim.cmd [[ToggleAutoComplete]]
+      end, { silent = true })
 
       cmp.setup({
         sources = {
@@ -450,6 +471,9 @@ require("lazy").setup({
           { name = 'nvim_lsp_signature_help' },
           { name = 'vsnip' },
           { name = 'nvim_lua' }
+        },
+        buffer = {
+          enabled = cmp_enabled,
         },
         formatting = {
           format = lspkind.cmp_format({
@@ -476,8 +500,28 @@ require("lazy").setup({
           }),
           ['<CR>'] = cmp.mapping.confirm({ select = false }),
           ['<C-e>'] = cmp.mapping.abort(),
-          ['C-p'] = cmp.mapping.select_prev_item({ behavior = 'select' }),
+          ['C-p'] = cmp.mapping.select_next_item({ behavior = 'select' }),
           ['C-n'] = cmp.mapping.select_next_item({ behavior = 'select' }),
+          ["<Tab>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_next_item()
+            elseif luasnip.locally_jumpable(1) then
+              luasnip.jump(1)
+            else
+              fallback()
+            end
+          end, { "i", "s" }),
+
+          ["<S-Tab>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_prev_item()
+            elseif luasnip.locally_jumpable(-1) then
+              luasnip.jump(-1)
+            else
+              fallback()
+            end
+          end, { "i", "s" }),
+
         },
         snippet = {
           expand = function(args)
@@ -543,6 +587,8 @@ require("lazy").setup({
       vim.diagnostic.config({
         virtual_text = true,
       })
+      require("cmp").setup.buffer({ enabled = false })
+      cmp_enabled = false
     end,
   }
 })
