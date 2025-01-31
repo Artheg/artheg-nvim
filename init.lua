@@ -373,6 +373,14 @@ require("lazy").setup({
     dependencies = {
       -- LSP Support
       "neovim/nvim-lspconfig",
+      {
+        "MysticalDevil/inlay-hints.nvim",
+        event = "LspAttach",
+        dependencies = { "neovim/nvim-lspconfig" },
+        config = function()
+          require("inlay-hints").setup()
+        end
+      },
       "Tetralux/odin.vim",
       {
         "williamboman/mason.nvim",
@@ -569,6 +577,38 @@ require("lazy").setup({
         cmd = { vim.fn.expand("$HOME/git/zig/zls/zig-out/bin/zls") },
       })
 
+      -- lsp_zero.configure("tsserver", {
+
+      -- })
+
+      require('lspconfig').ts_ls.setup({
+        settings = {
+
+          javascript = {
+            inlayHints = {
+              includeInlayEnumMemberValueHints = true,
+              includeInlayFunctionLikeReturnTypeHints = true,
+              includeInlayFunctionParameterTypeHints = true,
+              includeInlayParameterNameHints = "all", -- 'none' | 'literals' | 'all';
+              includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+              includeInlayPropertyDeclarationTypeHints = true,
+              includeInlayVariableTypeHints = false,
+            },
+          },
+
+          typescript = {
+            inlayHints = {
+              includeInlayEnumMemberValueHints = true,
+              includeInlayFunctionLikeReturnTypeHints = true,
+              includeInlayFunctionParameterTypeHints = true,
+              includeInlayParameterNameHints = "all", -- 'none' | 'literals' | 'all';
+              includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+              includeInlayPropertyDeclarationTypeHints = true,
+              includeInlayVariableTypeHints = false,
+            },
+          },
+        }
+      })
       -- lsp.skip_server_setup({ 'tsserver' })
       -- require("typescript-tools").setup({
       --   on_attach = function(client, bufnr)
