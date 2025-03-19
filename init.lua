@@ -373,14 +373,6 @@ require("lazy").setup({
     dependencies = {
       -- LSP Support
       "neovim/nvim-lspconfig",
-      {
-        "MysticalDevil/inlay-hints.nvim",
-        event = "LspAttach",
-        dependencies = { "neovim/nvim-lspconfig" },
-        config = function()
-          require("inlay-hints").setup()
-        end
-      },
       "Tetralux/odin.vim",
       {
         "williamboman/mason.nvim",
