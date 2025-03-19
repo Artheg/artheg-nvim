@@ -299,11 +299,35 @@ require("lazy").setup({
     dependencies = { "kyazdani42/nvim-web-devicons" }
   },
   -- [], {}, (), etc.
-  { "windwp/nvim-autopairs",     config = [[require("config.autopairs")]] },
+  { "windwp/nvim-autopairs",               config = [[require("config.autopairs")]] },
   -- colorschemes
+  -- nocolor
+  { "andreasvc/vim-256noir" },
+  { "Alligator/accent.vim" },
+  { "huyvohcmc/atlas.vim" },
+  { "LuRsT/austere.vim" },
+  { "https://git.sr.ht/~romainl/vim-bruin" },
+  { "aditya-azad/candle-grey" },
+  { "ntk148v/komau.vim" },
+  { "t184256/vim-boring" },
+  { "cranberry-clockworks/coal.nvim" },
+  { "davidosomething/vim-colors-meh" },
+  { "pbrisbin/vim-colors-off" },
+  { "andreypopp/vim-colors-plain" },
+  { "KKPMW/distilled-vim" },
+  { "jaredgorski/fogbell.vim" },
+  { "zekzekus/menguless" },
+  --
   { "sam4llis/nvim-tundra" },
   { "sainnhe/everforest" },
-  { "catppuccin/nvim",           name = "catppuccin",                     priority = 1000, config = function() vim.cmd [[colorscheme everforest]] end },
+  {
+    "catppuccin/nvim",
+    name = "catppuccin",
+    priority = 1000,
+    config = function()
+      vim.cmd [[colorscheme menguless]]
+    end
+  },
   { "slugbyte/lackluster.nvim" },
   { "haystackandroid/carbonized" },
   { "aliqyan-21/darkvoid.nvim" },
