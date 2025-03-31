@@ -198,7 +198,7 @@ require("lazy").setup({
     keys = {
       {
         "<leader>xx",
-        "<cmd>Trouble diagnostics toggle<cr>",
+        "<cmd>Trouble diagnostics toggle focus=true<cr>",
         desc = "Diagnostics (Trouble)",
       },
       {
@@ -318,6 +318,7 @@ require("lazy").setup({
   { "jaredgorski/fogbell.vim" },
   { "zekzekus/menguless" },
   --
+  { "xiyaowong/transparent.nvim" },
   { "sam4llis/nvim-tundra" },
   { "sainnhe/everforest" },
   {
@@ -325,7 +326,7 @@ require("lazy").setup({
     name = "catppuccin",
     priority = 1000,
     config = function()
-      vim.cmd [[colorscheme menguless]]
+      vim.cmd [[colorscheme base16-helios]]
     end
   },
   { "slugbyte/lackluster.nvim" },
@@ -591,6 +592,15 @@ require("lazy").setup({
       lsp_zero.configure("zls", {
         single_file_support = true,
         cmd = { vim.fn.expand("$HOME/git/zig/zls/zig-out/bin/zls") },
+      })
+
+      lsp_zero.configure("ols", {
+        single_file_support = true,
+        cmd = { vim.fn.expand("$HOME/git/odin/ols/ols") }
+      })
+
+      lsp_zero.configure("biome", {
+        single_file_support = true,
       })
 
       -- lsp_zero.configure("tsserver", {
