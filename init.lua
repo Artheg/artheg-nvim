@@ -88,6 +88,15 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
   })
 end
 vim.opt.rtp:prepend(lazypath)
+
+vim.api.nvim_create_autocmd("User", {
+  pattern = "LazyDone",
+  once = true,
+  callback = function()
+    vim.cmd [[colorscheme weird-days]]
+  end
+})
+
 require("lazy").setup({
   -- project managament, Rooter
   {
@@ -326,7 +335,8 @@ require("lazy").setup({
     name = "catppuccin",
     priority = 1000,
     config = function()
-      vim.cmd [[colorscheme base16-helios]]
+      -- vim.cmd [[colorscheme base16-helios]]
+      -- require('fd')
     end
   },
   { "slugbyte/lackluster.nvim" },
