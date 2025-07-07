@@ -118,6 +118,10 @@ require("lazy").setup({
       })
     end,
   },
+  -- better paste
+  {
+    'ConradIrwin/vim-bracketed-paste'
+  },
   -- better lsp experience
   {
     'nvimdev/lspsaga.nvim',
@@ -137,6 +141,55 @@ require("lazy").setup({
       vim.g.gitblame_date_format = "%d.%m.%y %H:%M"
       vim.g.gitblame_message_template = "// <author> (<committer-date>) • <summary>"
     end,
+  },
+  -- debug
+  { "rcarriga/nvim-dap-ui",     dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" } },
+  {
+    "mfussenegger/nvim-dap",
+    config = function()
+      local dap = require("dap")
+      dap.adapters.gdb = {
+        type = "executable",
+        command = "gdb",
+        args = { "--interpreter=dap", "--eval-command", "set print pretty on" }
+      }
+      dap.configurations.c = {
+        {
+          name = "Launch",
+          type = "gdb",
+          request = "launch",
+          program = function()
+            return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+          end,
+          cwd = "${workspaceFolder}",
+          stopAtBeginningOfMainSubprogram = false,
+        },
+        {
+          name = "Select and attach to process",
+          type = "gdb",
+          request = "attach",
+          program = function()
+            return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+          end,
+          pid = function()
+            local name = vim.fn.input('Executable name (filter): ')
+            return require("dap.utils").pick_process({ filter = name })
+          end,
+          cwd = '${workspaceFolder}'
+        },
+        {
+          name = 'Attach to gdbserver :1234',
+          type = 'gdb',
+          request = 'attach',
+          target = 'localhost:1234',
+          program = function()
+            return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+          end,
+          cwd = '${workspaceFolder}'
+        },
+      }
+      dap.configurations.odin = dap.configurations.c
+    end
   },
   {
     'Wansmer/symbol-usage.nvim',
@@ -805,10 +858,10 @@ vim.api.nvim_set_keymap('v', 'K', ':m \'<-2<CR>gv=gv', {})
 
 ----- Format
 -- auto indent on paste
-vim.api.nvim_set_keymap('n', 'p', 'p`[v`]=', { noremap = true })
-vim.api.nvim_set_keymap('n', 'P', 'P`[v`]=', { noremap = true })
--- vim.api.nvim_set_keymap('n', '<C-p>', ']p', { noremap=true })
--- vim.api.nvim_set_keymap('n', '<C-P>', 'P', { noremap=true })
+-- vim.api.nvim_set_keymap('n', 'p', 'p`[v`]=', { noremap = true })
+-- vim.api.nvim_set_keymap('n', 'P', 'P`[v`]=', { noremap = true })
+vim.api.nvim_set_keymap('n', 'p', ']p<S-v>==', { noremap = true })
+vim.api.nvim_set_keymap('n', 'P', 'P', { noremap = true })
 
 vim.api.nvim_set_keymap('n', '<F3>', '<ESC>:lua vim.lsp.buf.format({ async = true })<CR>', {})
 -----
@@ -818,6 +871,9 @@ vim.api.nvim_set_keymap('i', '<C-v>', '<ESC>"+p<S-v>==ea<ESC>', { noremap = true
 vim.api.nvim_set_keymap('v', '<C-c>', '"+y', { noremap = true })
 vim.api.nvim_set_keymap('n', '<C-S-v>', '"+pgv=', { noremap = true })
 vim.api.nvim_set_keymap('v', '<C-v>', '"+p<S-v>==ea<ESC>', { noremap = true })
+vim.cmd [[
+xnoremap <expr> p 'pgv"' . v:register . 'y'
+]]
 -----
 
 ----- Aerial (outline symbols)
