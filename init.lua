@@ -122,6 +122,13 @@ require("lazy").setup({
   {
     'ConradIrwin/vim-bracketed-paste'
   },
+  -- a custom text object (ib, ab)
+  {
+    "rhysd/vim-textobj-anyblock",
+    dependencies = {
+      "kana/vim-textobj-user"
+    }
+  },
   -- better lsp experience
   {
     'nvimdev/lspsaga.nvim',
@@ -143,7 +150,18 @@ require("lazy").setup({
     end,
   },
   -- debug
-  { "rcarriga/nvim-dap-ui",     dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" } },
+  -- {
+  --   "julianolf/nvim-dap-lldb",
+  --   dependencies = { "mfussenegger/nvim-dap" },
+  --   config = true
+  -- },
+  {
+    "rcarriga/nvim-dap-ui",
+    dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio", "williamboman/mason.nvim" },
+    config = function()
+      require("dapui").setup()
+    end
+  },
   {
     "mfussenegger/nvim-dap",
     config = function()
@@ -153,44 +171,73 @@ require("lazy").setup({
         command = "gdb",
         args = { "--interpreter=dap", "--eval-command", "set print pretty on" }
       }
-      dap.configurations.c = {
+
+      dap.adapters.codelldb = {
+        type = "server",
+        port = "${port}",
+        executable = {
+          command = "codelldb",
+          args = { "--port", "${port}" }
+        }
+      }
+
+
+      dap.configurations.odin = {
         {
-          name = "Launch",
-          type = "gdb",
+          name = 'Debug Odin With Arguments',
+          type = 'lldb',
+          request = 'launch',
+          program = function()
+            return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+          end,
+          args = function()
+            local input = vim.fn.input 'Arguments: '
+            return vim.split(input, ' ')
+          end,
+          cwd = '${workspaceFolder}',
+          stopOnEntry = false,
+          runInTerminal = false,
+        },
+        {
+          name = 'Debug Odin Without Arguments',
+          type = 'lldb',
+          request = 'launch',
+          program = function()
+            return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+          end,
+          args = {},
+          cwd = '${workspaceFolder}',
+          stopOnEntry = false,
+          runInTerminal = false,
+        },
+      }
+      dap.configurations.java = {
+        {
+          type = 'java',
+          request = 'attach',
+          name = "Debug (Attach) - Remote",
+          hostName = "127.0.0.1",
+          port = 5005,
+        },
+      }
+      dap.configurations.cpp = {
+        {
+          name = "Launch file",
+          type = "codelldb",
           request = "launch",
           program = function()
             return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
           end,
-          cwd = "${workspaceFolder}",
-          stopAtBeginningOfMainSubprogram = false,
-        },
-        {
-          name = "Select and attach to process",
-          type = "gdb",
-          request = "attach",
-          program = function()
-            return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
-          end,
-          pid = function()
-            local name = vim.fn.input('Executable name (filter): ')
-            return require("dap.utils").pick_process({ filter = name })
-          end,
-          cwd = '${workspaceFolder}'
-        },
-        {
-          name = 'Attach to gdbserver :1234',
-          type = 'gdb',
-          request = 'attach',
-          target = 'localhost:1234',
-          program = function()
-            return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
-          end,
-          cwd = '${workspaceFolder}'
+          cwd = '${workspaceFolder}',
+          stopOnEntry = false,
         },
       }
-      dap.configurations.odin = dap.configurations.c
+      dap.configurations.c = dap.configurations.cpp;
+      dap.configurations.rust = dap.configurations.cpp;
+      dap.configurations.odin = dap.configurations.cpp;
     end
   },
+  { "theHamsta/nvim-dap-virtual-text", config = true, dependencies = "mfussenegger/nvim-dap" },
   {
     'Wansmer/symbol-usage.nvim',
   },
@@ -203,7 +250,10 @@ require("lazy").setup({
       vim.g.matchup_matchparen_offscreen = { method = "popup" }
     end
   },
-  { 'mfussenegger/nvim-jdtls' },
+  {
+    'mfussenegger/nvim-jdtls',
+    dependencies = { "mfussenegger/nvim-dap", "williamboman/mason.nvim" }
+  },
   -- automatically replaces words
   {
     "AndrewRadev/switch.vim",
@@ -388,8 +438,8 @@ require("lazy").setup({
     name = "catppuccin",
     priority = 1000,
     config = function()
-      -- vim.cmd [[colorscheme base16-helios]]
-      -- require('fd')
+      -- vim.cmd [[colorscheme inferno]]
+      -- require('inferno.lua').setup()
     end
   },
   { "slugbyte/lackluster.nvim" },
@@ -420,7 +470,8 @@ require("lazy").setup({
     config = function()
       require("conform").setup({
         formatters_by_ft = {
-          typescript = { "biome" }
+          typescript = { "biome" },
+          java = { "jdtls" }
         },
         format_on_save = function(bufnr)
           -- Disable with a global or buffer-local variable
@@ -461,6 +512,7 @@ require("lazy").setup({
     dependencies = {
       -- LSP Support
       "neovim/nvim-lspconfig",
+      "mfussenegger/nvim-jdtls",
       "Tetralux/odin.vim",
       {
         "williamboman/mason.nvim",
@@ -505,7 +557,9 @@ require("lazy").setup({
       require('mason-lspconfig').setup({
         ensure_installed = {},
         handlers = {
-          lsp_zero.default_setup,
+          function(server_name)
+            require('lspconfig')[server_name].setup({})
+          end,
           clangd = function()
             require('lspconfig').clangd.setup({
               cmd = { "clangd", "--function-arg-placeholders=0" },
@@ -523,7 +577,13 @@ require("lazy").setup({
               },
             },
           }
+        end,
+        biome = function()
+          require 'lspconfig'.biome.setup {
+            cmd = '/Users/ashtukert/.nvm/versions/node/v18.20.7/bin/biome'
+          }
         end
+
 
       })
 
@@ -664,11 +724,25 @@ require("lazy").setup({
 
       lsp_zero.configure("biome", {
         single_file_support = true,
+        cmd = { vim.fn.expand("/Users/ashtukert/.nvm/versions/node/v18.20.7/bin/biome") },
       })
+
+      -- lsp_zero.configure("jdtls", {
+      --   cmd = {
+      --     vim.fn.expand '$HOME/.local/share/nvim/mason/bin/jdtls',
+      --     ('--jvm-arg=-javaagent:%s'):format(vim.fn.expand '$HOME/.local/share/nvim/mason/packages/jdtls/lombok.jar')
+      --   },
+      --   capabilities = require 'cmp_nvim_lsp'.default_capabilities()
+      -- })
 
       -- lsp_zero.configure("tsserver", {
 
       -- })
+
+      require('lspconfig').biome.setup({
+        single_file_support = true,
+        cmd = { vim.fn.expand("/Users/ashtukert/.nvm/versions/node/v18.20.7/bin/biome") },
+      })
 
       require('lspconfig').ts_ls.setup({
         settings = {
@@ -733,6 +807,14 @@ vim.api.nvim_set_keymap('n', '<A-l>', ':tabnext<CR>', { silent = true, noremap =
 vim.api.nvim_set_keymap('n', '<Leader>tc', ':tabclose<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '<Leader>tn', ':tabnew<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '<Leader>ct', '/class<CR>j', { silent = true })
+
+------ Editing
+vim.api.nvim_set_keymap('n', '<Leader>b', 'cib', { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>B', 'cab', { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>w', 'ciw', { silent = true })
+vim.api.nvim_set_keymap('i', '<A-w>', '<Esc>ciw', { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>4', 'C', { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>4', 'C', { silent = true })
 
 -- center screen when focusing on search occurences
 vim.api.nvim_set_keymap('n', 'n', 'nzzzv', { noremap = true })
@@ -862,6 +944,7 @@ vim.api.nvim_set_keymap('v', 'K', ':m \'<-2<CR>gv=gv', {})
 -- vim.api.nvim_set_keymap('n', 'P', 'P`[v`]=', { noremap = true })
 vim.api.nvim_set_keymap('n', 'p', ']p<S-v>==', { noremap = true })
 vim.api.nvim_set_keymap('n', 'P', 'P', { noremap = true })
+
 
 vim.api.nvim_set_keymap('n', '<F3>', '<ESC>:lua vim.lsp.buf.format({ async = true })<CR>', {})
 -----
