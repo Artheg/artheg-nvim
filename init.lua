@@ -24,6 +24,8 @@ vim.g.neovide_input_macos_option_key_is_meta = "only_left"
 vim.g.guifont = "CozetteVector:h11"
 
 -- vim.cmd.colorscheme[[catppuccin]]
+-- Tree sitter breaks indent?
+vim.opt.smartindent = false
 
 ---- syntax highlight vim.opt.syntax = 'on'
 
@@ -141,6 +143,10 @@ require("lazy").setup({
       'nvim-tree/nvim-web-devicons',     -- optional
     }
   },
+  -- documentation generator
+  {
+    "kkoomen/vim-doge",
+  },
   -- git
   {
     "f-person/git-blame.nvim",
@@ -162,6 +168,7 @@ require("lazy").setup({
       require("dapui").setup()
     end
   },
+
   {
     "mfussenegger/nvim-dap",
     config = function()
@@ -500,184 +507,15 @@ require("lazy").setup({
       })
     end
   },
-  -- Better typescript integration
-  -- {
-  --   "pmizio/typescript-tools.nvim",
-  --   dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
-  -- },
   -- LSP/Completion
+  -- this thing automatically configures and starts LSPs
   {
-    "VonHeikemen/lsp-zero.nvim",
-    branch = "v3.x",
+    "mason-org/mason-lspconfig.nvim",
     dependencies = {
-      -- LSP Support
+      { "mason-org/mason.nvim", opts = {} },
       "neovim/nvim-lspconfig",
-      "mfussenegger/nvim-jdtls",
-      "Tetralux/odin.vim",
-      {
-        "williamboman/mason.nvim",
-        config = function()
-          require("mason").setup()
-        end
-      },
-      "williamboman/mason-lspconfig.nvim",
-      -- lsp signature (displays signature params as you type)
-      "ray-x/lsp_signature.nvim",
-      -- fancy icons
-      "onsails/lspkind.nvim",
-      -- symbols outline
-      "stevearc/aerial.nvim",
-      -- Autocompletion
-      {
-        "hrsh7th/nvim-cmp",
-        dependencies = {
-          "hrsh7th/cmp-buffer",
-          "hrsh7th/cmp-path",
-          "hrsh7th/cmp-nvim-lsp-signature-help",
-          "saadparwaiz1/cmp_luasnip",
-          "hrsh7th/cmp-nvim-lsp",
-          "hrsh7th/cmp-nvim-lua",
-          "hrsh7th/cmp-vsnip",
-        }
-      },
-
-      -- Snippets
-      "L3MON4D3/LuaSnip",
-      "rafamadriz/friendly-snippets",
-
-      -- Better typescript integration
-      -- "pmizio/typescript-tools.nvim",
     },
     config = function()
-      -- require("lsp-format").setup()
-      local lsp_zero = require("lsp-zero")
-
-      lsp_zero.preset("recommended")
-      require('mason').setup({})
-      require('mason-lspconfig').setup({
-        ensure_installed = {},
-        handlers = {
-          function(server_name)
-            require('lspconfig')[server_name].setup({})
-          end,
-          clangd = function()
-            require('lspconfig').clangd.setup({
-              cmd = { "clangd", "--function-arg-placeholders=0" },
-            })
-          end,
-        },
-        lua_ls = function()
-          require 'lspconfig'.lua_ls.setup {
-            settings = {
-              Lua = {
-                diagnostics = {
-                  -- Get the language server to recognize the `vim` global
-                  globals = { 'vim' },
-                },
-              },
-            },
-          }
-        end,
-        biome = function()
-          require 'lspconfig'.biome.setup {
-            cmd = '/Users/ashtukert/.nvm/versions/node/v18.20.7/bin/biome'
-          }
-        end
-
-
-      })
-
-      local cmp = require('cmp')
-      local luasnip = require("luasnip")
-      local lspkind = require('lspkind')
-
-
-      local cmp_enabled = false
-      vim.api.nvim_create_user_command("ToggleAutoComplete", function()
-        if cmp_enabled then
-          require("cmp").setup.buffer({ enabled = false })
-          cmp_enabled = false
-          if (cmp.visible()) then
-            cmp.close()
-          end
-        else
-          require("cmp").setup.buffer({ enabled = true })
-          cmp_enabled = true
-          cmp.complete()
-        end
-      end, {})
-
-      vim.keymap.set({ "n", "v", "i" }, "<M-i>", function()
-        vim.cmd [[ToggleAutoComplete]]
-      end, { silent = true })
-
-      cmp.setup({
-        sources = {
-          { name = 'nvim_lsp' },
-          { name = 'buffer' },
-          { name = 'path' },
-          { name = 'nvim_lsp_signature_help' },
-          { name = 'vsnip' },
-          { name = 'nvim_lua' }
-        },
-        buffer = {
-          enabled = cmp_enabled,
-        },
-        formatting = {
-          format = lspkind.cmp_format({
-            mode = 'symbol_text', -- show only symbol annotations
-            maxwidth = 100,       -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
-          })
-        },
-        mapping = {
-          ["<C-space>"] = cmp.mapping({
-            i = function()
-              if cmp.visible() then
-                cmp.abort()
-              else
-                cmp.complete()
-              end
-            end,
-            c = function()
-              if cmp.visible() then
-                cmp.close()
-              else
-                cmp.complete()
-              end
-            end,
-          }),
-          ['<CR>'] = cmp.mapping.confirm({ select = false }),
-          ['<C-e>'] = cmp.mapping.abort(),
-          ['C-p'] = cmp.mapping.select_next_item({ behavior = 'select' }),
-          ['C-n'] = cmp.mapping.select_next_item({ behavior = 'select' }),
-          ["<Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_next_item()
-            elseif luasnip.locally_jumpable(1) then
-              luasnip.jump(1)
-            else
-              fallback()
-            end
-          end, { "i", "s" }),
-
-          ["<S-Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_prev_item()
-            elseif luasnip.locally_jumpable(-1) then
-              luasnip.jump(-1)
-            else
-              fallback()
-            end
-          end, { "i", "s" }),
-
-        },
-        snippet = {
-          expand = function(args)
-            require('luasnip').lsp_expand(args.body)
-          end,
-        },
-      })
-
       local on_attach = function(client, bufnr)
         -- require("lsp-format").on_attach(client, bufnr)
         require('symbol-usage').setup()
@@ -707,93 +545,101 @@ require("lazy").setup({
           vim.lsp.buf.signature_help()
         end, opts)
       end
-
-      lsp_zero.on_attach(function(client, bufnr)
-        on_attach(client, bufnr)
-      end)
-
-      lsp_zero.configure("zls", {
-        single_file_support = true,
-        cmd = { vim.fn.expand("$HOME/git/zig/zls/zig-out/bin/zls") },
-      })
-
-      lsp_zero.configure("ols", {
-        single_file_support = true,
-        cmd = { vim.fn.expand("$HOME/git/odin/ols/ols") }
-      })
-
-      lsp_zero.configure("biome", {
-        single_file_support = true,
-        cmd = { vim.fn.expand("/Users/ashtukert/.nvm/versions/node/v18.20.7/bin/biome") },
-      })
-
-      -- lsp_zero.configure("jdtls", {
-      --   cmd = {
-      --     vim.fn.expand '$HOME/.local/share/nvim/mason/bin/jdtls',
-      --     ('--jvm-arg=-javaagent:%s'):format(vim.fn.expand '$HOME/.local/share/nvim/mason/packages/jdtls/lombok.jar')
-      --   },
-      --   capabilities = require 'cmp_nvim_lsp'.default_capabilities()
-      -- })
-
-      -- lsp_zero.configure("tsserver", {
-
-      -- })
-
-      require('lspconfig').biome.setup({
-        single_file_support = true,
-        cmd = { vim.fn.expand("/Users/ashtukert/.nvm/versions/node/v18.20.7/bin/biome") },
-      })
-
-      require('lspconfig').ts_ls.setup({
-        settings = {
-
-          javascript = {
-            inlayHints = {
-              includeInlayEnumMemberValueHints = true,
-              includeInlayFunctionLikeReturnTypeHints = true,
-              includeInlayFunctionParameterTypeHints = true,
-              includeInlayParameterNameHints = "all", -- 'none' | 'literals' | 'all';
-              includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-              includeInlayPropertyDeclarationTypeHints = true,
-              includeInlayVariableTypeHints = false,
+      require('mason-lspconfig').setup({
+        ensure_installed = {
+          'lua_ls'
+        },
+        handlers = {
+          function(server_name)
+            require('lspconfig')[server_name].setup({
+              on_attach = on_attach
+            })
+          end,
+          clangd = function()
+            require('lspconfig').clangd.setup({
+              cmd = { "clangd", "--function-arg-placeholders=0" },
+            })
+          end,
+        },
+        lua_ls = function()
+          require 'lspconfig'.lua_ls.setup {
+            settings = {
+              Lua = {
+                diagnostics = {
+                  -- Get the language server to recognize the `vim` global
+                  globals = { 'vim' },
+                },
+              },
             },
-          },
+          }
+        end,
+        biome = function()
+          require 'lspconfig'.biome.setup {
+            cmd = '/Users/ashtukert/.nvm/versions/node/v18.20.7/bin/biome'
+          }
+        end
 
-          typescript = {
-            inlayHints = {
-              includeInlayEnumMemberValueHints = true,
-              includeInlayFunctionLikeReturnTypeHints = true,
-              includeInlayFunctionParameterTypeHints = true,
-              includeInlayParameterNameHints = "all", -- 'none' | 'literals' | 'all';
-              includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-              includeInlayPropertyDeclarationTypeHints = true,
-              includeInlayVariableTypeHints = false,
-            },
-          },
-        }
+
       })
-      -- lsp.skip_server_setup({ 'tsserver' })
-      -- require("typescript-tools").setup({
-      --   on_attach = function(client, bufnr)
-      --     on_attach(client, bufnr)
-      --   end,
-      --   settings = {
-      --     tsserver_file_preferences = {
-      --       includeInlayParameterNameHints = "all",
-      --       includeCompletionsForModuleExports = true,
-      --     }
-      --   }
-      -- })
+    end
+  },
+  {
+    'saghen/blink.cmp',
+    -- optional: provides snippets for the snippet source
+    dependencies = { 'rafamadriz/friendly-snippets' },
 
-      lsp_zero.setup()
+    -- use a release tag to download pre-built binaries
+    version = '1.*',
+    -- AND/OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
+    -- build = 'cargo build --release',
+    -- If you use nix, you can build from source using latest nightly rust with:
+    -- build = 'nix run .#build-plugin',
 
-      vim.diagnostic.config({
-        virtual_text = true,
-      })
-      require("cmp").setup.buffer({ enabled = false })
-      cmp_enabled = false
-    end,
-  }
+    ---@module 'blink.cmp'
+    ---@type blink.cmp.Config
+    opts = {
+      -- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)
+      -- 'super-tab' for mappings similar to vscode (tab to accept)
+      -- 'enter' for enter to accept
+      -- 'none' for no mappings
+      --
+      -- All presets have the following mappings:
+      -- C-space: Open menu or open docs if already open
+      -- C-n/C-p or Up/Down: Select next/previous item
+      -- C-e: Hide menu
+      -- C-k: Toggle signature help (if signature.enabled = true)
+      --
+      -- See :h blink-cmp-config-keymap for defining your own keymap
+      keymap = { preset = 'super-tab', ['<Enter>'] = { 'accept' } },
+      signature = { enabled = true },
+
+      appearance = {
+        -- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
+        -- Adjusts spacing to ensure icons are aligned
+        nerd_font_variant = 'mono'
+      },
+
+      -- (Default) Only show the documentation popup when manually triggered
+      completion = { documentation = { auto_show = true } },
+
+      -- Default list of enabled providers defined so that you can extend it
+      -- elsewhere in your config, without redefining it, due to `opts_extend`
+      sources = {
+        default = { 'lsp', 'path', 'snippets', 'buffer' },
+      },
+
+      -- (Default) Rust fuzzy matcher for typo resistance and significantly better performance
+      -- You may use a lua implementation instead by using `implementation = "lua"` or fallback to the lua implementation,
+      -- when the Rust fuzzy matcher is not available, by using `implementation = "prefer_rust"`
+      --
+      -- See the fuzzy documentation for more information
+      fuzzy = { implementation = "prefer_rust_with_warning" }
+    },
+    opts_extend = { "sources.default" }
+  },
+  -- Snippets
+  "L3MON4D3/LuaSnip",
+  "rafamadriz/friendly-snippets",
 })
 -- }}}
 --
