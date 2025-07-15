@@ -593,7 +593,7 @@ require("lazy").setup({
       -- C-k: Toggle signature help (if signature.enabled = true)
       --
       -- See :h blink-cmp-config-keymap for defining your own keymap
-      keymap = { preset = 'super-tab' },
+      keymap = { preset = 'enter', ['<Tab>'] = { 'accept', 'fallback' } },
       signature = { enabled = true },
 
       appearance = {
@@ -618,7 +618,7 @@ require("lazy").setup({
       -- See the fuzzy documentation for more information
       fuzzy = { implementation = "prefer_rust_with_warning" }
     },
-    opts_extend = { "sources.default" }
+    opts_extend = { "sources.default" },
   },
   -- Snippets
   "L3MON4D3/LuaSnip",
