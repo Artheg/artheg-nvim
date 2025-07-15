@@ -178,7 +178,11 @@ require("lazy").setup({
   {
     'nvimdev/lspsaga.nvim',
     config = function()
-      require('lspsaga').setup({})
+      require('lspsaga').setup({
+        lightbulb = {
+          sign = false,
+        }
+      })
       vim.keymap.set("n", "<leader>lp", ':Lspsaga peek_definition<CR>')
     end,
     dependencies = {
