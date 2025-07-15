@@ -74,7 +74,50 @@ vim.api.nvim_create_autocmd('VimResized', {
 
 vim.opt.foldmethod = 'marker'
 -- }}}
---
+-- {{{LSP
+vim.lsp.config('lua_ls', {
+  settings = {
+    Lua = {
+      runtime = {
+        version = 'LuaJIT',
+      },
+      diagnostics = {
+        globals = {
+          'vim',
+          'require',
+        },
+      },
+    },
+  },
+})
+vim.lsp.config("ts_ls", {
+  settings = {
+    javascript = {
+      inlayHints = {
+        includeInlayEnumMemberValueHints = true,
+        includeInlayFunctionLikeReturnTypeHints = true,
+        includeInlayFunctionParameterTypeHints = true,
+        includeInlayParameterNameHints = "all", -- 'none' | 'literals' | 'all';
+        includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+        includeInlayPropertyDeclarationTypeHints = true,
+        includeInlayVariableTypeHints = false,
+      },
+    },
+
+    typescript = {
+      inlayHints = {
+        includeInlayEnumMemberValueHints = true,
+        includeInlayFunctionLikeReturnTypeHints = true,
+        includeInlayFunctionParameterTypeHints = true,
+        includeInlayParameterNameHints = "all", -- 'none' | 'literals' | 'all';
+        includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+        includeInlayPropertyDeclarationTypeHints = true,
+        includeInlayVariableTypeHints = false,
+      },
+    },
+  }
+})
+-- }}}
 ---- {{{ lazy.nvim
 
 -- bootstrap
@@ -516,70 +559,10 @@ require("lazy").setup({
       "neovim/nvim-lspconfig",
     },
     config = function()
-      local on_attach = function(client, bufnr)
-        -- require("lsp-format").on_attach(client, bufnr)
-        require('symbol-usage').setup()
-        local opts = { buffer = bufnr, remap = false }
-        vim.keymap.set("n", "<leader>ld", function()
-          vim.diagnostic.open_float()
-        end, { silent = true })
-        vim.keymap.set("n", "gd", function()
-          vim.lsp.buf.definition()
-        end, opts)
-        vim.keymap.set("n", "gy", function()
-          vim.lsp.buf.type_definition()
-        end, opts)
-        vim.keymap.set("n", "K", function()
-          vim.lsp.buf.hover()
-        end, opts)
-        vim.keymap.set("n", "<leader>ga", function()
-          vim.lsp.buf.code_action()
-        end, opts)
-        vim.keymap.set("n", "gr", function()
-          vim.cmd("Telescope lsp_references")
-        end, opts)
-        vim.keymap.set("n", "gR", function()
-          vim.lsp.buf.rename()
-        end, opts)
-        vim.keymap.set("i", "<C-h>", function()
-          vim.lsp.buf.signature_help()
-        end, opts)
-      end
       require('mason-lspconfig').setup({
         ensure_installed = {
           'lua_ls'
         },
-        handlers = {
-          function(server_name)
-            require('lspconfig')[server_name].setup({
-              on_attach = on_attach
-            })
-          end,
-          clangd = function()
-            require('lspconfig').clangd.setup({
-              cmd = { "clangd", "--function-arg-placeholders=0" },
-            })
-          end,
-        },
-        lua_ls = function()
-          require 'lspconfig'.lua_ls.setup {
-            settings = {
-              Lua = {
-                diagnostics = {
-                  -- Get the language server to recognize the `vim` global
-                  globals = { 'vim' },
-                },
-              },
-            },
-          }
-        end,
-        biome = function()
-          require 'lspconfig'.biome.setup {
-            cmd = '/Users/ashtukert/.nvm/versions/node/v18.20.7/bin/biome'
-          }
-        end
-
-
       })
     end
   },
@@ -610,7 +593,7 @@ require("lazy").setup({
       -- C-k: Toggle signature help (if signature.enabled = true)
       --
       -- See :h blink-cmp-config-keymap for defining your own keymap
-      keymap = { preset = 'super-tab', ['<Enter>'] = { 'accept' } },
+      keymap = { preset = 'super-tab' },
       signature = { enabled = true },
 
       appearance = {
@@ -642,7 +625,6 @@ require("lazy").setup({
   "rafamadriz/friendly-snippets",
 })
 -- }}}
---
 -- {{{ Keybindings
 
 ----- Navigation
@@ -804,6 +786,41 @@ vim.cmd [[
 xnoremap <expr> p 'pgv"' . v:register . 'y'
 ]]
 -----
+---LSP
+vim.api.nvim_create_autocmd("LspAttach", {
+  callback = function(args)
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+    if not client then
+      return
+    end
+    require('symbol-usage').setup()
+    local opts = { buffer = bufnr, remap = false }
+    vim.keymap.set("n", "<leader>ld", function()
+      vim.diagnostic.open_float()
+    end, { silent = true })
+    vim.keymap.set("n", "gd", function()
+      vim.lsp.buf.definition()
+    end, opts)
+    vim.keymap.set("n", "gy", function()
+      vim.lsp.buf.type_definition()
+    end, opts)
+    vim.keymap.set("n", "K", function()
+      vim.lsp.buf.hover()
+    end, opts)
+    vim.keymap.set("n", "<leader>ga", function()
+      vim.lsp.buf.code_action()
+    end, opts)
+    vim.keymap.set("n", "gr", function()
+      vim.cmd("Telescope lsp_references")
+    end, opts)
+    vim.keymap.set("n", "gR", function()
+      vim.lsp.buf.rename()
+    end, opts)
+    vim.keymap.set("i", "<C-h>", function()
+      vim.lsp.buf.signature_help()
+    end, opts)
+  end,
+})
 
 ----- Aerial (outline symbols)
 vim.api.nvim_set_keymap('n', '<C-a>', ':AerialToggle<CR>', { silent = true })
