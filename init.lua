@@ -567,6 +567,40 @@ require("lazy").setup({
         ensure_installed = {
           'lua_ls'
         },
+        handlers = {
+          function(server_name)
+            require('lspconfig')[server_name].setup({
+              on_attach = on_attach
+            })
+          end,
+          clangd = function()
+            require('lspconfig').clangd.setup({
+              cmd = { "clangd", "--function-arg-placeholders=0" },
+            })
+          end,
+        },
+        lua_ls = function()
+          require 'lspconfig'.lua_ls.setup {
+            settings = {
+              Lua = {
+                diagnostics = {
+                  -- Get the language server to recognize the `vim` global
+                  globals = { 'vim' },
+                },
+              },
+            },
+          }
+        end,
+        biome = function()
+          require 'lspconfig'.biome.setup {
+            cmd = '/Users/ashtukert/.nvm/versions/node/v18.20.7/bin/biome'
+          }
+        end,
+	ols = function()
+		require('lspconfig').ols.setup({
+			cmd = { "/home/artheg/git/odin/ols/ols" },
+		})
+	end
       })
     end
   },
@@ -645,6 +679,7 @@ vim.api.nvim_set_keymap('n', '<Leader>b', 'cib', { silent = true })
 vim.api.nvim_set_keymap('n', '<Leader>B', 'cab', { silent = true })
 vim.api.nvim_set_keymap('n', '<Leader>w', 'ciw', { silent = true })
 vim.api.nvim_set_keymap('i', '<A-w>', '<Esc>ciw', { silent = true })
+vim.api.nvim_set_keymap('i', '<C-w>', '<ESC>dba', { silent = true })
 vim.api.nvim_set_keymap('n', '<Leader>4', 'C', { silent = true })
 vim.api.nvim_set_keymap('n', '<Leader>4', 'C', { silent = true })
 
