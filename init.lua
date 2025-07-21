@@ -708,6 +708,7 @@ vim.api.nvim_set_keymap('n', '<esc>', ':cclose<CR>', { silent = true })
 -- vim.api.nvim_set_keymap('n', '<leader>e', ':Lf<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '<F2>', ':FloatermToggle<cr>', { silent = true })
 vim.api.nvim_set_keymap('t', '<F2>', '<C-\\><C-n>:FloatermToggle<CR>', { silent = true, noremap = true })
+vim.api.nvim_set_keymap('n', '<C-H>', ':FloatermNew scooter<CR>', { silent = true, noremap = true })
 vim.g.floaterm_opener = 'drop'
 -----
 
