@@ -174,6 +174,13 @@ require("lazy").setup({
       "kana/vim-textobj-user"
     }
   },
+  {
+    'nathanaelkane/vim-indent-guides'
+  },
+  {
+    'nmac427/guess-indent.nvim',
+    config = function() require('guess-indent').setup {} end,
+  },
   -- better lsp experience
   {
     'nvimdev/lspsaga.nvim',
@@ -596,11 +603,11 @@ require("lazy").setup({
             cmd = '/Users/ashtukert/.nvm/versions/node/v18.20.7/bin/biome'
           }
         end,
-	ols = function()
-		require('lspconfig').ols.setup({
-			cmd = { "/home/artheg/git/odin/ols/ols" },
-		})
-	end
+        ols = function()
+          require('lspconfig').ols.setup({
+            cmd = { "/home/artheg/git/odin/ols/ols" },
+          })
+        end
       })
     end
   },
