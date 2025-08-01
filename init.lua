@@ -72,6 +72,12 @@ vim.api.nvim_create_autocmd('VimResized', {
   group = vim.api.nvim_create_augroup('Floaterm', {}),
 })
 
+-- preformat json with jq
+-- vim.api.nvim_create_autocmd({ "BufReadPost" }, {
+--   pattern = "*.json",
+--   command = ":%!jq ."
+-- })
+
 vim.opt.foldmethod = 'marker'
 -- }}}
 -- {{{LSP
@@ -358,6 +364,7 @@ require("lazy").setup({
     build = ":TSUpdate",
     config = function()
       require("nvim-treesitter.configs").setup({
+        enabled = false,
         matchup = {
           enable = true,
         },
