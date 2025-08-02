@@ -167,6 +167,7 @@ require("lazy").setup({
         },
         detection_methods = { "pattern", "lsp" },
       })
+      require("project_runner")
     end,
   },
   -- better paste
@@ -791,7 +792,7 @@ vim.api.nvim_set_keymap('n', '<leader>dt', ':lua require(\'dapui\').toggle()<CR>
 vim.api.nvim_set_keymap('n', '<leader>de', ':lua require(\'dapui\').eval()<CR>', { silent = true })
 
 ----- neovim-tasks
-vim.api.nvim_set_keymap('n', '<F5>', ':Task start auto run<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<F5>', ':RunProject<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '<F17>', ':Task start auto debug<CR>', { silent = true })
 
 vim.api.nvim_set_hl(0, 'LineBreakpoint', { ctermbg = 0, bg = '#511111' })
