@@ -147,6 +147,7 @@ vim.api.nvim_create_autocmd("User", {
   callback = function()
     -- vim.cmd [[colorscheme weird-days]]
     vim.cmd [[colorscheme neobones]]
+    require('project_runner')
   end
 })
 
