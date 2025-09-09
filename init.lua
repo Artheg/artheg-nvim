@@ -1,3 +1,4 @@
+require('fd')
 -- {{{ Options
 
 -- extend selection on right click instead of popup menu
@@ -144,31 +145,18 @@ vim.api.nvim_create_autocmd("User", {
   pattern = "LazyDone",
   once = true,
   callback = function()
-    vim.cmd [[colorscheme weird-days]]
+    -- vim.cmd [[colorscheme weird-days]]
+    vim.cmd [[colorscheme neobones]]
   end
 })
 
 require("lazy").setup({
   -- project managament, Rooter
   {
-    "ahmedkhalf/project.nvim",
+    "DrKJeff16/project.nvim",
     config = function()
-      require("project_nvim").setup({
-        patterns = {
-          ".git",
-          "_darcs",
-          ".hg",
-          ".bzr",
-          ".svn",
-          "Makefile",
-          "package.json",
-          "tsconfig.json",
-          "angular.json",
-        },
-        detection_methods = { "pattern", "lsp" },
-      })
-      require("project_runner")
-    end,
+      require('project').setup()
+    end
   },
   -- better paste
   {
@@ -180,6 +168,9 @@ require("lazy").setup({
     dependencies = {
       "kana/vim-textobj-user"
     }
+  },
+  {
+    "tpope/vim-sleuth"
   },
   {
     'nathanaelkane/vim-indent-guides'
@@ -212,8 +203,10 @@ require("lazy").setup({
   {
     "f-person/git-blame.nvim",
     config = function()
-      vim.g.gitblame_date_format = "%d.%m.%y %H:%M"
-      vim.g.gitblame_message_template = "// <author> (<committer-date>) • <summary>"
+      require('gitblame').setup {
+        date_format = "%d.%m.%y %H:%M",
+        message_template = "// <author> (<committer-date>) • <summary>"
+      }
     end,
   },
   -- debug
@@ -229,7 +222,7 @@ require("lazy").setup({
       require("dapui").setup()
     end
   },
-
+  { "mxsdev/nvim-dap-vscode-js",       requires = { "mfussenegger/nvim-dap" } },
   {
     "mfussenegger/nvim-dap",
     config = function()
@@ -248,7 +241,6 @@ require("lazy").setup({
           args = { "--port", "${port}" }
         }
       }
-
 
       dap.configurations.odin = {
         {
@@ -300,16 +292,133 @@ require("lazy").setup({
           stopOnEntry = false,
         },
       }
+
+      local js_debugger_cmd = vim.fn.stdpath("data") .. "/mason/packages/js-debug-adapter/js-debug-adapter"
+      -- require("dap-vscode-js").setup({
+      --   debugger_cmd = js_debugger_cmd,
+      --   adapters = { "pwa-node", "pwa-chrome", "pwa-msedge", "node-terminal", "pwa-extensionHost" },
+      -- })
+
+      for _, adapter in pairs({ "pwa-node", "pwa-chrome" }) do
+        require("dap").adapters[adapter] = {
+          type = "server",
+          host = "localhost",
+          port = "${port}",
+          executable = {
+            command = js_debugger_cmd,
+            args = { "${port}" },
+          },
+        }
+      end
+
+      dap.configurations.javascript = {
+        {
+          type = 'pwa-chrome',
+          request = 'attach',
+          name = 'Launch browser to debug client side code',
+          url = function()
+            local co = coroutine.running()
+            return coroutine.create(function()
+              vim.ui.input({ prompt = 'Enter URL: ', default = 'http://localhost:8888' }, function(url)
+                if url == nil or url == '' then
+                  return
+                else
+                  coroutine.resume(co, url)
+                end
+              end)
+            end)
+          end,
+          runtimeExecutable = '/usr/bin/brave',
+          runtimeArgs = { "--remote-debugging-port=" .. "9222" },
+          -- for TypeScript/Svelte
+          sourceMaps = true,
+          webRoot = '${workspaceFolder}/src',
+          protocol = 'inspector',
+          port = 9222,
+          -- skip files from vite's hmr
+          skipFiles = { '**/node_modules/**/*', '**/@vite/*', '**/src/client/*', '**/src/*' },
+        },
+      }
+      dap.configurations.typescript = dap.configurations.javascript
       dap.configurations.c = dap.configurations.cpp;
       dap.configurations.rust = dap.configurations.cpp;
       dap.configurations.odin = dap.configurations.cpp;
     end
   },
-  { "theHamsta/nvim-dap-virtual-text", config = true, dependencies = "mfussenegger/nvim-dap" },
+  { "theHamsta/nvim-dap-virtual-text", config = true,                         dependencies = "mfussenegger/nvim-dap" },
   {
     'Wansmer/symbol-usage.nvim',
   },
-  { "airblade/vim-gitgutter" },
+  {
+    "lewis6991/gitsigns.nvim",
+    config = function()
+      require('gitsigns').setup {
+        on_attach = function(bufnr)
+          local gitsigns = require('gitsigns')
+
+          local function map(mode, l, r, opts)
+            opts = opts or {}
+            opts.buffer = bufnr
+            vim.keymap.set(mode, l, r, opts)
+          end
+
+          -- Navigation
+          map('n', ']c', function()
+            if vim.wo.diff then
+              vim.cmd.normal({ ']c', bang = true })
+            else
+              gitsigns.nav_hunk('next')
+            end
+          end)
+
+          map('n', '[c', function()
+            if vim.wo.diff then
+              vim.cmd.normal({ '[c', bang = true })
+            else
+              gitsigns.nav_hunk('prev')
+            end
+          end)
+
+          -- Actions
+          map('n', '<leader>hs', gitsigns.stage_hunk)
+          map('n', '<leader>hu', gitsigns.reset_hunk)
+
+          map('v', '<leader>hs', function()
+            gitsigns.stage_hunk({ vim.fn.line('.'), vim.fn.line('v') })
+          end)
+
+          map('v', '<leader>hr', function()
+            gitsigns.reset_hunk({ vim.fn.line('.'), vim.fn.line('v') })
+          end)
+
+          map('n', '<leader>hS', gitsigns.stage_buffer)
+          map('n', '<leader>hR', gitsigns.reset_buffer)
+          map('n', '<leader>hp', gitsigns.preview_hunk)
+          map('n', '<leader>hi', gitsigns.preview_hunk_inline)
+
+          map('n', '<leader>hb', function()
+            gitsigns.blame_line({ full = true })
+          end)
+
+          map('n', '<leader>hd', gitsigns.diffthis)
+
+          map('n', '<leader>hD', function()
+            gitsigns.diffthis('~')
+          end)
+
+          map('n', '<leader>hQ', function() gitsigns.setqflist('all') end)
+          map('n', '<leader>hq', gitsigns.setqflist)
+
+          -- Toggles
+          map('n', '<leader>tb', gitsigns.toggle_current_line_blame)
+          map('n', '<leader>tw', gitsigns.toggle_word_diff)
+
+          -- Text object
+          map({ 'o', 'x' }, 'ih', gitsigns.select_hunk)
+        end
+      }
+    end
+  },
   { "akinsho/git-conflict.nvim" },
   -- extend match (matches special words)
   {
@@ -477,7 +586,52 @@ require("lazy").setup({
   -- status line
   {
     "nvim-lualine/lualine.nvim",
-    dependencies = { "kyazdani42/nvim-web-devicons" }
+    dependencies = { "kyazdani42/nvim-web-devicons" },
+    config = function()
+      require('lualine').setup {
+        options = {
+          icons_enabled = true,
+          theme = 'auto', -- you can pick another theme (gruvbox, catppuccin, etc.)
+          component_separators = { left = '', right = '' },
+          section_separators = { left = '', right = '' },
+          disabled_filetypes = {},
+          always_divide_middle = true,
+          globalstatus = true,
+        },
+        sections = {
+          lualine_a = { 'mode' },
+          lualine_b = { 'branch', 'diff', 'diagnostics' },
+
+          -- Center section
+          lualine_c = {
+            {
+              function()
+                -- fallback: just use cwd folder name
+                local cwd = vim.fn.getcwd()
+                return " " .. vim.fn.fnamemodify(cwd, ":t")
+                -- return " " .. vim.cmd [[ProjectRoot]]
+              end,
+              color = { gui = 'bold' },
+            },
+            { 'filename', path = 1 }, -- show relative file path
+          },
+
+          lualine_x = { 'encoding', 'fileformat', 'filetype' },
+          lualine_y = { 'progress' },
+          lualine_z = { 'location' },
+        },
+        inactive_sections = {
+          lualine_a = {},
+          lualine_b = {},
+          lualine_c = { 'filename' },
+          lualine_x = { 'location' },
+          lualine_y = {},
+          lualine_z = {}
+        },
+        tabline = {},
+        extensions = {}
+      }
+    end
   },
   -- [], {}, (), etc.
   { "windwp/nvim-autopairs",               config = [[require("config.autopairs")]] },
@@ -540,6 +694,7 @@ require("lazy").setup({
       require("conform").setup({
         formatters_by_ft = {
           typescript = { "biome" },
+          javascript = { "biome" },
           java = { "jdtls" }
         },
         format_on_save = function(bufnr)
@@ -673,6 +828,29 @@ require("lazy").setup({
     },
     opts_extend = { "sources.default" },
   },
+  -- A code outline window for skimming and quick navigation
+  {
+    'stevearc/aerial.nvim',
+    opts = {},
+    -- Optional dependencies
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+      "nvim-tree/nvim-web-devicons"
+    },
+    config = function()
+      require("aerial").setup({
+        nerd_font = "mono",
+        -- optionally use on_attach to set keymaps when aerial has attached to a buffer
+        on_attach = function(bufnr)
+          -- Jump forwards/backwards with '{' and '}'
+          vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr })
+          vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr })
+        end,
+      })
+      -- You probably also want to set a keymap to toggle aerial
+      vim.keymap.set("n", "<leader>a", "<cmd>AerialToggle!<CR>")
+    end
+  },
   -- Snippets
   "L3MON4D3/LuaSnip",
   "rafamadriz/friendly-snippets",
@@ -749,6 +927,7 @@ vim.api.nvim_set_keymap('v', '<Leader>tr', 'y<ESC>:Telescope live_grep default_t
 vim.api.nvim_set_keymap('n', '<Leader>tf', ':Telescope find_files<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '<Leader>to', ':Telescope oldfiles<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '<Leader>ta', ':Telescope aerial<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>tp', ':Telescope projects<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', 'gr', ':Telescope lsp_references<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '<Leader>ti', ':Telescope lsp_implementations<CR>', { silent = true })
 
