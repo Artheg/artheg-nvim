@@ -146,7 +146,7 @@ vim.api.nvim_create_autocmd("User", {
   once = true,
   callback = function()
     -- vim.cmd [[colorscheme weird-days]]
-    vim.cmd [[colorscheme neobones]]
+    vim.cmd [[colorscheme accent]]
     require('project_runner')
   end
 })
@@ -315,7 +315,7 @@ require("lazy").setup({
       dap.configurations.javascript = {
         {
           type = 'pwa-chrome',
-          request = 'attach',
+          request = 'launch',
           name = 'Launch browser to debug client side code',
           url = function()
             local co = coroutine.running()
@@ -475,12 +475,31 @@ require("lazy").setup({
     build = ":TSUpdate",
     config = function()
       require("nvim-treesitter.configs").setup({
-        enabled = false,
+        enabled = true,
         matchup = {
           enable = true,
         },
       })
     end
+  },
+  {
+    "folke/snacks.nvim",
+    priority = 1000,
+    lazy = false,
+    ---@type snacks.Config
+    opts = {
+      -- your configuration comes here
+      -- or leave it empty to use the default settings
+      -- refer to the configuration section below
+      bigfile = { enabled = true },
+      indent = { enabled = true },
+      picker = { enabled = true },
+      notifier = { enabled = true },
+      quickfile = { enabled = true },
+      scope = { enabled = true },
+      statuscolumn = { enabled = true },
+      words = { enabled = true },
+    },
   },
   {
     "folke/trouble.nvim",
