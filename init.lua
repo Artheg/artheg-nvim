@@ -758,11 +758,6 @@ require("lazy").setup({
           'lua_ls'
         },
         handlers = {
-          function(server_name)
-            require('lspconfig')[server_name].setup({
-              on_attach = on_attach
-            })
-          end,
           clangd = function()
             require('lspconfig').clangd.setup({
               cmd = { "clangd", "--function-arg-placeholders=0" },
@@ -770,7 +765,7 @@ require("lazy").setup({
           end,
         },
         lua_ls = function()
-          require 'lspconfig'.lua_ls.setup {
+          require('lspconfig').lua_ls.setup {
             settings = {
               Lua = {
                 diagnostics = {
@@ -782,7 +777,7 @@ require("lazy").setup({
           }
         end,
         biome = function()
-          require 'lspconfig'.biome.setup {
+          require('lspconfig').biome.setup {
             cmd = '/Users/ashtukert/.nvm/versions/node/v18.20.7/bin/biome'
           }
         end,
