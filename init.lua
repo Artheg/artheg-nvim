@@ -493,6 +493,7 @@ require("lazy").setup({
       -- refer to the configuration section below
       bigfile = { enabled = true },
       indent = { enabled = true },
+      gitbrowse = { enabled = true },
       picker = { enabled = true },
       notifier = { enabled = true },
       quickfile = { enabled = true },
@@ -1074,5 +1075,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
 ----- Aerial (outline symbols)
 vim.api.nvim_set_keymap('n', '<C-a>', ':AerialToggle<CR>', { silent = true })
 -----
+
+----- snacks
+vim.api.nvim_set_keymap('n', '<Leader>sg', ':lua Snacks.gitbrowse.open()<CR>', { silent = true })
 
 -- }}}
