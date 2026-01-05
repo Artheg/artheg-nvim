@@ -1,4 +1,4 @@
-require('fd')
+-- require('fd')
 -- {{{ Options
 
 -- extend selection on right click instead of popup menu
@@ -158,6 +158,12 @@ require("lazy").setup({
     config = function()
       require('project').setup()
     end
+  },
+  -- markdown renderer
+  {
+    "MeanderingProgrammer/render-markdown.nvim",
+    dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-mini/mini.nvim" },
+    opts = {},
   },
   -- better paste
   {
