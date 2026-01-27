@@ -680,7 +680,17 @@ require("lazy").setup({
   { "jaredgorski/fogbell.vim" },
   { "zekzekus/menguless" },
   --
-  { "xiyaowong/transparent.nvim" },
+  {
+    "xiyaowong/transparent.nvim",
+    config = function()
+      require("transparent").setup({
+        exclude_groups = {
+          "StatusLine",
+          "StatusLineNC",
+        }
+      })
+    end
+  },
   { "sam4llis/nvim-tundra" },
   { "sainnhe/everforest" },
   {
@@ -947,6 +957,7 @@ vim.api.nvim_set_keymap('n', '<Leader>tb', ':Telescope buffers<CR>', { silent = 
 vim.api.nvim_set_keymap('n', '<Leader>tr', ':Telescope live_grep<CR>', { silent = true })
 vim.api.nvim_set_keymap('v', '<Leader>tr', 'y<ESC>:Telescope live_grep default_text=<c-r>0<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '<Leader>tf', ':Telescope find_files<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>tc', ':Telescope command_history<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '<Leader>to', ':Telescope oldfiles<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '<Leader>ta', ':Telescope aerial<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '<Leader>tp', ':Telescope projects<CR>', { silent = true })
