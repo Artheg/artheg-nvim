@@ -326,7 +326,7 @@ require("lazy").setup({
           url = function()
             local co = coroutine.running()
             return coroutine.create(function()
-              vim.ui.input({ prompt = 'Enter URL: ', default = 'http://localhost:8888' }, function(url)
+              vim.ui.input({ prompt = 'Enter URL: ', default = 'http://localhost:8887/?debug=true' }, function(url)
                 if url == nil or url == '' then
                   return
                 else
@@ -335,7 +335,7 @@ require("lazy").setup({
               end)
             end)
           end,
-          runtimeExecutable = '/usr/bin/brave',
+          runtimeExecutable = '/usr/bin/chromium',
           runtimeArgs = { "--remote-debugging-port=" .. "9222" },
           -- for TypeScript/Svelte
           sourceMaps = true,
@@ -607,7 +607,12 @@ require("lazy").setup({
     end,
   },
   -- highlight hex colors
-  { "chrisbra/Colorizer" },
+  {
+    "catgoose/nvim-colorizer.lua",
+    event = "BufReadPre",
+    opts = { -- set to setup table
+    },
+  },
   -- better surrounding chars edit
   { "tpope/vim-surround" },
   -- status line
@@ -941,10 +946,6 @@ vim.g.floaterm_opener = 'drop'
 vim.api.nvim_set_keymap('n', '<Leader>gg', ':!git gui<cr><cr>', { silent = true })
 vim.api.nvim_set_keymap('n', '<Leader>gt', ':tabnew | :terminal lazygit<CR>i', { silent = true })
 -----
-
------ Colorizer
-vim.api.nvim_set_keymap('n', '<leader>c', ':ColorHighlight<CR>', { silent = true, noremap = true })
---
 
 ---- Typescript
 vim.api.nvim_set_keymap('n', '<Leader>ac', '/constructor<Esc>:nohl<cr>f(a<cr>', { silent = true })
