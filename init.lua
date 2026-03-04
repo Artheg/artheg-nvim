@@ -82,6 +82,7 @@ vim.api.nvim_create_autocmd('VimResized', {
 vim.opt.foldmethod = 'marker'
 -- }}}
 -- {{{LSP
+vim.lsp.enable('ts_ls', false)
 vim.lsp.config('lua_ls', {
   settings = {
     Lua = {
@@ -97,7 +98,7 @@ vim.lsp.config('lua_ls', {
     },
   },
 })
-vim.lsp.config("ts_ls", {
+vim.lsp.config("vtsls", {
   settings = {
     javascript = {
       inlayHints = {
@@ -110,7 +111,6 @@ vim.lsp.config("ts_ls", {
         includeInlayVariableTypeHints = false,
       },
     },
-
     typescript = {
       inlayHints = {
         includeInlayEnumMemberValueHints = true,
@@ -122,7 +122,22 @@ vim.lsp.config("ts_ls", {
         includeInlayVariableTypeHints = false,
       },
     },
+    vtsls = {
+      typescript = {
+        tsserver = {
+          maxTsServerMemory = 4096,
+        },
+      },
+    },
   }
+})
+vim.lsp.config("jsonls", {
+  settings = {
+    json = {
+      validate = { enable = true },
+      schemas = {},
+    },
+  },
 })
 -- }}}
 ---- {{{ lazy.nvim
@@ -145,8 +160,7 @@ vim.api.nvim_create_autocmd("User", {
   pattern = "LazyDone",
   once = true,
   callback = function()
-    -- vim.cmd [[colorscheme weird-days]]
-    vim.cmd [[colorscheme accent]]
+    vim.cmd [[colorscheme fresh-days]]
     require('project_runner')
   end
 })
@@ -192,8 +206,12 @@ require("lazy").setup({
     config = function()
       require('lspsaga').setup({
         lightbulb = {
-          sign = false,
-        }
+          enable = false,
+        },
+        code_action = {
+          show_server_name = true,
+          extend_gitsigns = false,
+        },
       })
       vim.keymap.set("n", "<leader>lp", ':Lspsaga peek_definition<CR>')
     end,
@@ -355,6 +373,15 @@ require("lazy").setup({
   { "theHamsta/nvim-dap-virtual-text", config = true,                         dependencies = "mfussenegger/nvim-dap" },
   {
     'Wansmer/symbol-usage.nvim',
+    event = 'BufReadPre',
+    opts = {
+      request_pending_text = false,
+      references = { enabled = true, include_declaration = false },
+      definition = { enabled = false },
+      implementation = { enabled = false },
+      update_event = 'BufEnter',
+      debounce = 500,
+    },
   },
   {
     "lewis6991/gitsigns.nvim",
@@ -576,8 +603,7 @@ require("lazy").setup({
   -- },
   -- floating terminal
   { "voldikss/vim-floaterm" },
-  -- highlight other uses of words
-  { "RRethy/vim-illuminate" },
+  -- vim-illuminate removed: snacks.words already provides word highlighting via LSP
   -- commenter
   { "tpope/vim-commentary" },
   -- Telescope
@@ -819,7 +845,8 @@ require("lazy").setup({
     config = function()
       require('mason-lspconfig').setup({
         ensure_installed = {
-          'lua_ls'
+          'lua_ls',
+          'vtsls',
         },
         handlers = {
           clangd = function()
@@ -890,7 +917,7 @@ require("lazy").setup({
       },
 
       -- (Default) Only show the documentation popup when manually triggered
-      completion = { documentation = { auto_show = true }, menu = { auto_show = false } },
+      completion = { documentation = { auto_show = true }, menu = { auto_show = true } },
 
       -- Default list of enabled providers defined so that you can extend it
       -- elsewhere in your config, without redefining it, due to `opts_extend`
@@ -1103,7 +1130,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
     if not client then
       return
     end
-    require('symbol-usage').setup()
     local opts = { buffer = bufnr, remap = false }
     vim.keymap.set("n", "<leader>ld", function()
       vim.diagnostic.open_float()
