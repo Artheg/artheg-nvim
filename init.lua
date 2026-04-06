@@ -55,6 +55,8 @@ vim.cmd [[set nohlsearch]]
 
 ---- start scrolling before reaching n*th line
 vim.opt.scrolloff = 25
+---- batch redraws during macros/mappings
+vim.opt.lazyredraw = true
 ----
 -- vim.opt.updatetime=500
 
@@ -80,6 +82,16 @@ vim.api.nvim_create_autocmd('VimResized', {
 -- })
 
 vim.opt.foldmethod = 'marker'
+
+-- JSON: indent folding (zero overhead) + disable treesitter highlighting
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "json", "jsonc" },
+  callback = function()
+    vim.opt_local.foldmethod = "indent"
+    vim.opt_local.foldlevel = 99
+    vim.treesitter.stop()
+  end,
+})
 -- }}}
 -- {{{LSP
 vim.lsp.enable('ts_ls', false)
@@ -160,7 +172,8 @@ vim.api.nvim_create_autocmd("User", {
   pattern = "LazyDone",
   once = true,
   callback = function()
-    vim.cmd [[colorscheme fresh-days]]
+    -- vim.cmd [[colorscheme fresh-days]]
+    vim.cmd [[colorscheme accent]]
     require('project_runner')
   end
 })
@@ -507,12 +520,7 @@ require("lazy").setup({
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
     config = function()
-      require("nvim-treesitter.configs").setup({
-        enabled = true,
-        matchup = {
-          enable = true,
-        },
-      })
+      require("nvim-treesitter").setup()
     end
   },
   {
@@ -525,14 +533,46 @@ require("lazy").setup({
       -- or leave it empty to use the default settings
       -- refer to the configuration section below
       bigfile = { enabled = true },
+      dashboard = {
+        enabled = true,
+        preset = {
+          header = table.concat({
+            "███╗   ███╗ █████╗ ██╗   ██╗██╗  ██╗███████╗███╗   ███╗",
+            "████╗ ████║██╔══██╗╚██╗ ██╔╝██║  ██║██╔════╝████╗ ████║",
+            "██╔████╔██║███████║ ╚████╔╝ ███████║█████╗  ██╔████╔██║",
+            "██║╚██╔╝██║██╔══██║  ╚██╔╝  ██╔══██║██╔══╝  ██║╚██╔╝██║",
+            "██║ ╚═╝ ██║██║  ██║   ██║   ██║  ██║███████╗██║ ╚═╝ ██║",
+            "╚═╝     ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝",
+            "███████╗ █████╗  ██████╗██╗██╗     ██╗████████╗██╗   ██╗  ",
+            "██╔════╝██╔══██╗██╔════╝██║██║     ██║╚══██╔══╝╚██╗ ██╔╝  ",
+            "█████╗  ███████║██║     ██║██║     ██║   ██║    ╚████╔╝   ",
+            "██╔══╝  ██╔══██║██║     ██║██║     ██║   ██║     ╚██╔╝    ",
+            "██║     ██║  ██║╚██████╗██║███████╗██║   ██║      ██║     ",
+            "╚═╝     ╚═╝  ╚═╝ ╚═════╝╚═╝╚══════╝╚═╝   ╚═╝      ╚═╝     ",
+          }, "\n"),
+          keys = {
+            { icon = " ", key = "i", desc = "New File", action = ":ene | startinsert" },
+            { icon = " ", key = "o", desc = "Old Files", action = ":Telescope oldfiles" },
+            { icon = " ", key = "e", desc = "File Manager", action = function() require("yazi").yazi() end },
+            { icon = " ", key = "q", desc = "Quit", action = ":qa" },
+          },
+        },
+        sections = {
+          { section = "header", padding = 1 },
+          { section = "keys", gap = 0, padding = 0 },
+          { section = "projects", padding = 0, title = "Projects", icon = " ", limit = 5 },
+          { section = "recent_files", padding = 0, title = "Recent Files", icon = " ", limit = 5 },
+          { section = "startup" },
+        },
+      },
       indent = { enabled = true },
       gitbrowse = { enabled = true },
       picker = { enabled = true },
       notifier = { enabled = true },
       quickfile = { enabled = true },
       scope = { enabled = true },
-      statuscolumn = { enabled = true },
-      words = { enabled = true },
+      statuscolumn = { enabled = false },
+      words = { enabled = true, debounce = 300 },
     },
   },
   {
@@ -573,7 +613,7 @@ require("lazy").setup({
     },
   },
   -- highlight arguments with treesitter
-  { 'm-demare/hlargs.nvim' },
+  { 'm-demare/hlargs.nvim', opts = { paint_catch_blocks = { declarations = false, usages = false }, performance = { parse_delay = 100, slow_parse_delay = 500, max_iterations = 400 } } },
   -- fuzzy file search
   { "junegunn/fzf" },
   { "junegunn/fzf.vim" },
@@ -805,6 +845,8 @@ require("lazy").setup({
         formatters_by_ft = {
           typescript = { "biome" },
           javascript = { "biome" },
+          json = { "jq" },
+          jsonc = { "biome" },
           java = { "jdtls" }
         },
         format_on_save = function(bufnr)
