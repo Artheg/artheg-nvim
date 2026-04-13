@@ -124,6 +124,9 @@ vim.lsp.config("vtsls", {
       },
     },
     typescript = {
+      preferences = {
+        preferTypeOnlyAutoImports = true,
+      },
       inlayHints = {
         includeInlayEnumMemberValueHints = true,
         includeInlayFunctionLikeReturnTypeHints = true,
@@ -843,11 +846,18 @@ require("lazy").setup({
     config = function()
       require("conform").setup({
         formatters_by_ft = {
-          typescript = { "biome" },
-          javascript = { "biome" },
+          typescript = { "biome-check" },
+          javascript = { "biome-check" },
           json = { "jq" },
           jsonc = { "biome" },
           java = { "jdtls" }
+        },
+        formatters = {
+          ["biome-check"] = {
+            command = "biome",
+            args = { "check", "--write", "--unsafe", "--stdin-file-path", "$FILENAME" },
+            stdin = true,
+          },
         },
         format_on_save = function(bufnr)
           -- Disable with a global or buffer-local variable
