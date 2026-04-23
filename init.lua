@@ -236,6 +236,33 @@ require("lazy").setup({
       'nvim-tree/nvim-web-devicons',     -- optional
     }
   },
+  -- inline diagnostics as virtual lines
+  {
+    url = "https://git.sr.ht/~whynothugo/lsp_lines.nvim",
+    event = "LspAttach",
+    config = function()
+      require("lsp_lines").setup()
+      vim.diagnostic.config({ virtual_text = false, virtual_lines = true })
+      vim.keymap.set("n", "<leader>lL", function()
+        local cfg = vim.diagnostic.config() or {}
+        vim.diagnostic.config({
+          virtual_text = cfg.virtual_lines and true or false,
+          virtual_lines = not cfg.virtual_lines,
+        })
+      end, { desc = "Toggle lsp_lines" })
+    end,
+  },
+  -- nicer code-action picker with diff preview
+  {
+    "aznhe21/actions-preview.nvim",
+    event = "LspAttach",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("actions-preview").setup({
+        backend = { "telescope" },
+      })
+    end,
+  },
   -- documentation generator
   {
     "kkoomen/vim-doge",
@@ -554,16 +581,16 @@ require("lazy").setup({
             "╚═╝     ╚═╝  ╚═╝ ╚═════╝╚═╝╚══════╝╚═╝   ╚═╝      ╚═╝     ",
           }, "\n"),
           keys = {
-            { icon = " ", key = "i", desc = "New File", action = ":ene | startinsert" },
-            { icon = " ", key = "o", desc = "Old Files", action = ":Telescope oldfiles" },
+            { icon = " ", key = "i", desc = "New File",     action = ":ene | startinsert" },
+            { icon = " ", key = "o", desc = "Old Files",    action = ":Telescope oldfiles" },
             { icon = " ", key = "e", desc = "File Manager", action = function() require("yazi").yazi() end },
-            { icon = " ", key = "q", desc = "Quit", action = ":qa" },
+            { icon = " ", key = "q", desc = "Quit",         action = ":qa" },
           },
         },
         sections = {
-          { section = "header", padding = 1 },
-          { section = "keys", gap = 0, padding = 0 },
-          { section = "projects", padding = 0, title = "Projects", icon = " ", limit = 5 },
+          { section = "header",       padding = 1 },
+          { section = "keys",         gap = 0,     padding = 0 },
+          { section = "projects",     padding = 0, title = "Projects",     icon = " ", limit = 5 },
           { section = "recent_files", padding = 0, title = "Recent Files", icon = " ", limit = 5 },
           { section = "startup" },
         },
@@ -616,7 +643,7 @@ require("lazy").setup({
     },
   },
   -- highlight arguments with treesitter
-  { 'm-demare/hlargs.nvim', opts = { paint_catch_blocks = { declarations = false, usages = false }, performance = { parse_delay = 100, slow_parse_delay = 500, max_iterations = 400 } } },
+  { 'm-demare/hlargs.nvim',     opts = { paint_catch_blocks = { declarations = false, usages = false }, performance = { parse_delay = 100, slow_parse_delay = 500, max_iterations = 400 } } },
   -- fuzzy file search
   { "junegunn/fzf" },
   { "junegunn/fzf.vim" },
@@ -1195,9 +1222,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
     vim.keymap.set("n", "K", function()
       vim.lsp.buf.hover()
     end, opts)
-    vim.keymap.set("n", "<leader>ga", function()
-      vim.lsp.buf.code_action()
-    end, opts)
+    vim.keymap.set({ "n", "x" }, "<leader>ga", function()
+      require("actions-preview").code_actions()
+    end, { noremap = true, silent = true })
     vim.keymap.set("n", "gr", function()
       vim.cmd("Telescope lsp_references")
     end, opts)
