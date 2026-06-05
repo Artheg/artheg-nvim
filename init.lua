@@ -21,8 +21,7 @@ vim.opt.shiftwidth = 2
 vim.g.lf_replace_netrw = 1
 vim.g.lf_map_keys = 0
 
-vim.g.neovide_input_macos_option_key_is_meta = "only_left"
-vim.g.guifont = "CozetteVector:h11"
+vim.o.guifont = "CozetteVector:h11"
 
 -- vim.cmd.colorscheme[[catppuccin]]
 -- Tree sitter breaks indent?
@@ -32,8 +31,10 @@ vim.opt.smartindent = false
 
 vim.opt.background = "dark"
 
+vim.opt.guicursor = "n-v-c:block-blinkon500-blinkoff500,i-ci-ve:ver25-blinkon500-blinkoff500,r-cr:hor20-blinkon500-blinkoff500"
+
 ---- cursor line
-vim.cmd [[set cursorline]]
+vim.opt.cursorline = true
 
 -- persistend undo
 vim.opt.undofile = true
@@ -45,7 +46,7 @@ vim.opt.confirm = true
 vim.opt.hidden = true
 
 ---- disable highlight search
-vim.cmd [[set nohlsearch]]
+vim.opt.hlsearch = false
 
 ---- change active directory based on current active file
 -- vim.opt.autochdir = true
@@ -94,22 +95,6 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 -- }}}
 -- {{{LSP
-vim.lsp.enable('ts_ls', false)
-vim.lsp.config('lua_ls', {
-  settings = {
-    Lua = {
-      runtime = {
-        version = 'LuaJIT',
-      },
-      diagnostics = {
-        globals = {
-          'vim',
-          'require',
-        },
-      },
-    },
-  },
-})
 vim.lsp.config("vtsls", {
   settings = {
     javascript = {
@@ -154,6 +139,15 @@ vim.lsp.config("jsonls", {
     },
   },
 })
+-- virtual_lines (native in nvim 0.12+)
+vim.diagnostic.config({ virtual_text = false, virtual_lines = true })
+vim.keymap.set("n", "<leader>lL", function()
+  local cfg = vim.diagnostic.config() or {}
+  vim.diagnostic.config({
+    virtual_text = cfg.virtual_lines and true or false,
+    virtual_lines = not cfg.virtual_lines,
+  })
+end, { desc = "Toggle virtual_lines" })
 -- }}}
 ---- {{{ lazy.nvim
 
@@ -192,7 +186,7 @@ require("lazy").setup({
   -- markdown renderer
   {
     "MeanderingProgrammer/render-markdown.nvim",
-    dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-mini/mini.nvim" },
+    dependencies = { "nvim-mini/mini.nvim" },
     opts = {},
   },
   -- better paste
@@ -205,12 +199,6 @@ require("lazy").setup({
     dependencies = {
       "kana/vim-textobj-user"
     }
-  },
-  {
-    "tpope/vim-sleuth"
-  },
-  {
-    'nathanaelkane/vim-indent-guides'
   },
   {
     'nmac427/guess-indent.nvim',
@@ -232,25 +220,8 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>lp", ':Lspsaga peek_definition<CR>')
     end,
     dependencies = {
-      'nvim-treesitter/nvim-treesitter', -- optional
-      'nvim-tree/nvim-web-devicons',     -- optional
+      'nvim-tree/nvim-web-devicons',
     }
-  },
-  -- inline diagnostics as virtual lines
-  {
-    url = "https://git.sr.ht/~whynothugo/lsp_lines.nvim",
-    event = "LspAttach",
-    config = function()
-      require("lsp_lines").setup()
-      vim.diagnostic.config({ virtual_text = false, virtual_lines = true })
-      vim.keymap.set("n", "<leader>lL", function()
-        local cfg = vim.diagnostic.config() or {}
-        vim.diagnostic.config({
-          virtual_text = cfg.virtual_lines and true or false,
-          virtual_lines = not cfg.virtual_lines,
-        })
-      end, { desc = "Toggle lsp_lines" })
-    end,
   },
   -- nicer code-action picker with diff preview
   {
@@ -290,7 +261,7 @@ require("lazy").setup({
       require("dapui").setup()
     end
   },
-  { "mxsdev/nvim-dap-vscode-js",       requires = { "mfussenegger/nvim-dap" } },
+  { "mxsdev/nvim-dap-vscode-js",       dependencies = { "mfussenegger/nvim-dap" } },
   {
     "mfussenegger/nvim-dap",
     config = function()
@@ -545,14 +516,6 @@ require("lazy").setup({
       vim.keymap.set("n", "<F4>", switchLine, { silent = true })
     end,
   },
-  -- Treesitter
-  {
-    "nvim-treesitter/nvim-treesitter",
-    build = ":TSUpdate",
-    config = function()
-      require("nvim-treesitter").setup()
-    end
-  },
   {
     "folke/snacks.nvim",
     priority = 1000,
@@ -644,9 +607,6 @@ require("lazy").setup({
   },
   -- highlight arguments with treesitter
   { 'm-demare/hlargs.nvim',     opts = { paint_catch_blocks = { declarations = false, usages = false }, performance = { parse_delay = 100, slow_parse_delay = 500, max_iterations = 400 } } },
-  -- fuzzy file search
-  { "junegunn/fzf" },
-  { "junegunn/fzf.vim" },
   -- better word motion (e.g. CamelCase)
   { "chaoren/vim-wordmotion" },
   -- yazi file manager
@@ -762,24 +722,24 @@ require("lazy").setup({
     end
   },
   -- [], {}, (), etc.
-  { "windwp/nvim-autopairs",               config = [[require("config.autopairs")]] },
+  { "windwp/nvim-autopairs",               config = true },
   -- colorschemes
   -- nocolor
-  { "andreasvc/vim-256noir" },
+  { "andreasvc/vim-256noir", lazy = true },
   { "Alligator/accent.vim" },
-  { "huyvohcmc/atlas.vim" },
-  { "LuRsT/austere.vim" },
-  { "https://git.sr.ht/~romainl/vim-bruin" },
-  { "aditya-azad/candle-grey" },
-  { "ntk148v/komau.vim" },
-  { "t184256/vim-boring" },
-  { "cranberry-clockworks/coal.nvim" },
-  { "davidosomething/vim-colors-meh" },
-  { "pbrisbin/vim-colors-off" },
-  { "andreypopp/vim-colors-plain" },
-  { "KKPMW/distilled-vim" },
-  { "jaredgorski/fogbell.vim" },
-  { "zekzekus/menguless" },
+  { "huyvohcmc/atlas.vim", lazy = true },
+  { "LuRsT/austere.vim", lazy = true },
+  { "https://git.sr.ht/~romainl/vim-bruin", lazy = true },
+  { "aditya-azad/candle-grey", lazy = true },
+  { "ntk148v/komau.vim", lazy = true },
+  { "t184256/vim-boring", lazy = true },
+  { "cranberry-clockworks/coal.nvim", lazy = true },
+  { "davidosomething/vim-colors-meh", lazy = true },
+  { "pbrisbin/vim-colors-off", lazy = true },
+  { "andreypopp/vim-colors-plain", lazy = true },
+  { "KKPMW/distilled-vim", lazy = true },
+  { "jaredgorski/fogbell.vim", lazy = true },
+  { "zekzekus/menguless", lazy = true },
   --
   {
     "xiyaowong/transparent.nvim",
@@ -792,39 +752,36 @@ require("lazy").setup({
       })
     end
   },
-  { "sam4llis/nvim-tundra" },
-  { "sainnhe/everforest" },
+  { "sam4llis/nvim-tundra", lazy = true },
+  { "sainnhe/everforest", lazy = true },
   {
     "catppuccin/nvim",
     name = "catppuccin",
-    priority = 1000,
+    lazy = true,
     config = function()
       -- vim.cmd [[colorscheme inferno]]
       -- require('inferno.lua').setup()
     end
   },
-  { "slugbyte/lackluster.nvim" },
-  { "haystackandroid/carbonized" },
-  { "aliqyan-21/darkvoid.nvim" },
+  { "slugbyte/lackluster.nvim", lazy = true },
+  { "haystackandroid/carbonized", lazy = true },
+  { "aliqyan-21/darkvoid.nvim", lazy = true },
   {
     'AlexvZyl/nordic.nvim',
-    lazy = false,
-    priority = 1000,
+    lazy = true,
   },
   {
     "zootedb0t/citruszest.nvim",
-    lazy = false,
-    priority = 1000,
+    lazy = true,
   },
-  { "paulfrische/reddish.nvim" },
+  { "paulfrische/reddish.nvim", lazy = true },
   {
     "mcchrish/zenbones.nvim",
+    lazy = true,
     dependencies = { "rktjmp/lush.nvim" },
   },
-  { "chriskempson/base16-vim" },
-  {
-    "hardselius/warlock"
-  },
+  { "chriskempson/base16-vim", lazy = true },
+  { "hardselius/warlock", lazy = true },
   {
     'dmtrKovalenko/fff.nvim',
     build = function()
@@ -891,7 +848,7 @@ require("lazy").setup({
           if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
             return
           end
-          return { timeout_ms = 500, lsp_fallback = true }
+          return { timeout_ms = 500, lsp_format = "fallback" }
         end,
       })
       vim.api.nvim_create_user_command("FormatDisable", function(args)
@@ -933,29 +890,26 @@ require("lazy").setup({
               cmd = { "clangd", "--function-arg-placeholders=0" },
             })
           end,
-        },
-        lua_ls = function()
-          require('lspconfig').lua_ls.setup {
-            settings = {
-              Lua = {
-                diagnostics = {
-                  -- Get the language server to recognize the `vim` global
-                  globals = { 'vim' },
+          lua_ls = function()
+            require('lspconfig').lua_ls.setup {
+              settings = {
+                Lua = {
+                  runtime = {
+                    version = 'LuaJIT',
+                  },
+                  diagnostics = {
+                    globals = { 'vim', 'require' },
+                  },
                 },
               },
-            },
-          }
-        end,
-        biome = function()
-          require('lspconfig').biome.setup {
-            cmd = '/Users/ashtukert/.nvm/versions/node/v18.20.7/bin/biome'
-          }
-        end,
-        ols = function()
-          require('lspconfig').ols.setup({
-            cmd = { "/home/artheg/git/odin/ols/ols" },
-          })
-        end
+            }
+          end,
+          ols = function()
+            require('lspconfig').ols.setup({
+              cmd = { "/home/artheg/git/odin/ols/ols" },
+            })
+          end,
+        },
       })
     end
   },
@@ -1019,7 +973,6 @@ require("lazy").setup({
     opts = {},
     -- Optional dependencies
     dependencies = {
-      "nvim-treesitter/nvim-treesitter",
       "nvim-tree/nvim-web-devicons"
     },
     config = function()
@@ -1205,11 +1158,11 @@ xnoremap <expr> p 'pgv"' . v:register . 'y'
 ---LSP
 vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(args)
-    local client = vim.lsp.get_client_by_id(args.data.client_id)
+    local client = vim.lsp.get_clients({ id = args.data.client_id })[1]
     if not client then
       return
     end
-    local opts = { buffer = bufnr, remap = false }
+    local opts = { buffer = args.buf, remap = false }
     vim.keymap.set("n", "<leader>ld", function()
       vim.diagnostic.open_float()
     end, { silent = true })
