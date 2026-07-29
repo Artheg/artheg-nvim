@@ -1,4 +1,4 @@
-# Gilt: two aristocratic gold colorschemes
+# Noble: two aristocratic gold colorschemes
 
 Date: 2026-07-29
 
@@ -51,7 +51,7 @@ variants. Nothing else uses attributes, so both stay meaningful.
 
 Identical key sets, so `load()` is a pure function of whichever table it is handed.
 
-### `gilt-ink` — warm old-gold on indigo
+### `noble-ink` — warm old-gold on indigo
 
 ```
 surfaces                      gold ladder              accents
@@ -67,7 +67,7 @@ sl_fg        #DCCBA0          faint    #5E5238         chg  #16203A
                                                        text #1F2C4E
 ```
 
-### `gilt-leather` — cool champagne on brown
+### `noble-leather` — cool champagne on brown
 
 ```
 surfaces                      champagne ladder         accents
@@ -85,14 +85,23 @@ sl_fg        #DED5B6          faint    #625C48         chg  #2A2418
 
 ### Measured contrast
 
-Computed WCAG ratios against each theme's own `bg`:
+WCAG ratios against each theme's own `bg`, as measured by the verification pass from the
+shipped palette (not hand-computed):
 
-| role | ink | leather |
-|---|---|---|
-| `base` | 11.33:1 | 11.85:1 |
-| `comment` | 4.01:1 | 4.91:1 |
-| `punct` | 3.55:1 | 4.13:1 |
-| `faint` | 2.38:1 | 2.60:1 |
+| role | ink | leather | delta |
+|---|---|---|---|
+| `bright` | 13.79:1 | 14.41:1 | 0.62 |
+| `string` | 12.17:1 | 12.82:1 | 0.64 |
+| `base` | 11.06:1 | 11.78:1 | 0.72 |
+| `type` | 9.99:1 | 10.48:1 | 0.49 |
+| `brass` | 7.48:1 | 8.21:1 | 0.72 |
+| `dim` | 5.71:1 | 6.26:1 | 0.56 |
+| `comment` | 3.99:1 | 4.87:1 | 0.89 |
+| `punct` | 3.48:1 | 4.09:1 | 0.61 |
+| `faint` | 2.31:1 | 2.59:1 | 0.28 |
+
+The verification pass asserts every readable role clears 4.5:1 and that no role's `delta`
+between the two themes exceeds 1.2, so the siblings cannot drift apart.
 
 `faint` is intentionally sub-threshold — it is scaffolding (indent guides, `EndOfBuffer`)
 that should be perceptible without being readable.
@@ -105,15 +114,23 @@ does not change how hard the eye works.
 ### Files
 
 ```
-lua/gilt/palette.lua                 pure data: { ink = {...}, leather = {...} }, no nvim calls
-lua/gilt/init.lua                    M.load("ink"|"leather") -> ~200 nvim_set_hl calls
-colors/gilt-ink.lua                  entry point
-colors/gilt-leather.lua              entry point
-lua/lualine/themes/gilt-ink.lua      lualine theme='auto' resolves via colors_name
-lua/lualine/themes/gilt-leather.lua
+lua/noble/palette.lua                 pure data: { ink = {...}, leather = {...} }, no nvim calls
+lua/noble/init.lua                    M.load("ink"|"leather") -> 493 nvim_set_hl calls
+lua/noble/lualine.lua                 M.build(name) -> lualine theme from the same palette
+colors/noble-ink.lua                  entry point
+colors/noble-leather.lua              entry point
+lua/lualine/themes/noble-ink.lua      lualine theme='auto' resolves via colors_name
+lua/lualine/themes/noble-leather.lua
 ```
 
-`M.load` takes a palette *name*, looks the table up in `gilt.palette`, and derives every
+The two `lua/lualine/themes/*` files are one-line shims delegating to
+`noble.lualine.build`, so statusline colors are derived from the same palette table rather
+than being a second set of hardcoded hexes that could drift.
+
+`load` also sets `vim.g.terminal_color_0`–`15` to mirror the Alacritty ANSI palette, so
+`:terminal` inside Neovim matches the host terminal.
+
+`M.load` takes a palette *name*, looks the table up in `noble.palette`, and derives every
 highlight group from it — so the group definitions exist exactly once and both themes are
 guaranteed to have identical structure.
 
@@ -131,13 +148,13 @@ dependency.
 vim.cmd("hi clear")
 if vim.fn.exists("syntax_on") then vim.cmd("syntax reset") end
 vim.opt.background = "dark"
-vim.g.colors_name = "gilt-ink"
-package.loaded["gilt"] = nil          -- so palette edits show on re-:colorscheme
-package.loaded["gilt.palette"] = nil
-require("gilt").load("ink")
+vim.g.colors_name = "noble-ink"
+package.loaded["noble"] = nil          -- so palette edits show on re-:colorscheme
+package.loaded["noble.palette"] = nil
+require("noble").load("ink")
 ```
 
-The cache busting is for tuning: edit a hex, re-run `:colorscheme gilt-ink`, see it. Cost is
+The cache busting is for tuning: edit a hex, re-run `:colorscheme noble-ink`, see it. Cost is
 negligible next to the `nvim_set_hl` calls themselves.
 
 ### `init.lua` is not modified
@@ -146,7 +163,7 @@ The user is staying on `colorscheme accent` for now and will try these with `:co
 
 The two existing manual overrides at `init.lua:1267-1268` (`LineBreakpoint` at `#511111`,
 `DapStopped` at `#31353f`) are therefore **left in place**. Instead both groups are defined
-*inside* each gilt scheme, retoned per theme. Since a colorscheme's `hi clear` wipes custom
+*inside* each noble scheme, retoned per theme. Since a colorscheme's `hi clear` wipes custom
 groups anyway, this is the only correct place for them — and it leaves `accent` behavior
 completely untouched.
 
@@ -178,7 +195,12 @@ current plugin set actually renders:
 
 Accent assignment: `DiagnosticError`/`GitSignsDelete` → garnet, `DiagnosticWarn`/
 `GitSignsChange` → amber, `DiagnosticInfo` → verdigris, `DiagnosticHint`/`GitSignsAdd` →
-sage. `Search`/`CurSearch` invert to `bg`-on-amber; `IncSearch` inverts to `bg`-on-`bright`.
+sage.
+
+Search uses three escalating tiers rather than the two originally specified — `Search` on
+brass, `CurSearch` on amber, `IncSearch` on `bright`, all inverted to `bg` text. Putting
+`Search` and `CurSearch` both on amber would have made the focused match indistinguishable
+from the rest.
 `Visual` is a lifted `bg_visual` with gold text left unchanged.
 
 ## Alacritty
@@ -187,8 +209,8 @@ Real files in `~/dotfiles/alacritty/.config/alacritty/`, relative-symlinked into
 `~/.config/alacritty/` — matching the existing `dec_*.toml` convention exactly:
 
 ```
-dec_gilt_ink.toml
-dec_gilt_leather.toml
+dec_noble_ink.toml
+dec_noble_leather.toml
 ```
 
 Named `dec_*` so `theme-switch`'s existing `dec_[a-z_]+` regexes keep working with no logic
@@ -232,8 +254,8 @@ matching how the existing five `dec-*.yazi` flavors are handled, which keeps the
 across a re-clone of upstream:
 
 ```
-dec-gilt-ink.yazi/{flavor.toml,tmtheme.xml}
-dec-gilt-leather.yazi/{flavor.toml,tmtheme.xml}
+dec-noble-ink.yazi/{flavor.toml,tmtheme.xml}
+dec-noble-leather.yazi/{flavor.toml,tmtheme.xml}
 ```
 
 `flavor.toml` follows `dec-green.yazi`'s structure and its convention of using ANSI color
@@ -244,13 +266,21 @@ rather than duplicating hexes.
 `dec-green.yazi`'s by remapping its bounded set of palette hexes onto the gold ladder, not
 authored from scratch — mechanical and diff-verifiable.
 
+**Finding, worth knowing:** `dec-green.yazi/tmtheme.xml` is an *unmodified gruvbox* theme —
+its internal name is literally `gruvbox (Dark) (Medium)` and all 25 of its hexes are gruvbox
+values. The same is true of the other four `dec-*` flavors. So yazi's file previews have
+always rendered in gruvbox regardless of which `dec-*` flavor was active. The two noble
+flavors do not inherit that: their tmthemes contain only palette colors (15 distinct hexes,
+verified as a subset of the palette). The pre-existing five are left as they are — fixing
+them was not part of this work.
+
 ## Switcher
 
 `~/dotfiles/scripts/.local/bin/theme-switch` — two array entries, no logic change:
 
 ```bash
-ALACRITTY_THEMES=(dec_amber dec_blue dec_gray dec_gray_light dec_green dec_gilt_ink dec_gilt_leather)
-YAZI_THEMES=(dec-amber dec-blue dec-gray dec-gray-light dec-green dec-gilt-ink dec-gilt-leather)
+ALACRITTY_THEMES=(dec_amber dec_blue dec_gray dec_gray_light dec_green dec_noble_ink dec_noble_leather)
+YAZI_THEMES=(dec-amber dec-blue dec-gray dec-gray-light dec-green dec-noble-ink dec-noble-leather)
 ```
 
 The two golds sit adjacent and last, so one press moves between the siblings.
