@@ -17,6 +17,33 @@ vim.opt.termguicolors = true
 vim.opt.expandtab = true
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
+-- draw hard tabs as blank cells (not one wide tab glyph) so tab-indented files
+-- (biome defaults to tabs) look like space indentation and indent guides line up
+vim.opt.list = true
+vim.opt.listchars = { tab = '  ', nbsp = '␣' }
+
+-- One tab always renders exactly 2 columns. guess-indent sets tabstop per buffer
+-- from detection, so re-assert it after that runs -- scheduled, since detection
+-- happens synchronously on the same events.
+local tabwidth_group = vim.api.nvim_create_augroup('force_tab_width', { clear = true })
+vim.api.nvim_create_autocmd({ 'BufReadPost', 'BufNewFile', 'BufWinEnter', 'FileType' }, {
+  group = tabwidth_group,
+  callback = function(ev)
+    vim.schedule(function()
+      -- real files only: help/man/terminal are pre-formatted assuming tabstop=8
+      if not vim.api.nvim_buf_is_valid(ev.buf) or vim.bo[ev.buf].buftype ~= '' then
+        return
+      end
+      vim.bo[ev.buf].vartabstop = ''
+      vim.bo[ev.buf].tabstop = 2
+      if not vim.bo[ev.buf].expandtab then
+        -- indent ops insert one tab per level instead of sleuth's detected width
+        vim.bo[ev.buf].shiftwidth = 0
+        vim.bo[ev.buf].softtabstop = 0
+      end
+    end)
+  end,
+})
 
 vim.g.lf_replace_netrw = 1
 vim.g.lf_map_keys = 0
@@ -39,6 +66,51 @@ vim.opt.cursorline = true
 -- persistend undo
 vim.opt.undofile = true
 vim.opt.undodir = os.getenv('HOME') .. '/.nvim/undodir'
+
+-- Per-instance shada writes + lock-serialized merge back to the shared main.shada.
+-- Avoids E576/E886 corruption from concurrent nvim exits while keeping oldfiles/marks/history
+-- (and snacks dashboard projects + recent files, which read v:oldfiles) shared across sessions.
+local shada_dir = vim.fn.stdpath('state') .. '/shada'
+local main_shada = shada_dir .. '/main.shada'
+local pid_shada = shada_dir .. '/main-' .. vim.fn.getpid() .. '.shada'
+vim.opt.shadafile = pid_shada
+
+vim.api.nvim_create_autocmd('VimEnter', {
+  once = true,
+  callback = function()
+    if vim.fn.filereadable(main_shada) == 1 then
+      pcall(vim.cmd, 'rshada ' .. vim.fn.fnameescape(main_shada))
+    end
+  end,
+})
+
+vim.api.nvim_create_autocmd('VimLeavePre', {
+  callback = function()
+    local uv = vim.uv or vim.loop
+    local lock = main_shada .. '.writelock'
+    local stat = uv.fs_stat(lock)
+    if stat and (os.time() - stat.mtime.sec) > 30 then
+      pcall(uv.fs_unlink, lock)
+    end
+    local fd = uv.fs_open(lock, 'wx', 384)
+    if fd then
+      uv.fs_close(fd)
+      pcall(vim.cmd, 'wshada ' .. vim.fn.fnameescape(main_shada))
+      pcall(uv.fs_unlink, lock)
+    end
+  end,
+})
+
+vim.schedule(function()
+  for _, f in ipairs(vim.fn.readdir(shada_dir) or {}) do
+    if f:match('^main%-%d+%.shada$') then
+      local full = shada_dir .. '/' .. f
+      if os.time() - vim.fn.getftime(full) > 7 * 86400 then
+        os.remove(full)
+      end
+    end
+  end
+end)
 
 ---- confirm save on q
 vim.opt.confirm = true
@@ -181,6 +253,22 @@ require("lazy").setup({
     "DrKJeff16/project.nvim",
     config = function()
       require('project').setup()
+
+      -- Update-proof guard for an upstream bug (history.lua:549, unfixed as of 124f2a5):
+      -- read_history() builds a Log.warn message with two %s placeholders but passes
+      -- MODSTR once, so string.format throws "bad argument #2 to 'format'" whenever the
+      -- fs_event watcher catches the history file empty mid-write. Wrapping the call here
+      -- (instead of editing the plugin file, which :Lazy update would clobber) keeps it
+      -- from crashing and preserves the intended recovery (deferred write_history).
+      local ok_hist, hist = pcall(require, 'project.util.history')
+      if ok_hist and type(hist.read_history) == 'function' then
+        local orig_read_history = hist.read_history
+        hist.read_history = function(...)
+          if not pcall(orig_read_history, ...) then
+            vim.defer_fn(hist.write_history, 10000)
+          end
+        end
+      end
     end
   },
   -- markdown renderer
@@ -567,6 +655,26 @@ require("lazy").setup({
       statuscolumn = { enabled = false },
       words = { enabled = true, debounce = 300 },
     },
+    config = function(_, opts)
+      -- Per-instance picker history: same race as shada when multiple nvim exit together.
+      local History = require("snacks.picker.util.history")
+      local orig_new = History.new
+      History.new = function(name, o)
+        return orig_new(name .. "-" .. vim.fn.getpid(), o)
+      end
+      vim.schedule(function()
+        local dir = vim.fn.stdpath("data") .. "/snacks"
+        for _, f in ipairs(vim.fn.readdir(dir) or {}) do
+          if f:match("%-%d+%.history$") then
+            local full = dir .. "/" .. f
+            if os.time() - vim.fn.getftime(full) > 7 * 86400 then
+              os.remove(full)
+            end
+          end
+        end
+      end)
+      require("snacks").setup(opts)
+    end,
   },
   {
     "folke/trouble.nvim",
