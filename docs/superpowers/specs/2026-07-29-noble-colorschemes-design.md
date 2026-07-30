@@ -2,8 +2,13 @@
 
 Date: 2026-07-29
 
-Two sibling themes — gold text on dark indigo, gold text on rich brown — delivered for
+Two sibling themes — gold text on deep indigo, champagne text on graphite — delivered for
 Neovim, Alacritty and Yazi, wired into the existing `super + F9` theme switcher.
+
+> **Revised 2026-07-29 (backgrounds).** `noble-leather`'s base moved from brown `#241811` to
+> `dec_amber`'s neutral `#2D2D2D`, keeping a low-chroma warm tint on every surface above the
+> base; `noble-ink`'s base dropped from `#14162E` to `#0C0E20`. Decision 2 below (matched
+> depth) no longer holds — see [Measured contrast](#measured-contrast).
 
 ## Aesthetic decisions
 
@@ -13,12 +18,15 @@ Four decisions, settled during brainstorming, that everything else follows from:
    by `bold`/`italic`, never by hue. Only diagnostics, git signs and diffs leave the family.
    This matches the user's existing collection (`accent.vim`, `vim-256noir`, `austere`,
    `komau`, `vim-boring`, `coal`, `vim-colors-off`, `plain`, `fogbell`).
-2. **Mid-depth backgrounds.** Dark enough that gold glows, light enough that indigo reads as
-   indigo and brown reads as brown. Both themes sit at the same depth so they feel matched.
+2. ~~**Mid-depth backgrounds.** Dark enough that gold glows, light enough that indigo reads
+   as indigo and brown reads as brown. Both themes sit at the same depth so they feel
+   matched.~~ **Superseded 2026-07-29.** The bases were pulled apart deliberately: ink went
+   deeper, leather went to `dec_amber`'s neutral graphite so the two terminal themes share a
+   base. The siblings no longer sit at the same depth.
 3. **Gold retuned per background.** Same lightness ladder and same role structure in both,
-   but the brown theme's gold shifts cooler toward champagne-ivory. On cool indigo, warm gold
-   is complementary and pops; on warm brown, the identical gold would sit inside the
-   background's own hue family and go muddy even at equal contrast ratio.
+   but the leather theme's gold shifts cooler toward champagne-ivory. On cool indigo, warm
+   gold is complementary and pops; against leather's warm surfaces, the identical gold would
+   sit inside their own hue family and go muddy even at equal contrast ratio.
 4. **Muted jewel accents.** Garnet, amber, verdigris, sage — real hues, desaturated enough
    that they never shatter the monochrome field. Diffs are background washes only, so gold
    text keeps its own color inside a diff.
@@ -51,11 +59,11 @@ variants. Nothing else uses attributes, so both stay meaningful.
 
 Identical key sets, so `load()` is a pure function of whichever table it is handed.
 
-### `noble-ink` — warm old-gold on indigo
+### `noble-ink` — warm old-gold on deep indigo
 
 ```
 surfaces                      gold ladder              accents
-bg           #14162E          bright   #F0E2BE         garnet    #B8555E
+bg           #0C0E20          bright   #F0E2BE         garnet    #B8555E
 bg_light     #1B1E3C          base     #DCCBA0         amber     #D9A85C
 bg_float     #191C36          string   #E8D4A8         verdigris #6E9188
 bg_visual    #2A2E52          type     #D8C08A         sage      #8A9A78
@@ -67,20 +75,23 @@ sl_fg        #DCCBA0          faint    #5E5238         chg  #16203A
                                                        text #1F2C4E
 ```
 
-### `noble-leather` — cool champagne on brown
+### `noble-leather` — cool champagne on graphite
+
+`bg` is `dec_amber`'s neutral `#2D2D2D`; every surface above it keeps a low-chroma warm tint,
+so floats, visual and the statusline still read as leather on a neutral desk.
 
 ```
 surfaces                      champagne ladder         accents
-bg           #241811          bright   #F2EAD3         garnet    #B85A52
-bg_light     #2E2017          base     #DED5B6         amber     #D9AE68
-bg_float     #2A1D15          string   #E9DDBF         verdigris #6F938C
-bg_visual    #3E2C1E          type     #D5C9A4         sage      #8C9B79
-border       #5A4433          brass    #C0B287
-indent       #33251A          dim      #A79B78         diff washes
-indent_scope #4A3726          comment  #90886A         add  #1E2417
-sl_bg        #33251A          punct    #837B60         del  #2E1815
-sl_fg        #DED5B6          faint    #625C48         chg  #2A2418
-                                                       text #3A3020
+bg           #2D2D2D          bright   #F2EAD3         garnet    #B85A52
+bg_light     #383430          base     #DED5B6         amber     #D9AE68
+bg_float     #333029          string   #E9DDBF         verdigris #6F938C
+bg_visual    #47413A          type     #D5C9A4         sage      #8C9B79
+border       #5F564C          brass    #C0B287
+indent       #3E3A34          dim      #A79B78         diff washes
+indent_scope #524A40          comment  #90886A         add  #2B3626
+sl_bg        #3E3A34          punct    #837B60         del  #3B2A26
+sl_fg        #DED5B6          faint    #625C48         chg  #363327
+                                                       text #464031
 ```
 
 ### Measured contrast
@@ -88,26 +99,33 @@ sl_fg        #DED5B6          faint    #625C48         chg  #2A2418
 WCAG ratios against each theme's own `bg`, as measured by the verification pass from the
 shipped palette (not hand-computed):
 
-| role | ink | leather | delta |
-|---|---|---|---|
-| `bright` | 13.79:1 | 14.41:1 | 0.62 |
-| `string` | 12.17:1 | 12.82:1 | 0.64 |
-| `base` | 11.06:1 | 11.78:1 | 0.72 |
-| `type` | 9.99:1 | 10.48:1 | 0.49 |
-| `brass` | 7.48:1 | 8.21:1 | 0.72 |
-| `dim` | 5.71:1 | 6.26:1 | 0.56 |
-| `comment` | 3.99:1 | 4.87:1 | 0.89 |
-| `punct` | 3.48:1 | 4.09:1 | 0.61 |
-| `faint` | 2.31:1 | 2.59:1 | 0.28 |
-
-The verification pass asserts every readable role clears 4.5:1 and that no role's `delta`
-between the two themes exceeds 1.2, so the siblings cannot drift apart.
+| role | ink | leather | delta | (was: ink / leather) |
+|---|---|---|---|---|
+| `bright` | 14.85:1 | 11.47:1 | 3.39 | 13.79 / 14.41 |
+| `string` | 13.11:1 | 10.20:1 | 2.91 | 12.17 / 12.82 |
+| `base` | 11.91:1 | 9.38:1 | 2.53 | 11.06 / 11.78 |
+| `type` | 10.76:1 | 8.34:1 | 2.42 | 9.99 / 10.48 |
+| `brass` | 8.06:1 | 6.53:1 | 1.53 | 7.48 / 8.21 |
+| `dim` | 6.15:1 | 4.99:1 | 1.16 | 5.71 / 6.26 |
+| `comment` | 4.29:1 | 3.88:1 | 0.41 | 3.99 / 4.87 |
+| `punct` | 3.75:1 | 3.26:1 | 0.50 | 3.48 / 4.09 |
+| `faint` | 2.49:1 | 2.06:1 | 0.43 | 2.31 / 2.59 |
 
 `faint` is intentionally sub-threshold — it is scaffolding (indent guides, `EndOfBuffer`)
-that should be perceptible without being readable.
+that should be perceptible without being readable. `punct` and `comment` have always sat
+below 4.5:1 on at least one theme; the ladder targets 4.5:1 from `bright` down through
+`dim`, and that still holds on both (`dim` is the floor at 4.99:1 on leather).
 
-The two themes are deliberately kept within a rung of each other so switching between them
-does not change how hard the eye works.
+**The `delta ≤ 1.2` invariant no longer holds.** It was written when both bases sat at the
+same depth. The 2026-07-29 background change pulled them apart in opposite directions — ink
+darker, leather lighter — so the same text ladders now measure up to 3.39 apart, and leather
+reads flatter than ink. Restoring parity would mean brightening leather's champagne ladder,
+which changes text colors rather than backgrounds; not done, since the brief was backgrounds
+only.
+
+Leather's accents dropped with its base: garnet `3.03:1`, verdigris `4.08:1`, sage `4.64:1`,
+amber `6.69:1` (ink: `4.09` / `5.52` / `6.34` / `8.83`). Garnet on leather is the weakest
+point — error diagnostics and `DiffDelete` text are the places to watch.
 
 ## Neovim
 
@@ -231,7 +249,7 @@ the gold ladder:
 
 | slot | ink normal | ink bright | leather normal | leather bright |
 |---|---|---|---|---|
-| black | `#1B1E3C` | `#4A4E7A` | `#2E2017` | `#5A4433` |
+| black | `#1B1E3C` | `#4A4E7A` | `#383430` | `#5F564C` |
 | red | `#B8555E` | `#C97078` | `#B85A52` | `#CA7168` |
 | green | `#8A9A78` | `#A0B08C` | `#8C9B79` | `#A3B08D` |
 | yellow | `#C4A469` | `#D9A85C` | `#C0B287` | `#D9AE68` |
@@ -241,7 +259,7 @@ the gold ladder:
 | white | `#DCCBA0` | `#F0E2BE` | `#DED5B6` | `#F2EAD3` |
 
 ANSI needs six hues where the Neovim palette has four, so blue and magenta are extrapolated:
-amethyst on indigo (coherent with that background), dusty rose on brown.
+amethyst on indigo (coherent with that background), dusty rose on leather.
 
 Note: `alacritty.toml` sets `opacity = 0.95` globally, so both backgrounds blend slightly
 with whatever is behind the window. The indigo in particular will shift with the wallpaper.

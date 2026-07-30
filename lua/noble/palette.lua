@@ -17,10 +17,12 @@
 
 local M = {}
 
--- Warm old-gold on dark indigo. Gold is complementary to the base, so it glows.
+-- Warm old-gold on deep indigo. Gold is complementary to the base, so it glows.
+-- bg sits a step below the rest of the surface ladder, so panels and floats lift
+-- off the background more strongly than a uniform step would give.
 M.ink = {
   -- surfaces
-  bg           = "#14162E",
+  bg           = "#0C0E20",
   bg_light     = "#1B1E3C",
   bg_float     = "#191C36",
   bg_visual    = "#2A2E52",
@@ -57,20 +59,22 @@ M.ink = {
   diff_text = "#1F2C4E",
 }
 
--- Cool champagne on rich brown. The same warm gold would sit inside the
--- background's own hue family and go muddy, so this ladder shifts toward ivory
--- and separates by hue distance as well as lightness.
+-- Cool champagne on graphite. bg is dec_amber's neutral #2D2D2D so the two
+-- themes share a base; every surface above it keeps a low-chroma warm tint, so
+-- floats, visual and the statusline still read as leather. The same warm gold
+-- ink uses would sit inside those surfaces' own hue family and go muddy, so this
+-- ladder shifts toward ivory and separates by hue distance as well as lightness.
 M.leather = {
   -- surfaces
-  bg           = "#241811",
-  bg_light     = "#2E2017",
-  bg_float     = "#2A1D15",
-  bg_visual    = "#3E2C1E",
-  border       = "#5A4433",
-  indent       = "#33251A",
-  indent_scope = "#4A3726",
+  bg           = "#2D2D2D",
+  bg_light     = "#383430",
+  bg_float     = "#333029",
+  bg_visual    = "#47413A",
+  border       = "#5F564C",
+  indent       = "#3E3A34",
+  indent_scope = "#524A40",
 
-  sl_bg = "#33251A",
+  sl_bg = "#3E3A34",
   sl_fg = "#DED5B6",
 
   -- champagne ladder
@@ -90,10 +94,10 @@ M.leather = {
   verdigris = "#6F938C",
   sage      = "#8C9B79",
 
-  diff_add  = "#1E2417",
-  diff_del  = "#2E1815",
-  diff_chg  = "#2A2418",
-  diff_text = "#3A3020",
+  diff_add  = "#2B3626",
+  diff_del  = "#3B2A26",
+  diff_chg  = "#363327",
+  diff_text = "#464031",
 }
 
 return M
