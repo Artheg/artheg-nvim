@@ -79,7 +79,9 @@ vim.api.nvim_create_autocmd('VimEnter', {
   once = true,
   callback = function()
     if vim.fn.filereadable(main_shada) == 1 then
-      pcall(vim.cmd, 'rshada ' .. vim.fn.fnameescape(main_shada))
+      -- wrapped rather than pcall(vim.cmd, ...): vim.cmd is a callable table, and
+      -- lua_ls won't accept one where pcall wants a fun(...).
+      pcall(function() vim.cmd('rshada ' .. vim.fn.fnameescape(main_shada)) end)
     end
   end,
 })
@@ -95,7 +97,7 @@ vim.api.nvim_create_autocmd('VimLeavePre', {
     local fd = uv.fs_open(lock, 'wx', 384)
     if fd then
       uv.fs_close(fd)
-      pcall(vim.cmd, 'wshada ' .. vim.fn.fnameescape(main_shada))
+      pcall(function() vim.cmd('wshada ' .. vim.fn.fnameescape(main_shada)) end)
       pcall(uv.fs_unlink, lock)
     end
   end,
@@ -978,6 +980,21 @@ require("lazy").setup({
       })
     end
   },
+  -- Teaches lua_ls where plugin type definitions live, on demand. Without it
+  -- annotations like ---@type snacks.Config resolve to undefined-doc-name, and
+  -- putting every lazy plugin on workspace.library instead would make lua_ls
+  -- index the whole plugin tree on every Lua buffer.
+  {
+    "folke/lazydev.nvim",
+    ft = "lua",
+    opts = {
+      library = {
+        { path = "snacks.nvim",           words = { "snacks" } },
+        { path = "blink.cmp",             words = { "blink" } },
+        { path = "${3rd}/luv/library",    words = { "vim%.uv" } },
+      },
+    },
+  },
   -- LSP/Completion
   -- this thing automatically configures and starts LSPs
   {
@@ -1009,6 +1026,10 @@ require("lazy").setup({
       vim.lsp.config('clangd', {
         cmd = { "clangd", "--function-arg-placeholders=0" },
       })
+      -- automatic_enable only enables servers mason installed, and clangd is a
+      -- system binary here, so it needs enabling by hand or the config above
+      -- never gets used.
+      vim.lsp.enable('clangd')
 
       vim.lsp.config('ols', {
         cmd = { "/home/artheg/git/odin/ols/ols" },
