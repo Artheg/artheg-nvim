@@ -987,36 +987,37 @@ require("lazy").setup({
       "neovim/nvim-lspconfig",
     },
     config = function()
+      -- mason-lspconfig v2 removed the `handlers` setting (and .setup_handlers()).
+      -- It now only vim.lsp.enable()s the servers mason has installed, via
+      -- automatic_enable (on by default). Per-server tweaks go through
+      -- vim.lsp.config(), which merges over the defaults nvim-lspconfig ships in
+      -- its lsp/<server>.lua. An unknown key in setup() is merged and then never
+      -- read, so a leftover `handlers` table fails silently rather than erroring.
+      vim.lsp.config('lua_ls', {
+        settings = {
+          Lua = {
+            runtime = {
+              version = 'LuaJIT',
+            },
+            diagnostics = {
+              globals = { 'vim', 'require' },
+            },
+          },
+        },
+      })
+
+      vim.lsp.config('clangd', {
+        cmd = { "clangd", "--function-arg-placeholders=0" },
+      })
+
+      vim.lsp.config('ols', {
+        cmd = { "/home/artheg/git/odin/ols/ols" },
+      })
+
       require('mason-lspconfig').setup({
         ensure_installed = {
           'lua_ls',
           'vtsls',
-        },
-        handlers = {
-          clangd = function()
-            require('lspconfig').clangd.setup({
-              cmd = { "clangd", "--function-arg-placeholders=0" },
-            })
-          end,
-          lua_ls = function()
-            require('lspconfig').lua_ls.setup {
-              settings = {
-                Lua = {
-                  runtime = {
-                    version = 'LuaJIT',
-                  },
-                  diagnostics = {
-                    globals = { 'vim', 'require' },
-                  },
-                },
-              },
-            }
-          end,
-          ols = function()
-            require('lspconfig').ols.setup({
-              cmd = { "/home/artheg/git/odin/ols/ols" },
-            })
-          end,
         },
       })
     end
